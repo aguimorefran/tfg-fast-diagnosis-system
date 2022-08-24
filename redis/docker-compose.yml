@@ -1,0 +1,22 @@
+# Create a docker-compose for a redis server
+# Use the latest version of redis
+# Use a network called fds-network
+# Service name is redis-cache
+# Service port is 6379
+# Environment ALLOW_EMPTY_PASSWORD=yes
+
+services:
+  FDS-redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - fds-network
+    ports:
+      - 6379:6379
+
+networks:
+  fds-network:
+    driver: bridge
