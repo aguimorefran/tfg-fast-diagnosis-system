@@ -2,13 +2,29 @@ version: '3.8'
 
 services:
   cache:
-    image: redis:alpine
+    image: redis:latest
+    container_name: fds-redis
+    command: ["redis-server", "--appendonly", "yes"]
     networks:
       - fds-network
     ports:
       - 6379:6379
     volumes:
-      - ./redis:/data
+      - ./cache:/data
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: fds-redis_ui
+    environment:
+      - REDIS_HOSTS=local:cache:6379
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=admin
+    networks:
+      - fds-network
+    ports:
+      - 8081:8081
+    depends_on:
+      - cache
 
 networks:
   fds-network:
