@@ -1,18 +1,38 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from translator_engine.translator import Translator as TranslatorEngine
+from config import TRANSLATORS
+from logger import logger as log
 
 app = FastAPI()
 
-# Initialize a translator engine for en-es and es-en
-translator_en_es = TranslatorEngine("en", "es")
-translator_es_en = TranslatorEngine("es", "en")
+translators = {}
 
-available_translators = {
-    "en-es": translator_en_es,
-    "es-en": translator_es_en,
-}
+@app.on_event("startup")
+async def startup():
+    '''
+    Startup event
+    '''
+    for src, dst in TRANSLATORS:
+        translator = TranslatorEngine(src, dst)
+        translators[(src, dst)] = translator
 
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.get("/translate/")
+async def translate(src_lang: str, dst_lang: str, text: str):
+    '''
+    Translate text from src_lang to dst_lang
+    Input:
+        src_lang: source language
+        dst_lang: destination language
+        text: text to translate
+    Output:
+        translated text
+    '''
+    try:
+        translator = translators[(src_lang, dst_lang)]
+    except KeyError:
+        log.error("Translator not found for %s-%s", src_lang, dst_lang)
+        raise HTTPException(status_code=404, detail="Translator not found")
+    except Exception as e:
+        log.error("Error: %s", e)
+        raise HTTPException(status_code=500, detail="Error"+e)
+    return translator.translate(text)
