@@ -1,9 +1,36 @@
-# Define a translator class
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from logger import logger as log
+from cache.redis import redis_client
+
+rd = redis_client()
 
 class Translator:
     def __init__(self, src_lang: str, dst_lang: str):
         self.src_lang = src_lang
         self.dst_lang = dst_lang
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            "Helsinki-NLP/opus-mt-" + self.src_lang + "-" + self.dst_lang)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(
+            "Helsinki-NLP/opus-mt-" + self.src_lang + "-" + self.dst_lang)
+        log.info(
+            "Translator initialized for {} -> {}".format(self.src_lang, self.dst_lang))
+
+    def is_translated(self, text: str):
+        cached = rd.get_key(text)
+        if cached is not None and cached[self.src_lang][self.dst_lang] is not None and cached[self.src_lang][self.dst_lang] is not "":
+            return True
+
+    def model_translate(self, text: str):
+        input_ids = self.tokenizer(text, return_tensors="pt").input_ids
+        outputs = self.model.generate(input_ids=input_ids, num_beams=4)
+        return self.tokenizer.batch_decode(outputs, skip_special_tokens=True, clean_up_tokenization_spaces=True)[0]
 
     def translate(self, text: str):
-        return f"{text} in {self.dst_lang}"
+        if self.is_translated(text):
+            return rd.get_key(text)[self.src_lang][self.dst_lang]
+        else:
+            translation = self.model_translate(text)
+            ok = rd.set_key(text, {self.src_lang: {self.dst_lang: translation}})
+            if not ok:
+                log.error("Error saving translation to cache")
+            return translation

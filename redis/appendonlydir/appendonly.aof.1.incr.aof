@@ -206,3 +206,63 @@ $10
 created_by
 $4
 test
+*2
+$6
+SELECT
+$1
+4
+*2
+$3
+del
+$3
+hhh
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+set
+$1
+1
+$1
+2
+*3
+$3
+set
+$1
+1
+$1
+4
+*2
+$3
+del
+$1
+1
+*2
+$6
+SELECT
+$1
+4
+*3
+$3
+SET
+$18
+hello good morning
+$41
+{"en": {"es": "Hola, buenos d\u00edas."}}
+*3
+$3
+SET
+$39
+hello friend, how is the morning going?
+$64
+{"en": {"es": "Hola amigo, \u00bfc\u00f3mo va la ma\u00f1ana?"}}
+*3
+$3
+SET
+$11
+buenos dias
+$31
+{"es": {"en": "Good morning."}}

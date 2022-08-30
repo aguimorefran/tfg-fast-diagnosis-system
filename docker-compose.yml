@@ -12,19 +12,19 @@ services:
     volumes:
       - ./redis:/data
 
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: redis-commander
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-      - HTTP_USER=admin
-      - HTTP_PASSWORD=admin
-    networks:
-      - fds-network
-    ports:
-      - 8081:8081
-    depends_on:
-      - redis
+  # redis-commander:
+  #   image: rediscommander/redis-commander:latest
+  #   container_name: redis-commander
+  #   environment:
+  #     - REDIS_HOSTS=local:redis:6379
+  #     - HTTP_USER=admin
+  #     - HTTP_PASSWORD=admin
+  #   networks:
+  #     - fds-network
+  #   ports:
+  #     - 8081:8081
+  #   depends_on:
+  #     - redis
 
 networks:
   fds-network:
