@@ -1,8 +1,9 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-from logger import logger as log
-from cache.redis import redis_client
+from app.logger import logger as log
+from app.cache.redis import RedisClient
 
-rd = redis_client()
+rd = RedisClient()
+
 
 class Translator:
     def __init__(self, src_lang: str, dst_lang: str):
@@ -30,7 +31,8 @@ class Translator:
             return rd.get_key(text)[self.src_lang][self.dst_lang]
         else:
             translation = self.model_translate(text)
-            ok = rd.set_key(text, {self.src_lang: {self.dst_lang: translation}})
+            ok = rd.set_key(
+                text, {self.src_lang: {self.dst_lang: translation}})
             if not ok:
                 log.error("Error saving translation to cache")
             return translation

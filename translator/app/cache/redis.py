@@ -1,11 +1,10 @@
-import redis
 import json
-from config import REDIS_HOST, REDIS_PORT, REDIS_DB
+import redis
+from app.config import REDIS_HOST, REDIS_PORT, REDIS_DB
+from app.logger import logger as log
 
-from logger import logger as log
 
-
-class redis_client:
+class RedisClient:
     def __init__(self):
         self.redis_host = REDIS_HOST
         self.redis_port = REDIS_PORT

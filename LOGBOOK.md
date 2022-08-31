@@ -8,4 +8,8 @@
 
 ## 29/08/22
 
-- Translator module finished. TODO fix new languge KeyError
+- Translator module finished locally.
+
+## 30/08/22 - 31/08/22
+
+- Translator module dockerized and harmony with redis MS.

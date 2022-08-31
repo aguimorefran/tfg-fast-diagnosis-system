@@ -1,22 +1,23 @@
 from fastapi import FastAPI, HTTPException
-from translator_engine.translator import Translator as TranslatorEngine
-from cache.redis import redis_client
-from config import TRANSLATORS, REDIS_HOST, REDIS_PORT, REDIS_DB
-from logger import logger as log
+from app.translator_engine.translator import Translator as TranslatorEngine
+from app.cache.redis import RedisClient
+from app.config import TRANSLATORS, REDIS_HOST, REDIS_PORT, REDIS_DB
+from app.logger import logger as log
 
 app = FastAPI()
 
 translators = {}
-redis_client = redis_client()
+RedisClient = RedisClient()
 
 
 @app.on_event("startup")
 async def startup():
     try:
+        log.info("Starting up translators")
         for src, dst in TRANSLATORS:
             translators[(src.strip(), dst.strip())] = TranslatorEngine(
                 src.strip(), dst.strip())
-        if not redis_client.status():
+        if not RedisClient.status():
             raise Exception('Redis server is not running')
         else:
             log.info('Redis connection ok for {}:{}, db {}'.format(
@@ -34,8 +35,8 @@ async def get_cache_status():
     Get cache status
     '''
     try:
-        if redis_client.status():
-            return {"status": "ok", "numbe_of_keys": len(redis_client.get_all_keys())}
+        if RedisClient.status():
+            return {"status": "ok", "numbe_of_keys": len(RedisClient.get_all_keys())}
         else:
             raise Exception('Redis server is not running or not connected')
     except Exception as e:
@@ -49,8 +50,8 @@ async def get_cache_dump():
     Get cache dump
     '''
     try:
-        if redis_client.status():
-            return {"dump": redis_client.dump()}
+        if RedisClient.status():
+            return {"dump": RedisClient.dump()}
         else:
             raise Exception('Redis server is not running or not connected')
     except Exception as e:
@@ -72,7 +73,7 @@ async def get_translators():
 
 @app.post("/create_translator")
 async def create_translator(src: str, dst: str):
-    #TODO: fix new translator giving KeyError
+    # TODO: fix new translator giving KeyErrordddddd
     '''
     Create new translator
     Input:

@@ -5,26 +5,30 @@ services:
     image: redis:latest
     container_name: redis
     command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./redis:/data
     networks:
       - fds-network
     ports:
       - 6379:6379
-    volumes:
-      - ./redis:/data
 
-  # redis-commander:
-  #   image: rediscommander/redis-commander:latest
-  #   container_name: redis-commander
-  #   environment:
-  #     - REDIS_HOSTS=local:redis:6379
-  #     - HTTP_USER=admin
-  #     - HTTP_PASSWORD=admin
-  #   networks:
-  #     - fds-network
-  #   ports:
-  #     - 8081:8081
-  #   depends_on:
-  #     - redis
+  translator:
+    build: ./translator
+    container_name: translator
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    env_file:
+      - ./translator/.env
+    volumes:
+      - ./translator:/app/
+    networks:
+      - fds-network
+    ports:
+      - 8000:8000
+    depends_on:
+      - redis
+
+
+#######################
 
 networks:
   fds-network:

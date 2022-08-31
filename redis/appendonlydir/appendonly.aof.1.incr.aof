@@ -266,3 +266,30 @@ $11
 buenos dias
 $31
 {"es": {"en": "Good morning."}}
+*2
+$6
+SELECT
+$1
+4
+*2
+$3
+del
+$11
+buenos dias
+*2
+$3
+del
+$39
+hello friend, how is the morning going?
+*2
+$3
+del
+$18
+hello good morning
+*3
+$3
+SET
+$12
+Good morning
+$35
+{"en": {"es": "Buenos d\u00edas."}}
