@@ -1,31 +1,64 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:latest
-    container_name: redis
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - ./redis:/data
-    networks:
-      - fds-network
-    ports:
-      - 6379:6379
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   command: ["redis-server", "--appendonly", "yes"]
+  #   networks:
+  #     - fds-network
+  #   ports:
+  #     - 6379:6379
+  #   restart: always
+  #   volumes:
+  #     - ./redis:/data
 
-  translator:
-    build: ./translator
-    container_name: translator
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-    env_file:
-      - ./translator/.env
-    volumes:
-      - ./translator:/app/
+  # translator:
+  #   build: ./translator
+  #   container_name: translator
+  #   command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  #   env_file:
+  #     - ./translator/.env
+  #   networks:
+  #     - fds-network
+  #   ports:
+  #     - 8000:8000
+  #   restart: always
+  #   depends_on:
+  #     - redis
+  #   volumes:
+  #     - ./translator:/app/
+
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    environment:
+      - "MAX_HEAP_SIZE=256M"
+      - "HEAP_NEWSIZE=128M"
     networks:
       - fds-network
     ports:
-      - 8000:8000
+      - 9042:9042
+    volumes:
+      - ./cassandra/data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  cassandra-load-keyspace:
+    image: cassandra:latest
+    container_name: cassandra-load-keyspace
     depends_on:
-      - redis
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./cassandra/scripts:/scripts
+    entrypoint: ["/scripts/init.sh"]
+    restart: "no"
+    networks:
+      - fds-network
 
 
 #######################

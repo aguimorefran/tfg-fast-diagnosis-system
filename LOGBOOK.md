@@ -13,3 +13,8 @@
 ## 30/08/22 - 31/08/22
 
 - Translator module dockerized and harmony with redis MS.
+
+## 04/09/22
+
+- Cassandra and load-keyspace-cassandra services working.
+- Keyspace removal and automatic table creation on startup.

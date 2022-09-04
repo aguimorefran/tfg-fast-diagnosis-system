@@ -24,7 +24,7 @@ async def startup():
                 REDIS_HOST, REDIS_PORT, REDIS_DB))
     except Exception as e:
         log.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise   Exception(status_code=500, detail=str(e))
 
 
 ##############################################################################################
