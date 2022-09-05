@@ -8,6 +8,10 @@
 
 *.rdb
 
+
+### Cassandra ###
+cassandra/data
+
 ### Linux ###
 *~
 
