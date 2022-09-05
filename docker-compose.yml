@@ -55,7 +55,7 @@ services:
         condition: service_healthy
     volumes:
       - ./cassandra/scripts:/scripts
-    entrypoint: ["/scripts/init.sh"]
+    entrypoint: ["sh", "/scripts/init.sh"]
     restart: "no"
     networks:
       - fds-network
