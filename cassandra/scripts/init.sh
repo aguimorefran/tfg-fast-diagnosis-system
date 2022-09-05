@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # cassandra:9042
 until cqlsh cassandra 9042 -e "describe keyspaces"; do 
