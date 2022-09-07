@@ -1,5 +1,5 @@
 Disease,Precaution_1,Precaution_2,Precaution_3,Precaution_4
-Drug Reaction,stop irritation,consult nearest hospital,stop taking drug,follow up
+Drug Reaction,stop irritation,consult nearest hospital,stop taking drugs,follow up
 Malaria,Consult nearest hospital,avoid oily food,avoid non veg food,keep mosquitos out
 Allergy,apply calamine,cover area with bandage,,use ice to compress itching
 Hypothyroidism,reduce stress,exercise,eat healthy,get proper sleep
@@ -24,11 +24,11 @@ Urinary tract infection,drink plenty of water,increase vitamin c intake,drink cr
 Varicose veins,lie down flat and raise the leg high,use oinments,use vein compression,dont stand still for long
 AIDS,avoid open cuts,wear ppe if possible,consult doctor,follow up
 Paralysis (brain hemorrhage),massage,eat healthy,exercise,consult doctor
-Typhoid,eat high calorie vegitables,antiboitic therapy,consult doctor,medication
+Typhoid,eat high calorie vegitables,antibiotic therapy,consult doctor,medication
 Hepatitis B,consult nearest hospital,vaccination,eat healthy,medication
 Fungal infection,bath twice,use detol or neem in bathing water,keep infected area dry,use clean cloths
 Hepatitis C,Consult nearest hospital,vaccination,eat healthy,medication
-Migraine,meditation,reduce stress,use poloroid glasses in sun,consult doctor
+Migraine,meditation,reduce stress,use polarized glasses in sun,consult doctor
 Bronchial Asthma,switch to loose cloothing,take deep breaths,get away from trigger,seek help
 Alcoholic hepatitis,stop alcohol consumption,consult doctor,medication,follow up
 Jaundice,drink plenty of water,consume milk thistle,eat fruits and high fiberous food,medication
