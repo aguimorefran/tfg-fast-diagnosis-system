@@ -2,21 +2,27 @@ CREATE KEYSPACE fds WITH replication = {'class': 'SimpleStrategy', 'replication_
 
 
 CREATE TABLE fds.diseases (
+    id uuid,
     name text,
     description text,
-    symptoms text,
-    precautions text,
+    symptoms set<uuid>,
+    precautions set<uuid>,
     severity int,
-    PRIMARY KEY (name)
+    translations map<text, text>,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE fds.symptoms (
+    id uuid,
     name text,
     severity int,
-    PRIMARY KEY (name)
+    translations map<text, text>,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE fds.precautions (
+    id uuid,
     name text,
-    PRIMARY KEY (name)
+    translations map<text, text>,
+    PRIMARY KEY (id)
 );
