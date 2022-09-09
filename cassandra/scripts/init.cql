@@ -7,7 +7,7 @@ CREATE TABLE fds.diseases (
     description text,
     symptoms set<uuid>,
     precautions set<uuid>,
-    severity int,
+    severity float,
     translations map<text, text>,
     PRIMARY KEY (id)
 );
@@ -15,7 +15,7 @@ CREATE TABLE fds.diseases (
 CREATE TABLE fds.symptoms (
     id uuid,
     name text,
-    severity int,
+    severity float,
     translations map<text, text>,
     PRIMARY KEY (id)
 );
