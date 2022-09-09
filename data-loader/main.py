@@ -1,3 +1,4 @@
+from plistlib import load
 import pandas as pd
 import re
 from cassandradb import Cassandra_client
@@ -32,77 +33,46 @@ DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
 
 
 def clean_string(string):
-    string = string
-    string = re.sub(r'\s+', ' ', string)
+    string = str(string)
     string = re.sub(r'\([^)]*\)', '', string)
+    string = re.sub(r'_', ' ', string)
+    string = re.sub(r'\s+', ' ', string)
     return string.strip().lower()
 
 
-def fetch_insert_precaution(db_client, precaution):
-    query = "SELECT id FROM fds.precautions WHERE name = '{}' ALLOW FILTERING".format(
-        precaution)
-    result = db_client.execute(query).all()
+def insert_symptom(symptom):
+    query = "SELECT * FROM fds.symptoms WHERE name = '{}' ALLOW FILTERING".format(
+        symptom)
+    result = client.execute(query).all()
     if len(result) == 1:
-        print("Precaution {} already exists".format(precaution))
         return result[0].id
-    if len(result) > 1:
-        raise Exception(
-            'More than one precaution with same name: {}'.format(precaution))
-    query = "INSERT INTO fds.precautions (id, name) VALUES (uuid(), '{}')".format(
-        precaution)
-    db_client.execute(query)
-    query = "SELECT id FROM fds.precautions WHERE name = '{}' ALLOW FILTERING".format(
-        precaution)
-    result = db_client.execute(query).all()
-    if len(result) != 1:
-        raise Exception('Could not insert precaution: {}'.format(precaution))
-    print("Inserted precaution: {}".format(precaution))
-    return result[0].id
-
-
-def fetch_insert_disease(db_client, disease_name, precautions_str):
-    query = "SELECT id FROM fds.diseases WHERE name = '{}' ALLOW FILTERING".format(
-        disease_name)
-    result = db_client.execute(query).all()
-    if len(result) == 1:
-        print("Disease {} already exists".format(disease_name))
+    else:
+        query = "INSERT INTO fds.symptoms (id, name) VALUES (uuid(), '{}')".format(
+            symptom)
+        client.execute(query)
+        query = "SELECT * FROM fds.symptoms WHERE name = '{}' ALLOW FILTERING".format(
+            symptom)
+        result = client.execute(query).all()
         return result[0].id
-    if len(result) > 1:
-        raise Exception(
-            'More than one disease with same name: {}'.format(disease_name))
-    query = "INSERT INTO fds.diseases (id, name, precautions) VALUES (uuid(), '{}', {})".format(
-        disease_name, precautions_str)
-    db_client.execute(query)
-    query = "SELECT id FROM fds.diseases WHERE name = '{}' ALLOW FILTERING".format(
-        disease_name)
-    result = db_client.execute(query).all()
-    if len(result) != 1:
-        raise Exception('Could not insert disease: {}'.format(disease_name))
-    print("Inserted disease: {}".format(disease_name))
-    return result[0].id
 
 
-def load_disease_precautions(DATASET_FOLDER):
-    df_sym_prec = pd.read_csv(DISEASES_FOLDER + 'disease_precaution.csv')
-    df_sym_prec.columns = [col.lower() for col in df_sym_prec.columns]
-    df_sym_prec = df_sym_prec.drop_duplicates()
-    df_sym_prec = df_sym_prec.fillna('')
-    df_sym_prec = df_sym_prec.applymap(clean_string)
+def load_disease_symptoms():
+    df = pd.read_csv(DISEASES_FOLDER + 'disease_symptoms.csv')
+    df = df.applymap(clean_string)
+    df = df.drop_duplicates()
+    df.columns = [clean_string(col) for col in df.columns]
 
-    df_sym_prec['precautions'] = df_sym_prec.apply(lambda row: [
-                                                   row['precaution_1'], row['precaution_2'], row['precaution_3'], row['precaution_4']], axis=1)
-    df_sym_prec = df_sym_prec.drop(
-        ['precaution_1', 'precaution_2', 'precaution_3', 'precaution_4'], axis=1)
+    for index, row in df.iterrows():
+        disease = row['disease']
+        symptoms = [row[col] for col in df.columns if 'symptom' in col]
+        symptoms = [symptom for symptom in symptoms if symptom != 'nan']
+        symptom_ids = [insert_symptom(symptom) for symptom in symptoms]
+        symptom_str = '{' + ','.join(map(str, symptom_ids)) + '}'
+        
+        query = "INSERT INTO fds.diseases (id, name, symptoms) VALUES (uuid(), '{}', {})".format(
+            disease, symptom_str)
+        client.execute(query).all()
+        
+        print('Inserted disease: {}'.format(disease))
 
-    for index, row in df_sym_prec.iterrows():
-        precautions = set()
-        for precaution in row['precautions']:
-            if precaution != '':
-                precautions.add(fetch_insert_precaution(client, precaution))
-        df_sym_prec.at[index, 'precautions'] = precautions
-
-        precautions_str = '{' + ','.join(map(str, precautions)) + '}'
-        fetch_insert_disease(client, row['disease'], precautions_str)
-
-
-load_disease_precautions(DISEASES_FOLDER)
+load_disease_symptoms()
