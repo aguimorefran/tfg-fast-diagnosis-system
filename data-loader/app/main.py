@@ -8,33 +8,6 @@ client = Cassandra_client()
 
 DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
 
-# CREATE TABLE fds.diseases (
-#     id uuid,
-#     name text,
-#     description text,
-#     symptoms set<uuid>,
-#     precautions set<uuid>,
-#     severity int,
-#     translations map<text, text>,
-#     PRIMARY KEY (id)
-# );
-
-# CREATE TABLE fds.symptoms (
-#     id uuid,
-#     name text,
-#     severity int,
-#     translations map<text, text>,
-#     PRIMARY KEY (id)
-# );
-
-# CREATE TABLE fds.precautions (
-#     id uuid,
-#     name text,
-#     translations map<text, text>,
-#     PRIMARY KEY (id)
-# );
-
-
 def clean_string(string):
     string = str(string)
     string = re.sub(r'\([^)]*\)', '', string)
@@ -62,6 +35,7 @@ def insert_symptom(symptom):
 
 
 def load_disease_symptoms():
+    print('Loading disease symptoms...')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_symptoms.csv')
     df = df.applymap(clean_string)
     df = df.drop_duplicates()
@@ -78,10 +52,10 @@ def load_disease_symptoms():
             disease, symptom_str)
         client.execute(query).all()
 
-        print('Inserted disease: {}'.format(disease))
 
 
 def load_disease_description():
+    print('Loading disease description...')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_description.csv')
     df = df.applymap(clean_string)
     df = df.drop_duplicates()
@@ -98,10 +72,10 @@ def load_disease_description():
         query = '''UPDATE fds.diseases SET description = '{}' WHERE id IN {}'''.format(
             description, ids)
         client.execute(query)
-        print("Updated description for disease: {}".format(disease))
 
 
 def load_symptom_severity():
+    print("Loading symptom severity...")
     df = pd.read_csv(DISEASES_FOLDER + 'symptom_severity.csv')
     df = df.applymap(clean_string)
     df = df.drop_duplicates()
@@ -118,10 +92,10 @@ def load_symptom_severity():
         query = '''UPDATE fds.symptoms SET severity = {} WHERE id IN {}'''.format(
             severity, ids)
         client.execute(query)
-        print("Updated severity for symptom: {}".format(symptom))
 
 
 def update_disease_severity():
+    print('Updating disease severity...')
     disease_ids = "SELECT id FROM fds.diseases"
     disease_ids = [str(disease.id)
                    for disease in client.execute(disease_ids).all()]
@@ -135,12 +109,13 @@ def update_disease_severity():
             ','.join(symptoms))
         severities = [
             symptom.severity for symptom in client.execute(query).all()]
-        severities = [severity for severity in severities if severity is not None]
+        severities = [
+            severity for severity in severities if severity is not None]
         severity = (sum(severities) / len(severities))
         query = "UPDATE fds.diseases SET severity = {} WHERE id = {}".format(
             severity, disease_id)
         client.execute(query)
-        print("Updated severity for disease: {}".format(disease_id))
+
 
 def insert_precaution(precaution):
     query = "SELECT * FROM fds.precautions WHERE name = '{}' ALLOW FILTERING".format(
@@ -157,7 +132,9 @@ def insert_precaution(precaution):
         result = client.execute(query).all()
         return result[0].id
 
+
 def load_disease_precautions():
+    print("Loading disease precautions")
     df = pd.read_csv(DISEASES_FOLDER + 'disease_precautions.csv')
     df = df.applymap(clean_string)
     df = df.drop_duplicates()
@@ -166,10 +143,12 @@ def load_disease_precautions():
     for _, row in df.iterrows():
         disease = row['disease']
         precautions = [row[col] for col in df.columns if 'precaution' in col]
-        precautions = [precaution for precaution in precautions if precaution != 'nan']
-        precaution_ids = [insert_precaution(precaution) for precaution in precautions]
+        precautions = [
+            precaution for precaution in precautions if precaution != 'nan']
+        precaution_ids = [insert_precaution(
+            precaution) for precaution in precautions]
         precaution_str = '{' + ','.join(map(str, precaution_ids)) + '}'
-        
+
         query = "SELECT * FROM fds.diseases WHERE name = '{}' ALLOW FILTERING".format(
             disease)
         result = client.execute(query).all()
@@ -178,11 +157,12 @@ def load_disease_precautions():
         query = "UPDATE fds.diseases SET precautions = {} WHERE id = {}".format(
             precaution_str, id)
         client.execute(query)
-        print("Updated precautions for disease: {}".format(disease))
 
 
-# load_disease_symptoms()
-# load_disease_description()
-# load_symptom_severity()
-# update_disease_severity()
+print("Dataloader started")
+print("Loading diseases into database")
+load_disease_symptoms()
+load_disease_description()
+load_symptom_severity()
+update_disease_severity()
 load_disease_precautions()

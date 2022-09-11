@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
 
-LOCAL = os.environ.get('LOCAL', False)
+DOCKER = os.environ.get('DOCKER', False)
 
-if not LOCAL:
+if not DOCKER:
     load_dotenv()
     CASSANDRA_HOST = os.getenv('CASSANDRA_HOST')
     CASSANDRA_PORT = os.getenv('CASSANDRA_PORT')

@@ -50,6 +50,8 @@ services:
   cassandra-load-keyspace:
     image: cassandra:latest
     container_name: cassandra-load-keyspace
+    environment:
+      - "ERASE_DATA=false"
     depends_on:
       cassandra:
         condition: service_healthy
@@ -57,6 +59,22 @@ services:
       - ./cassandra/scripts:/scripts
     entrypoint: ["sh", "/scripts/init.sh"]
     restart: "no"
+    networks:
+      - fds-network
+
+  data-loader:
+    build:
+      context: ./data-loader
+      dockerfile: Dockerfile
+    container_name: data-loader
+    command: python3 app/main.py
+    environment:
+      - "DOCKER=true"
+    depends_on:
+      cassandra-load-keyspace:
+        condition: service_completed_successfully
+    env_file:
+      - ./data-loader/.env
     networks:
       - fds-network
 
