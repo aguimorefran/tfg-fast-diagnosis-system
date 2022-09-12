@@ -29,6 +29,13 @@ async def startup():
 
 ##############################################################################################
 
+@app.get("healthcheck")
+async def healthcheck():
+    '''
+    Healthcheck endpoint
+    '''
+    return {"status": "ok"}
+
 @app.get("/cache/status")
 async def get_cache_status():
     '''
@@ -36,7 +43,7 @@ async def get_cache_status():
     '''
     try:
         if RedisClient.status():
-            return {"status": "ok", "numbe_of_keys": len(RedisClient.get_all_keys())}
+            return {"status": "ok", "number_of_keys": len(RedisClient.get_all_keys())}
         else:
             raise Exception('Redis server is not running or not connected')
     except Exception as e:

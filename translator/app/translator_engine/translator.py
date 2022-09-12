@@ -9,10 +9,14 @@ class Translator:
     def __init__(self, src_lang: str, dst_lang: str):
         self.src_lang = src_lang
         self.dst_lang = dst_lang
+
+        path = "app/translator_engine/Helsinki-NLP/opus-mt-{}-{}".format(src_lang, dst_lang)
         self.tokenizer = AutoTokenizer.from_pretrained(
             "Helsinki-NLP/opus-mt-" + self.src_lang + "-" + self.dst_lang)
+
         self.model = AutoModelForSeq2SeqLM.from_pretrained(
-            "Helsinki-NLP/opus-mt-" + self.src_lang + "-" + self.dst_lang)
+            path,
+            local_files_only=True)
         log.info(
             "Translator initialized for {} -> {}".format(self.src_lang, self.dst_lang))
 

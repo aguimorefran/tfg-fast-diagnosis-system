@@ -2,11 +2,13 @@ from plistlib import load
 import pandas as pd
 import re
 from cassandradb import Cassandra_client
-from config import DATASET_FOLDER
+from config import DATASET_FOLDER, BASE_LANG
+from translator import translate
 
 client = Cassandra_client()
 
 DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
+DATASET_LANG = "en"
 
 def clean_string(string):
     string = str(string)
@@ -35,9 +37,10 @@ def insert_symptom(symptom):
 
 
 def load_disease_symptoms():
-    print('Loading disease symptoms...')
+    print('Loading disease symptoms')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_symptoms.csv')
     df = df.applymap(clean_string)
+    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -55,9 +58,10 @@ def load_disease_symptoms():
 
 
 def load_disease_description():
-    print('Loading disease description...')
+    print('Loading disease description')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_description.csv')
     df = df.applymap(clean_string)
+    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -75,9 +79,10 @@ def load_disease_description():
 
 
 def load_symptom_severity():
-    print("Loading symptom severity...")
+    print("Loading symptom severity")
     df = pd.read_csv(DISEASES_FOLDER + 'symptom_severity.csv')
     df = df.applymap(clean_string)
+    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -95,7 +100,7 @@ def load_symptom_severity():
 
 
 def update_disease_severity():
-    print('Updating disease severity...')
+    print('Updating disease severity')
     disease_ids = "SELECT id FROM fds.diseases"
     disease_ids = [str(disease.id)
                    for disease in client.execute(disease_ids).all()]
@@ -137,6 +142,7 @@ def load_disease_precautions():
     print("Loading disease precautions")
     df = pd.read_csv(DISEASES_FOLDER + 'disease_precautions.csv')
     df = df.applymap(clean_string)
+    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 

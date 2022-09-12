@@ -18,3 +18,7 @@
 
 - Cassandra and load-keyspace-cassandra services working.
 - Keyspace removal and automatic table creation on startup.
+
+## 11/09/22
+
+- Data-loader microservice complete. Translations applied as BASE_LANG
