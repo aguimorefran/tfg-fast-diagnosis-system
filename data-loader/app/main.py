@@ -2,7 +2,7 @@ from plistlib import load
 import pandas as pd
 import re
 from cassandradb import Cassandra_client
-from config import DATASET_FOLDER, BASE_LANG
+from config import DATASET_FOLDER, BASE_LANG, LOAD_DISEASES
 from translator import translate
 
 client = Cassandra_client()
@@ -166,9 +166,16 @@ def load_disease_precautions():
 
 
 print("Dataloader started")
-print("Loading diseases into database")
-load_disease_symptoms()
-load_disease_description()
-load_symptom_severity()
-update_disease_severity()
-load_disease_precautions()
+
+print("load diseases", LOAD_DISEASES)
+
+if LOAD_DISEASES:
+    print("Loading diseases into database")
+    load_disease_symptoms()
+    load_disease_description()
+    load_symptom_severity()
+    update_disease_severity()
+    load_disease_precautions()
+    print("Diseases loaded into database")
+else:
+    print("Skipping disease loading")
