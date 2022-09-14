@@ -13,10 +13,11 @@ python-dotenv = "^0.20.0"
 numpy = "1.20"
 transformers = "^4.21.2"
 sentencepiece = "^0.1.97"
-torch = "^1.12.1"
 sacremoses = "^0.0.53"
 pip-utils = "^0.0.6"
 redis = "^4.3.4"
+torch = {path = "packages/torch-1.12.1-cp37-cp37m-manylinux1_x86_64.whl"}
+requests = "^2.28.1"
 
 [tool.poetry.dev-dependencies]
 

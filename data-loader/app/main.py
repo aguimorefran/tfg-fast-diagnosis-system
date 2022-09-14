@@ -40,7 +40,7 @@ def load_disease_symptoms():
     print('Loading disease symptoms')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_symptoms.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
+    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -61,7 +61,7 @@ def load_disease_description():
     print('Loading disease description')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_description.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
+    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -82,7 +82,7 @@ def load_symptom_severity():
     print("Loading symptom severity")
     df = pd.read_csv(DISEASES_FOLDER + 'symptom_severity.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
+    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -142,7 +142,7 @@ def load_disease_precautions():
     print("Loading disease precautions")
     df = pd.read_csv(DISEASES_FOLDER + 'disease_precautions.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(x, DATASET_LANG, BASE_LANG))
+    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 

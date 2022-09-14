@@ -17,11 +17,11 @@ services:
     build: ./translator
     container_name: translator
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "localhost:8000/cache/status"]
-    #   interval: 60s
-    #   timeout: 10s
-    #   retries: 5
+    healthcheck:
+      test: curl -f translator:8000/healthcheck || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
     env_file:
       - ./translator/.env
     networks:
@@ -34,58 +34,58 @@ services:
     volumes:
       - ./translator:/app/
 
-  # cassandra:
-  #   image: cassandra:latest
-  #   container_name: cassandra
-  #   environment:
-  #     - "MAX_HEAP_SIZE=256M"
-  #     - "HEAP_NEWSIZE=128M"
-  #   networks:
-  #     - fds-network
-  #   ports:
-  #     - 9042:9042
-  #   volumes:
-  #     - ./cassandra/data:/var/lib/cassandra
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
-  #     interval: 15s
-  #     timeout: 10s
-  #     retries: 10
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    environment:
+      - "MAX_HEAP_SIZE=256M"
+      - "HEAP_NEWSIZE=128M"
+    networks:
+      - fds-network
+    ports:
+      - 9042:9042
+    volumes:
+      - ./cassandra/data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
 
-  # cassandra-load-keyspace:
-  #   image: cassandra:latest
-  #   container_name: cassandra-load-keyspace
-  #   environment:
-  #     - "ERASE_DATA=true"
-  #   depends_on:
-  #     cassandra:
-  #       condition: service_healthy
-  #   volumes:
-  #     - ./cassandra/scripts:/scripts
-  #   entrypoint: ["sh", "/scripts/init.sh"]
-  #   restart: "no"
-  #   networks:
-  #     - fds-network
+  cassandra-load-keyspace:
+    image: cassandra:latest
+    container_name: cassandra-load-keyspace
+    environment:
+      - "ERASE_DATA=true"
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./cassandra/scripts:/scripts
+    entrypoint: ["sh", "/scripts/init.sh"]
+    restart: "no"
+    networks:
+      - fds-network
 
-  # data-loader:
-  #   build:
-  #     context: ./data-loader
-  #     dockerfile: Dockerfile
-  #   container_name: data-loader
-  #   command: python3 app/main.py
-  #   environment:
-  #     - "DOCKER=true"
-  #     - "TRANSLATOR_PORT=8000"
-  #     - "BASE_LANG=es"
-  #   depends_on:
-  #     cassandra-load-keyspace:
-  #       condition: service_completed_successfully
-  #     translator:
-  #       condition: service_healthy
-  #   env_file:
-  #     - ./data-loader/.env
-  #   networks:
-  #     - fds-network
+  data-loader:
+    build:
+      context: ./data-loader
+      dockerfile: Dockerfile
+    container_name: data-loader
+    command: python3 app/main.py
+    environment:
+      - "DOCKER=true"
+      - "TRANSLATOR_PORT=8000"
+      - "BASE_LANG=es"
+    depends_on:
+      cassandra-load-keyspace:
+        condition: service_completed_successfully
+      translator:
+        condition: service_healthy
+    env_file:
+      - ./data-loader/.env
+    networks:
+      - fds-network
 
 
 #######################
