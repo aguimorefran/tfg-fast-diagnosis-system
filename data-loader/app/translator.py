@@ -12,14 +12,12 @@ def ping():
 def translate(src_lang, dst_lang, text):
     if not ping():
         raise Exception('Translator is not available')
-    if text is None:
-        return None
     if text.lower() == 'nan':
         return "nan"
-    # if text is a literal number, return that string
     if text.isdigit():
         return text
     url = 'http://{}:{}/translate/?src_lang={}&dst_lang={}&text={}'.format(
         TRANSLATOR_HOST, TRANSLATOR_PORT,
         src_lang, dst_lang, text)
-    response = requests.get(url)
+    response = requests.get(url).content.decode('utf-8')
+    return response[1:-1]

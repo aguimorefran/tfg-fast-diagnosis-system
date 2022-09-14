@@ -29,7 +29,7 @@ async def startup():
 
 ##############################################################################################
 
-@app.get("/healthcheck")
+@app.get("/healthcheck",)
 async def healthcheck():
     '''
     Healthcheck endpoint

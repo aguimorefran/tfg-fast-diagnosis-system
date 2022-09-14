@@ -11,6 +11,9 @@ DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
 DATASET_LANG = "en"
 
 def clean_string(string):
+    # if AIDS is in string, return AIDS
+    if string == 'AIDS':
+        return string
     string = str(string)
     string = re.sub(r'\([^)]*\)', '', string)
     string = re.sub(r'_', ' ', string)

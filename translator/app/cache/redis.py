@@ -1,6 +1,6 @@
 import json
 import redis
-from app.config import REDIS_HOST, REDIS_PORT, REDIS_DB
+from app.config import REDIS_HOST, REDIS_PORT, REDIS_DB, CLEAR_CACHE
 from app.logger import logger as log
 
 
@@ -11,6 +11,9 @@ class RedisClient:
         self.redis_db = REDIS_DB
         self.client = redis.Redis(
             host=self.redis_host, port=self.redis_port, db=self.redis_db)
+        if CLEAR_CACHE:
+            log.info('Clearing cache')
+            self.client.flushdb()
 
     def status(self):
         return self.client.ping()
