@@ -1,7 +1,8 @@
 import random
 import requests
-from dis import dis
+import numpy as np
 
+from dis import dis
 from cassandradb import Cassandra_client
 
 cassandra = Cassandra_client()
@@ -10,7 +11,7 @@ GENERATOR_API = "https://api.generadordni.es/v2/profiles/person"
 AGE_RANGE = (0, 100)
 
 def gen_ten_identities():
-    """Returns a random identity."""
+    """Returns 100 random identities"""
     response = requests.get(GENERATOR_API)
     data = response.json()
 
@@ -21,16 +22,15 @@ def gen_ten_identities():
         return data
     
     
-def gen_medical_record(data):
+def gen_medical_record(person_data):
     '''
     Generates random medical data from a given identity
     '''
 
-    age = data['age']
+    age = person_data['age']
 
     diseases = cassandra.execute("SELECT name, severity FROM diseases").all()
     diseases = {disease.name: {'severity': disease.severity, 'prob': (age*2)/(disease.severity*10*random.uniform(0.5, 1.5))} for disease in diseases}
-    # normalize probabilities to be between 0 and 1
     total_prob = sum([diseases[disease]['prob'] for disease in diseases])
     diseases = {disease: {'severity': diseases[disease]['severity'], 'prob': diseases[disease]['prob']/total_prob} for disease in diseases}
 
@@ -45,9 +45,23 @@ def gen_medical_record(data):
         'enfermedades': ''
     }
 
-    print(age)
-    print(diseases)
+    #TODO: añadir cuidador si la persona es mayor de 65 años aleatoriamente
+    #TODO: añadir alergias aleatorias
+    #TODO: añadir vacunas aleatorias
+    
+
+    if random.random() < 0.2:
+        disease = np.random.choice(list(diseases.keys()), p=list(diseases[disease]['prob'] for disease in diseases))
+        medical['enfermedades'] = disease
+        if random.random() < 0.2:
+            medical['enfermedades'] += ' (severa)'
+            if random.random() < 0.2:
+                medical['enfermedades'] += ' (critica)'
+
+    person_data.update(medical)
+    return person_data
+    
     
 person = gen_ten_identities()[0]
-
-gen_medical_record(person)
+person = gen_medical_record(person)
+print(person)

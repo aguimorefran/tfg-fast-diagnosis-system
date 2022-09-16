@@ -57,6 +57,7 @@ services:
   #   command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
   #   environment:
   #     - N_PEOPLE=100
+  #     - RESET_DB=true
   #   healthcheck:
   #     test: curl -f sasmock:8001/healthcheck || exit 1
   #   env_file:

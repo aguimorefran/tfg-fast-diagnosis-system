@@ -1,6 +1,7 @@
 # from config import CASSANDRA_HOST, CASSANDRA_PORT, CASSANDRA_KEYSPACE
 from cassandra.cluster import Cluster
 
+
 CASSANDRA_HOST = 'localhost'
 CASSANDRA_PORT = '9042'
 CASSANDRA_KEYSPACE = 'fds'
