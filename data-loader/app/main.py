@@ -187,72 +187,95 @@ else:
 
 if LOAD_PEOPLE:
     print("Loading people into database")
-    people = dg.fetch_identities()
-    for person in people:
-        print(person)
-        query = '''
-        INSERT INTO fds.people (
-            dni,
-            nombre,
-            apellido1,
-            apellido2,
-            sexo,
-            fecha_nacimiento,
-            edad,
-            telefono,
-            email,
-            municipio,
-            provincia,
-            direccion,
-            direccion_numero,
-            codigo_postal) VALUES ( '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, '{}', '{}', '{}', '{}', {}, {} )'''.format(
-            person['dni'],
-            person['nombre'],
-            person['apellido1'],
-            person['apellido2'],
-            person['sexo'],
-            person['fecha_nacimiento'],
-            person['edad'],
-            person['telefono'],
-            person['email'],
-            person['municipio'],
-            person['provincia'],
-            person['direccion'],
-            person['direccion_numero'],
-            person['codigo_postal'])
+    n = 4
+    for i in range(n):
+        people = dg.fetch_identities()
+        for person in people:
+            # sanitize data ' and " for string values
+            for key in person:
+                if type(person[key]) == str:
+                    person[key] = person[key].replace("'", "")
+                    person[key] = person[key].replace('"', '')
+            query = '''
+            INSERT INTO fds.people (
+                dni,
+                nombre,
+                apellido1,
+                apellido2,
+                sexo,
+                fecha_nacimiento,
+                edad,
+                telefono,
+                email,
+                municipio,
+                provincia,
+                direccion,
+                direccion_numero,
+                codigo_postal) VALUES ( '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, '{}', '{}', '{}', '{}', {}, {} )'''.format(
+                person['dni'],
+                person['nombre'],
+                person['apellido1'],
+                person['apellido2'],
+                person['sexo'],
+                person['fecha_nacimiento'],
+                person['edad'],
+                person['telefono'],
+                person['email'],
+                person['municipio'],
+                person['provincia'],
+                person['direccion'],
+                person['direccion_numero'],
+                person['codigo_postal'])
 
-        result = client.execute(query)
-        if result:
-            print(person['dni'], "inserted")
-        medical = dg.gen_medical_record(client, person)
-        query = '''
-        INSERT INTO fds.medical_history (
-            dni,
-            cuidador_dni,
-            cuidador_telefono,
-            cuidador_nombre,
-            alergias,
-            vacunaciones,
-            problemas_y_episodios_activos,
-            recomendaciones,
-            tratamientos,
-            enfermedades) VALUES ( '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}' )'''.format(
-            person['dni'],
-            medical['cuidador_dni'],
-            medical['cuidador_telefono'],
-            medical['cuidador_nombre'],
-            medical['alergias'],
-            medical['vacunaciones'],
-            medical['problemas_y_episodios_activos'],
-            medical['recomendaciones'],
-            medical['tratamientos'],
-            medical['enfermedades'])
-
-        try:
             result = client.execute(query)
-        except Exception as e:
-            print(e)
-            print(query)
-            raise Exception("Error inserting medical history")
-        if result:
-            print(person['dni'], "medical history inserted")
+            if result:
+                print(person['dni'], "inserted")
+            medical = dg.gen_medical_record(client, person)
+            if medical['cuidador_dni'] is not None:
+                query = '''
+                INSERT INTO fds.medical_history (
+                    dni,
+                    cuidador_dni,
+                    cuidador_telefono,
+                    cuidador_nombre,
+                    alergias,
+                    vacunaciones,
+                    problemas_y_episodios_activos,
+                    recomendaciones,
+                    tratamientos,
+                    enfermedades) VALUES ( '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}' )'''.format(
+                    person['dni'],
+                    medical['cuidador_dni'],
+                    medical['cuidador_telefono'],
+                    medical['cuidador_nombre'],
+                    medical['alergias'],
+                    medical['vacunaciones'],
+                    medical['problemas_y_episodios_activos'],
+                    medical['recomendaciones'],
+                    medical['tratamientos'],
+                    medical['enfermedades'])
+            else:
+                query = '''
+                INSERT INTO fds.medical_history (
+                    dni,
+                    alergias,
+                    vacunaciones,
+                    problemas_y_episodios_activos,
+                    recomendaciones,
+                    tratamientos,
+                    enfermedades) VALUES ( '{}', '{}', '{}', '{}', '{}', '{}', '{}' )'''.format(
+                    person['dni'],
+                    medical['alergias'],
+                    medical['vacunaciones'],
+                    medical['problemas_y_episodios_activos'],
+                    medical['recomendaciones'],
+                    medical['tratamientos'],
+                    medical['enfermedades'])
+
+            try:
+                result = client.execute(query)
+            except Exception as e:
+                print(e)
+                print(query)
+                raise Exception("Error inserting medical history")
+    print("People loaded into database")

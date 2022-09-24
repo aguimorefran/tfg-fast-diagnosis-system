@@ -42,7 +42,7 @@ CREATE TABLE fds.people (
 );
 
 CREATE TABLE fds.medical_history (
-    dni text,
+    dni text PRIMARY KEY,
     cuidador_dni text,
     cuidador_telefono int,
     cuidador_nombre text,

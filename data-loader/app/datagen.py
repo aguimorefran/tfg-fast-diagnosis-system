@@ -49,13 +49,13 @@ def fetch_identities():
             identity["fecha_nacimiento"] = datetime.date(int(d[2]), int(d[1]), int(d[0]))
         except ValueError:
             print("Error parsing date", d)
-            raise ValueError
-        identity["sexo"] = "hombre" if identity["sexo"] == "male" else "mujer"
-
+            print('Setting birthdate day to 15')
+            identity["fecha_nacimiento"] = datetime.date(int(d[2]), int(d[1]), 15)
     if response.status_code == 200:
         return data
     else:
         raise Exception('Could not fetch random identity from generator API')
+        
 
 
 def gen_medical_record(cassandra, person_data):
@@ -82,13 +82,22 @@ def gen_medical_record(cassandra, person_data):
         cuidador = fetch_identities()[0]
         medical['cuidador_dni'] = cuidador['dni']
         medical['cuidador_telefono'] = cuidador['telefono']
-        medical['cuidador_principal'] = cuidador['nombre'] + ' ' + \
+        medical['cuidador_nombre'] = cuidador['nombre'] + ' ' + \
             cuidador['apellido1'] + ' ' + cuidador['apellido2']
     else:
-        # fill with empty string
-        medical['cuidador_dni'] = ''
-        medical['cuidador_telefono'] = ''
-        medical['cuidador_principal'] = ''
+        medical['cuidador_dni'] = None
+        medical['cuidador_telefono'] = None
+        medical['cuidador_nombre'] = None
+
+    symptoms = cassandra.execute("SELECT * FROM symptoms").all()
+    ids_severity_null = [
+        symptom.id for symptom in symptoms if symptom.severity is None]
+    severity_sum = sum(
+        [symptom.severity for symptom in symptoms if symptom.severity is not None])
+    severity_avg = severity_sum / (len(symptoms) - len(ids_severity_null))
+    for id in ids_severity_null:
+        cassandra.execute(
+            "UPDATE symptoms SET severity = %s WHERE id = %s", (severity_avg, id))
 
     # Calculate disease probability
     diseases = cassandra.execute("SELECT name, severity FROM diseases").all()
@@ -99,16 +108,6 @@ def gen_medical_record(cassandra, person_data):
                           'prob': diseases[disease]['prob']/total_prob} for disease in diseases}
 
     # Calculate symptoms probability
-    # First replace in db the symptoms that have severity null with an average of the rest
-    symptoms = cassandra.execute("SELECT * FROM symptoms").all()
-    ids_severity_null = [
-        symptom.id for symptom in symptoms if symptom.severity is None]
-    severity_sum = sum(
-        [symptom.severity for symptom in symptoms if symptom.severity is not None])
-    severity_avg = severity_sum / (len(symptoms) - len(ids_severity_null))
-    for id in ids_severity_null:
-        cassandra.execute(
-            "UPDATE symptoms SET severity = %s WHERE id = %s", (severity_avg, id))
     symptoms = cassandra.execute("SELECT * FROM symptoms").all()
     symptoms = {symptom.name: {'severity': symptom.severity, 'prob': (
         edad*2)/(symptom.severity*10*random.uniform(0.5, 1.5))} for symptom in symptoms}
