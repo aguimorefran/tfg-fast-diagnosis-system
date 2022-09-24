@@ -14,3 +14,4 @@ TRANSLATOR_HOST = os.environ['TRANSLATOR_HOST']
 BASE_LANG = os.environ['BASE_LANG']
 LOAD_DISEASES = os.environ['LOAD_DISEASES'] == "true"
 LOAD_PEOPLE = os.environ['LOAD_PEOPLE'] == "true"
+ALLERGY_DATASET = os.environ['ALLERGY_DATASET']

@@ -2,12 +2,16 @@ import random
 import requests
 import numpy as np
 import datetime
+import pandas as pd
 
-from dis import dis
+from config import ALLERGY_DATASET
+from translator import translate
 
 GENERATOR_API = "https://api.generadordni.es/v2/profiles/person"
 AGE_RANGE = (0, 100)
 
+# open allergy dataset, column 0 is allergy name, column 1 is probability. separated by ,
+allergies = pd.read_csv(ALLERGY_DATASET, sep=',', header=None)
 
 def key_translation(key):
     keymap = {
@@ -62,7 +66,6 @@ def gen_medical_record(cassandra, person_data):
     '''
     Generates random medical data from a given identity
     '''
-    # TODO: añadir alergias aleatorias tanto normales como a medicamentos
 
     medical = {
         'cuidador_dni': '',
@@ -136,5 +139,15 @@ def gen_medical_record(cassandra, person_data):
                 medical['problemas_y_episodios_activos'] += ' (critico)'
         if random.random() < 0.2:
             medical['problemas_y_episodios_activos'] += ' (reciente)'
+
+    if random.random() > 0.5:
+        random_idx = random.randint(0, len(allergies)-1)
+        medical['alergias'] = allergies[random_idx]
+        if random.random() > 0.5:
+            medical['alergias'] += ', ' + allergies[random_idx]
+            
+    medical['alergias'] = translate('en', 'es', medical['alergias'])
+
+                       
 
     return medical

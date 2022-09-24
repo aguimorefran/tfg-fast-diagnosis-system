@@ -10,6 +10,7 @@ def ping():
 
 
 def translate(src_lang, dst_lang, text):
+    text = str(text)
     if not ping():
         raise Exception('Translator is not available')
     if text.lower() == 'nan':
