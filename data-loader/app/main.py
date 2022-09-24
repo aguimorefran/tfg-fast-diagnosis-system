@@ -1,14 +1,18 @@
-from plistlib import load
 import pandas as pd
 import re
+import datetime
+
+import datagen as dg
 from cassandradb import Cassandra_client
-from config import DATASET_FOLDER, BASE_LANG, LOAD_DISEASES
+from config import DATASET_FOLDER, BASE_LANG, LOAD_DISEASES, LOAD_PEOPLE
 from translator import translate
+
 
 client = Cassandra_client()
 
 DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
 DATASET_LANG = "en"
+
 
 def clean_string(string):
     # if AIDS is in string, return AIDS
@@ -57,7 +61,6 @@ def load_disease_symptoms():
         query = "INSERT INTO fds.diseases (id, name, symptoms) VALUES (uuid(), '{}', {})".format(
             disease, symptom_str)
         client.execute(query).all()
-
 
 
 def load_disease_description():
@@ -168,9 +171,7 @@ def load_disease_precautions():
         client.execute(query)
 
 
-print("Dataloader started")
-
-print("load diseases", LOAD_DISEASES)
+print("Dataloader starting")
 
 if LOAD_DISEASES:
     print("Loading diseases into database")
@@ -182,3 +183,76 @@ if LOAD_DISEASES:
     print("Diseases loaded into database")
 else:
     print("Skipping disease loading")
+
+
+if LOAD_PEOPLE:
+    print("Loading people into database")
+    people = dg.fetch_identities()
+    for person in people:
+        print(person)
+        query = '''
+        INSERT INTO fds.people (
+            dni,
+            nombre,
+            apellido1,
+            apellido2,
+            sexo,
+            fecha_nacimiento,
+            edad,
+            telefono,
+            email,
+            municipio,
+            provincia,
+            direccion,
+            direccion_numero,
+            codigo_postal) VALUES ( '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, '{}', '{}', '{}', '{}', {}, {} )'''.format(
+            person['dni'],
+            person['nombre'],
+            person['apellido1'],
+            person['apellido2'],
+            person['sexo'],
+            person['fecha_nacimiento'],
+            person['edad'],
+            person['telefono'],
+            person['email'],
+            person['municipio'],
+            person['provincia'],
+            person['direccion'],
+            person['direccion_numero'],
+            person['codigo_postal'])
+
+        result = client.execute(query)
+        if result:
+            print(person['dni'], "inserted")
+        medical = dg.gen_medical_record(client, person)
+        query = '''
+        INSERT INTO fds.medical_history (
+            dni,
+            cuidador_dni,
+            cuidador_telefono,
+            cuidador_nombre,
+            alergias,
+            vacunaciones,
+            problemas_y_episodios_activos,
+            recomendaciones,
+            tratamientos,
+            enfermedades) VALUES ( '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}' )'''.format(
+            person['dni'],
+            medical['cuidador_dni'],
+            medical['cuidador_telefono'],
+            medical['cuidador_nombre'],
+            medical['alergias'],
+            medical['vacunaciones'],
+            medical['problemas_y_episodios_activos'],
+            medical['recomendaciones'],
+            medical['tratamientos'],
+            medical['enfermedades'])
+
+        try:
+            result = client.execute(query)
+        except Exception as e:
+            print(e)
+            print(query)
+            raise Exception("Error inserting medical history")
+        if result:
+            print(person['dni'], "medical history inserted")

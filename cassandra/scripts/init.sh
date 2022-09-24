@@ -15,6 +15,9 @@ if [ "$ERASE_DATA" = "true" ]; then
     cqlsh cassandra 9042 -e "describe keyspaces";
     echo "Executing init.cql to create keyspace";
     cqlsh cassandra 9042 -f /scripts/init.cql
+
+    echo "Keyspaces after init.cql";
+    cqlsh cassandra 9042 -e "describe keyspaces";
 else
     echo "ERASE DATA is set to false, not erasing data...";
     echo "NOT erasing data";
