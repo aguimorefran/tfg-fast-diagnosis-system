@@ -184,8 +184,6 @@ if LOAD_DISEASES:
 else:
     print("Skipping disease loading")
 
-
-if LOAD_PEOPLE:
     print("Loading people into database")
     n = 4
     for i in range(n):

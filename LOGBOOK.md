@@ -22,3 +22,5 @@
 ## 11/09/22
 
 - Data-loader microservice complete. Translations applied as BASE_LANG
+
+## 15/02/23

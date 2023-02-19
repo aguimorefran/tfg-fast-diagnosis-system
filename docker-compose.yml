@@ -76,7 +76,6 @@ services:
       - "DOCKER=true"
       - "BASE_LANG=es"
       - "LOAD_DISEASES=false"
-      - "LOAD_PEOPLE=true"
     depends_on:
       cassandra-load-keyspace:
         condition: service_completed_successfully
