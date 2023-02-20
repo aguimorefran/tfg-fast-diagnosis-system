@@ -2,6 +2,7 @@ import requests
 
 from config import TRANSLATOR_PORT, TRANSLATOR_HOST
 
+session = requests.Session()
 
 def ping():
     url = 'http://{}:{}/cache/status'.format(TRANSLATOR_HOST, TRANSLATOR_PORT)
@@ -20,5 +21,5 @@ def translate(src_lang, dst_lang, text):
     url = 'http://{}:{}/translate/?src_lang={}&dst_lang={}&text={}'.format(
         TRANSLATOR_HOST, TRANSLATOR_PORT,
         src_lang, dst_lang, text)
-    response = requests.get(url).content.decode('utf-8')
+    response = session.get(url).content.decode('utf-8')
     return response[1:-1]
