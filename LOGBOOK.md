@@ -23,4 +23,10 @@
 
 - Data-loader microservice complete. Translations applied as BASE_LANG
 
-## 15/02/23
+## 19/02/23
+
+- Remove sas-mock implementation.
+
+## 20/02/23
+
+- Put everything back on track.

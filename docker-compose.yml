@@ -4,7 +4,7 @@ services:
   redis:
     image: redis:latest
     container_name: redis
-    command: ["redis-server", "--appendonly", "yes"]
+    command: [ "redis-server", "--appendonly", "yes" ]
     networks:
       - fds-network
     ports:
@@ -46,7 +46,7 @@ services:
     volumes:
       - ./cassandra/data:/var/lib/cassandra
     healthcheck:
-      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+      test: [ "CMD-SHELL", "[ $$(nodetool statusgossip) = running ]" ]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -55,13 +55,13 @@ services:
     image: cassandra:latest
     container_name: cassandra-load-keyspace
     environment:
-      - "ERASE_DATA=false"
+      - "ERASE_DATA=true"
     depends_on:
       cassandra:
         condition: service_healthy
     volumes:
       - ./cassandra/scripts:/scripts
-    entrypoint: ["sh", "/scripts/init.sh"]
+    entrypoint: [ "sh", "/scripts/init.sh" ]
     restart: "no"
     networks:
       - fds-network
@@ -73,7 +73,7 @@ services:
     container_name: data-loader
     command: python3 app/main.py
     environment:
-      - "DOCKER=true"
+      - "DOCKER=false"
       - "BASE_LANG=es"
       - "LOAD_DISEASES=false"
     depends_on:
@@ -85,7 +85,6 @@ services:
       - ./data-loader/.env
     networks:
       - fds-network
-
 
 #######################
 

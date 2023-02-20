@@ -10,3 +10,2190 @@ $13
 hello friends
 $29
 {"en": {"es": "Hola amigos"}}
+*2
+$6
+SELECT
+$1
+4
+*3
+$3
+SET
+$16
+fungal infection
+$45
+{"en": {"es": "infecci\u00f3n f\u00fangica"}}
+*3
+$3
+SET
+$7
+allergy
+$25
+{"en": {"es": "alergia"}}
+*3
+$3
+SET
+$4
+gerd
+$22
+{"en": {"es": "gerd"}}
+*3
+$3
+SET
+$19
+chronic cholestasis
+$41
+{"en": {"es": "colestasis cr\u00f3nica"}}
+*3
+$3
+SET
+$13
+drug reaction
+$46
+{"en": {"es": "reacci\u00f3n al medicamento"}}
+*3
+$3
+SET
+$19
+peptic ulcer diseae
+$44
+{"en": {"es": "ulcera p\u00e9ptica diseae"}}
+*3
+$3
+SET
+$4
+AIDS
+$22
+{"en": {"es": "SIDA"}}
+*3
+$3
+SET
+$8
+diabetes
+$26
+{"en": {"es": "diabetes"}}
+*3
+$3
+SET
+$15
+gastroenteritis
+$33
+{"en": {"es": "gastroenteritis"}}
+*3
+$3
+SET
+$16
+bronchial asthma
+$32
+{"en": {"es": "asma bronquial"}}
+*3
+$3
+SET
+$12
+hypertension
+$35
+{"en": {"es": "hipertensi\u00f3n"}}
+*3
+$3
+SET
+$8
+migraine
+$30
+{"en": {"es": "migra\u00f1a"}}
+*3
+$3
+SET
+$20
+cervical spondylosis
+$39
+{"en": {"es": "espondilosis cervical"}}
+*3
+$3
+SET
+$9
+paralysis
+$32
+{"en": {"es": "par\u00e1lisis"}}
+*3
+$3
+SET
+$8
+jaundice
+$27
+{"en": {"es": "ictericia"}}
+*3
+$3
+SET
+$7
+malaria
+$25
+{"en": {"es": "malaria"}}
+*3
+$3
+SET
+$11
+chicken pox
+$26
+{"en": {"es": "varicela"}}
+*3
+$3
+SET
+$6
+dengue
+$24
+{"en": {"es": "dengue"}}
+*3
+$3
+SET
+$7
+typhoid
+$26
+{"en": {"es": "tifoidea"}}
+*3
+$3
+SET
+$11
+hepatitis a
+$29
+{"en": {"es": "hepatitis a"}}
+*3
+$3
+SET
+$11
+hepatitis b
+$29
+{"en": {"es": "hepatitis b"}}
+*3
+$3
+SET
+$11
+hepatitis c
+$29
+{"en": {"es": "hepatitis c"}}
+*3
+$3
+SET
+$11
+hepatitis d
+$29
+{"en": {"es": "hepatitis d"}}
+*3
+$3
+SET
+$11
+hepatitis e
+$29
+{"en": {"es": "hepatitis e"}}
+*3
+$3
+SET
+$19
+alcoholic hepatitis
+$43
+{"en": {"es": "hepatitis alcoh\u00f3lica"}}
+*3
+$3
+SET
+$12
+tuberculosis
+$30
+{"en": {"es": "tuberculosis"}}
+*3
+$3
+SET
+$11
+common cold
+$38
+{"en": {"es": "resfriado com\u00fan"}}
+*3
+$3
+SET
+$9
+pneumonia
+$31
+{"en": {"es": "neumon\u00eda"}}
+*3
+$3
+SET
+$21
+dimorphic hemmorhoids
+$45
+{"en": {"es": "Hemmoroides dim\u00f3rficos"}}
+*3
+$3
+SET
+$12
+heart attack
+$40
+{"en": {"es": "ataque al coraz\u00f3n"}}
+*3
+$3
+SET
+$14
+varicose veins
+$25
+{"en": {"es": "varices"}}
+*3
+$3
+SET
+$14
+hypothyroidism
+$32
+{"en": {"es": "hipotiroidismo"}}
+*3
+$3
+SET
+$15
+hyperthyroidism
+$33
+{"en": {"es": "hipertiroidismo"}}
+*3
+$3
+SET
+$12
+hypoglycemia
+$30
+{"en": {"es": "hipoglucemia"}}
+*3
+$3
+SET
+$15
+osteoarthristis
+$32
+{"en": {"es": "osteoartristis"}}
+*3
+$3
+SET
+$9
+arthritis
+$26
+{"en": {"es": "artritis"}}
+*3
+$3
+SET
+$28
+paroymsal positional vertigo
+$51
+{"en": {"es": "v\u00e9rtigo posicional paroymsal"}}
+*3
+$3
+SET
+$4
+acne
+$27
+{"en": {"es": "acn\u00e9"}}
+*3
+$3
+SET
+$23
+urinary tract infection
+$52
+{"en": {"es": "infecci\u00f3n del tracto urinario"}}
+*3
+$3
+SET
+$9
+psoriasis
+$27
+{"en": {"es": "psoriasis"}}
+*3
+$3
+SET
+$8
+impetigo
+$31
+{"en": {"es": "imp\u00e9tigo"}}
+*3
+$3
+SET
+$7
+itching
+$23
+{"en": {"es": "picor"}}
+*3
+$3
+SET
+$9
+skin rash
+$44
+{"en": {"es": "erupci\u00f3n cut\u00e1nea"}}
+*3
+$3
+SET
+$19
+continuous sneezing
+$38
+{"en": {"es": "estornudos continuos"}}
+*3
+$3
+SET
+$9
+shivering
+$34
+{"en": {"es": "escalofr\u00edos"}}
+*3
+$3
+SET
+$12
+stomach pain
+$40
+{"en": {"es": "dolor de est\u00f3mago"}}
+*3
+$3
+SET
+$7
+acidity
+$24
+{"en": {"es": "acidez"}}
+*3
+$3
+SET
+$8
+vomiting
+$30
+{"en": {"es": "v\u00f3mitos"}}
+*3
+$3
+SET
+$11
+indigestion
+$34
+{"en": {"es": "indigesti\u00f3n"}}
+*3
+$3
+SET
+$14
+muscle wasting
+$41
+{"en": {"es": "Desperdicios musculares"}}
+*3
+$3
+SET
+$17
+patches in throat
+$40
+{"en": {"es": "parches en la garganta"}}
+*3
+$3
+SET
+$7
+fatigue
+$24
+{"en": {"es": "fatiga"}}
+*3
+$3
+SET
+$11
+weight loss
+$38
+{"en": {"es": "p\u00e9rdida de peso"}}
+*3
+$3
+SET
+$11
+sunken eyes
+$31
+{"en": {"es": "ojos hundidos"}}
+*3
+$3
+SET
+$5
+cough
+$21
+{"en": {"es": "tos"}}
+*3
+$3
+SET
+$8
+headache
+$33
+{"en": {"es": "dolor de cabeza"}}
+*3
+$3
+SET
+$10
+chest pain
+$37
+{"en": {"es": "dolor tor\u00e1cico"}}
+*3
+$3
+SET
+$9
+back pain
+$34
+{"en": {"es": "dolor de espalda"}}
+*3
+$3
+SET
+$17
+weakness in limbs
+$47
+{"en": {"es": "debilidad en las extremidades"}}
+*3
+$3
+SET
+$6
+chills
+$34
+{"en": {"es": "escalofr\u00edos"}}
+*3
+$3
+SET
+$10
+joint pain
+$45
+{"en": {"es": "dolor en las articulaciones"}}
+*3
+$3
+SET
+$14
+yellowish skin
+$34
+{"en": {"es": "piel amarillenta"}}
+*3
+$3
+SET
+$12
+constipation
+$36
+{"en": {"es": "estre\u00f1imiento"}}
+*3
+$3
+SET
+$27
+pain during bowel movements
+$48
+{"en": {"es": "dolor durante las deposiciones"}}
+*3
+$3
+SET
+$14
+breathlessness
+$42
+{"en": {"es": "dificultad para respirar"}}
+*3
+$3
+SET
+$6
+cramps
+$27
+{"en": {"es": "calambres"}}
+*3
+$3
+SET
+$11
+weight gain
+$33
+{"en": {"es": "aumento de peso"}}
+*3
+$3
+SET
+$11
+mood swings
+$34
+{"en": {"es": "cambios de humor"}}
+*3
+$3
+SET
+$9
+neck pain
+$33
+{"en": {"es": "dolor de cuello"}}
+*3
+$3
+SET
+$15
+muscle weakness
+$36
+{"en": {"es": "debilidad muscular"}}
+*3
+$3
+SET
+$10
+stiff neck
+$36
+{"en": {"es": "cuello r\u00edgido"}}
+*3
+$3
+SET
+$18
+pus filled pimples
+$44
+{"en": {"es": "Espinillas rellenas de pus"}}
+*3
+$3
+SET
+$19
+burning micturition
+$39
+{"en": {"es": "micci\u00f3n ardiente"}}
+*3
+$3
+SET
+$18
+bladder discomfort
+$40
+{"en": {"es": "molestias en la vejiga"}}
+*3
+$3
+SET
+$10
+high fever
+$29
+{"en": {"es": "fiebre alta"}}
+*3
+$3
+SET
+$20
+nodal skin eruptions
+$50
+{"en": {"es": "erupciones cut\u00e1neas nodales"}}
+*3
+$3
+SET
+$16
+ulcers on tongue
+$43
+{"en": {"es": "\u00falceras en la lengua"}}
+*3
+$3
+SET
+$16
+loss of appetite
+$41
+{"en": {"es": "p\u00e9rdida de apetito"}}
+*3
+$3
+SET
+$12
+restlessness
+$27
+{"en": {"es": "inquietud"}}
+*3
+$3
+SET
+$11
+dehydration
+$37
+{"en": {"es": "deshidrataci\u00f3n"}}
+*3
+$3
+SET
+$9
+dizziness
+$23
+{"en": {"es": "mareo"}}
+*3
+$3
+SET
+$25
+weakness of one body side
+$49
+{"en": {"es": "debilidad de un lado del cuerpo"}}
+*3
+$3
+SET
+$8
+lethargy
+$25
+{"en": {"es": "letargo"}}
+*3
+$3
+SET
+$6
+nausea
+$30
+{"en": {"es": "n\u00e1useas"}}
+*3
+$3
+SET
+$14
+abdominal pain
+$33
+{"en": {"es": "dolor abdominal"}}
+*3
+$3
+SET
+$19
+pain in anal region
+$46
+{"en": {"es": "dolor en la regi\u00f3n anal"}}
+*3
+$3
+SET
+$8
+sweating
+$33
+{"en": {"es": "sudoraci\u00f3n"}}
+*3
+$3
+SET
+$8
+bruising
+$27
+{"en": {"es": "hematomas"}}
+*3
+$3
+SET
+$20
+cold hands and feets
+$41
+{"en": {"es": "manos y pies fr\u00edos"}}
+*3
+$3
+SET
+$7
+anxiety
+$26
+{"en": {"es": "ansiedad"}}
+*3
+$3
+SET
+$9
+knee pain
+$34
+{"en": {"es": "dolor de rodilla"}}
+*3
+$3
+SET
+$15
+swelling joints
+$54
+{"en": {"es": "hinchaz\u00f3n de las articulaciones"}}
+*3
+$3
+SET
+$10
+blackheads
+$32
+{"en": {"es": "Cabezas negras"}}
+*3
+$3
+SET
+$19
+foul smell of urine
+$40
+{"en": {"es": "olor asqueroso a orina"}}
+*3
+$3
+SET
+$12
+skin peeling
+$45
+{"en": {"es": "descamaci\u00f3n de la piel"}}
+*3
+$3
+SET
+$7
+blister
+$25
+{"en": {"es": "blister"}}
+*3
+$3
+SET
+$18
+dischromic patches
+$42
+{"en": {"es": "parches discr\u00f3micos"}}
+*3
+$3
+SET
+$18
+watering from eyes
+$34
+{"en": {"es": "agua de los ojos"}}
+*3
+$3
+SET
+$22
+extra marital contacts
+$46
+{"en": {"es": "contactos extramatrimoniales"}}
+*3
+$3
+SET
+$9
+diarrhoea
+$25
+{"en": {"es": "diarrea"}}
+*3
+$3
+SET
+$15
+loss of balance
+$40
+{"en": {"es": "P\u00e9rdida del saldo"}}
+*3
+$3
+SET
+$28
+blurred and distorted vision
+$53
+{"en": {"es": "visi\u00f3n borrosa y distorsionada"}}
+*3
+$3
+SET
+$17
+altered sensorium
+$39
+{"en": {"es": "Sensibilidad alterada"}}
+*3
+$3
+SET
+$10
+dark urine
+$30
+{"en": {"es": "orina oscura"}}
+*3
+$3
+SET
+$19
+swelling of stomach
+$50
+{"en": {"es": "hinchaz\u00f3n del est\u00f3mago"}}
+*3
+$3
+SET
+$12
+bloody stool
+$38
+{"en": {"es": "heces ensangrentadas"}}
+*3
+$3
+SET
+$7
+obesity
+$26
+{"en": {"es": "obesidad"}}
+*3
+$3
+SET
+$14
+hip joint pain
+$58
+{"en": {"es": "dolor en las articulaciones de la cadera"}}
+*3
+$3
+SET
+$18
+movement stiffness
+$40
+{"en": {"es": "rigidez del movimiento"}}
+*3
+$3
+SET
+$18
+spinning movements
+$39
+{"en": {"es": "Movimientos de hilado"}}
+*3
+$3
+SET
+$8
+scurring
+$28
+{"en": {"es": "curriculum"}}
+*3
+$3
+SET
+$24
+continuous feel of urine
+$50
+{"en": {"es": "sensaci\u00f3n continua de orina"}}
+*3
+$3
+SET
+$19
+silver like dusting
+$34
+{"en": {"es": "plata como polvo"}}
+*3
+$3
+SET
+$20
+red sore around nose
+$50
+{"en": {"es": "dolor rojo alrededor de la nariz"}}
+*2
+$6
+SELECT
+$1
+4
+*3
+$3
+SET
+$18
+spotting urination
+$41
+{"en": {"es": "manchar la micci\u00f3n"}}
+*3
+$3
+SET
+$16
+passage of gases
+$31
+{"en": {"es": "paso de gases"}}
+*3
+$3
+SET
+$21
+irregular sugar level
+$48
+{"en": {"es": "nivel irregular de az\u00facar"}}
+*3
+$3
+SET
+$14
+family history
+$41
+{"en": {"es": "antecedentes familiares"}}
+*3
+$3
+SET
+$21
+lack of concentration
+$45
+{"en": {"es": "falta de concentraci\u00f3n"}}
+*3
+$3
+SET
+$16
+excessive hunger
+$33
+{"en": {"es": "hambre excesiva"}}
+*3
+$3
+SET
+$17
+yellowing of eyes
+$57
+{"en": {"es": "coloraci\u00f3n amarillenta de los ojos"}}
+*3
+$3
+SET
+$21
+distention of abdomen
+$45
+{"en": {"es": "distensi\u00f3n del abdomen"}}
+*3
+$3
+SET
+$18
+irritation in anus
+$43
+{"en": {"es": "irritaci\u00f3n en el ano"}}
+*3
+$3
+SET
+$12
+swollen legs
+$35
+{"en": {"es": "piernas hinchadas"}}
+*3
+$3
+SET
+$15
+painful walking
+$39
+{"en": {"es": "Caminar dolorosamente"}}
+*3
+$3
+SET
+$20
+small dents in nails
+$60
+{"en": {"es": "peque\u00f1as abolladuras en las u\u00f1as"}}
+*3
+$3
+SET
+$17
+yellow crust ooze
+$38
+{"en": {"es": "costra amarilla ooze"}}
+*3
+$3
+SET
+$16
+internal itching
+$31
+{"en": {"es": "picor interno"}}
+*3
+$3
+SET
+$13
+mucoid sputum
+$33
+{"en": {"es": "esputo mucoideo"}}
+*3
+$3
+SET
+$30
+history of alcohol consumption
+$52
+{"en": {"es": "antecedentes de consumo de alcohol"}}
+*3
+$3
+SET
+$21
+swollen blood vessels
+$63
+{"en": {"es": "inflamaci\u00f3n de los vasos sangu\u00edneos"}}
+*3
+$3
+SET
+$12
+unsteadiness
+$31
+{"en": {"es": "inestabilidad"}}
+*3
+$3
+SET
+$18
+inflammatory nails
+$41
+{"en": {"es": "u\u00f1as inflamatorias"}}
+*3
+$3
+SET
+$10
+depression
+$32
+{"en": {"es": "depresi\u00f3n"}}
+*3
+$3
+SET
+$14
+fluid overload
+$45
+{"en": {"es": "sobrecarga de l\u00edquidos"}}
+*3
+$3
+SET
+$19
+swelled lymph nodes
+$66
+{"en": {"es": "inflamaci\u00f3n de los ganglios linf\u00e1ticos"}}
+*3
+$3
+SET
+$7
+malaise
+$26
+{"en": {"es": "malestar"}}
+*3
+$3
+SET
+$23
+prominent veins on calf
+$53
+{"en": {"es": "venas prominentes en la pantorrilla"}}
+*3
+$3
+SET
+$19
+puffy face and eyes
+$39
+{"en": {"es": "cara y ojos hinchados"}}
+*3
+$3
+SET
+$15
+fast heart rate
+$49
+{"en": {"es": "ritmo card\u00edaco r\u00e1pido"}}
+*3
+$3
+SET
+$12
+irritability
+$31
+{"en": {"es": "irritabilidad"}}
+*3
+$3
+SET
+$11
+muscle pain
+$32
+{"en": {"es": "dolor muscular"}}
+*3
+$3
+SET
+$10
+mild fever
+$29
+{"en": {"es": "fiebre leve"}}
+*3
+$3
+SET
+$12
+yellow urine
+$32
+{"en": {"es": "orina amarilla"}}
+*3
+$3
+SET
+$6
+phlegm
+$23
+{"en": {"es": "flema"}}
+*3
+$3
+SET
+$16
+enlarged thyroid
+$56
+{"en": {"es": "aumento del tama\u00f1o de la tiroides"}}
+*3
+$3
+SET
+$18
+increased appetite
+$37
+{"en": {"es": "aumento del apetito"}}
+*3
+$3
+SET
+$19
+visual disturbances
+$39
+{"en": {"es": "alteraciones visuales"}}
+*3
+$3
+SET
+$13
+brittle nails
+$39
+{"en": {"es": "U\u00f1as quebradizas"}}
+*3
+$3
+SET
+$24
+drying and tingling lips
+$46
+{"en": {"es": "labios de secado y hormigueo"}}
+*3
+$3
+SET
+$8
+polyuria
+$26
+{"en": {"es": "poliuria"}}
+*3
+$3
+SET
+$20
+pain behind the eyes
+$47
+{"en": {"es": "dolor detr\u00e1s de los ojos"}}
+*3
+$3
+SET
+$10
+toxic look
+$37
+{"en": {"es": "aspecto t\u00f3xico"}}
+*3
+$3
+SET
+$17
+throat irritation
+$45
+{"en": {"es": "irritaci\u00f3n de garganta"}}
+*3
+$3
+SET
+$19
+swollen extremeties
+$41
+{"en": {"es": "Extremidades inflamadas"}}
+*3
+$3
+SET
+$14
+slurred speech
+$31
+{"en": {"es": "habla slurred"}}
+*3
+$3
+SET
+$19
+red spots over body
+$47
+{"en": {"es": "manchas rojas sobre el cuerpo"}}
+*3
+$3
+SET
+$10
+belly pain
+$40
+{"en": {"es": "dolor de est\u00f3mago"}}
+*3
+$3
+SET
+$27
+receiving blood transfusion
+$52
+{"en": {"es": "recibir transfusi\u00f3n de sangre"}}
+*3
+$3
+SET
+$19
+acute liver failure
+$51
+{"en": {"es": "insuficiencia hep\u00e1tica aguda"}}
+*3
+$3
+SET
+$15
+redness of eyes
+$44
+{"en": {"es": "enrojecimiento de los ojos"}}
+*3
+$3
+SET
+$12
+rusty sputum
+$32
+{"en": {"es": "esputo oxidado"}}
+*3
+$3
+SET
+$21
+abnormal menstruation
+$43
+{"en": {"es": "menstruaci\u00f3n anormal"}}
+*3
+$3
+SET
+$30
+receiving unsterile injections
+$59
+{"en": {"es": "que reciben inyecciones no est\u00e9riles"}}
+*3
+$3
+SET
+$4
+coma
+$22
+{"en": {"es": "coma"}}
+*3
+$3
+SET
+$14
+sinus pressure
+$38
+{"en": {"es": "presi\u00f3n sinusal"}}
+*3
+$3
+SET
+$12
+palpitations
+$31
+{"en": {"es": "palpitaciones"}}
+*3
+$3
+SET
+$16
+stomach bleeding
+$45
+{"en": {"es": "hemorragia de est\u00f3mago"}}
+*3
+$3
+SET
+$10
+runny nose
+$29
+{"en": {"es": "goteo nasal"}}
+*3
+$3
+SET
+$10
+congestion
+$33
+{"en": {"es": "congesti\u00f3n"}}
+*3
+$3
+SET
+$15
+blood in sputum
+$34
+{"en": {"es": "sangre en esputo"}}
+*3
+$3
+SET
+$13
+loss of smell
+$40
+{"en": {"es": "p\u00e9rdida de olfato"}}
+*3
+$3
+SET
+$195
+an adverse drug reaction is an injury caused by taking medication. adrs may occur following a single dose or prolonged administration of a drug or result from the combination of two or more drugs
+$270
+{"en": {"es": "una reacci\u00f3n adversa es una lesi\u00f3n causada por tomar medicamentos. adrs puede ocurrir despu\u00e9s de una dosis \u00fanica o la administraci\u00f3n prolongada de un medicamento o resultado de la combinaci\u00f3n de dos o m\u00e1s medicamentos"}}
+*3
+$3
+SET
+$227
+an infectious disease caused by protozoan parasites from the plasmodium family that can be transmitted by the bite of the anopheles mosquito or by a contaminated needle or transfusion. falciparum malaria is the most deadly type
+$267
+{"en": {"es": "una enfermedad infecciosa causada por par\u00e1sitos protozoarios de la familia plasmodium que puede transmitirse por la picadura del mosquito anofeles o por una aguja contaminada o una transfusi\u00f3n. falciparum malaria es el tipo m\u00e1s mortal"}}
+*3
+$3
+SET
+$235
+an allergy is an immune system response to a foreign substance thats not typically harmful to your body.they can include certain foods, pollen, or pet dander. your immune systems job is to keep you healthy by fighting harmful pathogens
+$316
+{"en": {"es": "una alergia es una respuesta del sistema inmunitario a una sustancia extra\u00f1a que no es t\u00edpicamente perjudicial para su cuerpo.pueden incluir ciertos alimentos, polen o caspa de mascotas. su trabajo del sistema inmunitario es mantenerlo sano luchando contra los pat\u00f3genos da\u00f1inos"}}
+*3
+$3
+SET
+$168
+hypothyroidism, also called underactive thyroid or low thyroid, is a disorder of the endocrine system in which the thyroid gland does not produce enough thyroid hormone
+$207
+{"en": {"es": "El hipotiroidismo, tambi\u00e9n llamado tiroides hipoactiva o tiroides baja, es un trastorno del sistema endocrino en el que la gl\u00e1ndula tiroides no produce suficiente hormona tiroidea"}}
+*3
+$3
+SET
+$291
+psoriasis is a common skin disorder that forms thick, red, bumpy patches covered with silvery scales. they can pop up anywhere, but most appear on the scalp, elbows, knees, and lower back. psoriasis cant be passed from person to person. it does sometimes happen in members of the same family
+$377
+{"en": {"es": "psoriasis es un trastorno com\u00fan de la piel que forma manchas gruesas, rojas, baches cubiertas con escamas plateadas. pueden aparecer en cualquier lugar, pero la mayor\u00eda aparecen en el cuero cabelludo, codos, rodillas, y la parte inferior de la espalda. psoriasis no se puede pasar de persona a persona. a veces sucede en miembros de la misma familia"}}
+*3
+$3
+SET
+$261
+gastroesophageal reflux disease, or gerd, is a digestive disorder that affects the lower esophageal sphincter , the ring of muscle between the esophagus and stomach. many people, including pregnant women, suffer from heartburn or acid indigestion caused by gerd
+$336
+{"en": {"es": "La enfermedad por reflujo gastroesof\u00e1gico, o gerd, es un trastorno digestivo que afecta al esf\u00ednter esof\u00e1gico inferior, el anillo muscular entre el es\u00f3fago y el est\u00f3mago. muchas personas, incluyendo mujeres embarazadas, sufren de acidez estomacal o indigesti\u00f3n \u00e1cida causada por gerd"}}
+*3
+$3
+SET
+$241
+chronic cholestatic diseases, whether occurring in infancy, childhood or adulthood, are characterized by defective bile acid transport from the liver to the intestine, which is caused by primary damage to the biliary epithelium in most cases
+$310
+{"en": {"es": "Las enfermedades colest\u00e1ticas cr\u00f3nicas, ya se produzcan en la infancia, la infancia o la edad adulta, se caracterizan por un transporte defectuoso de \u00e1cido biliar del h\u00edgado al intestino, causado por da\u00f1os primarios al epitelio biliar en la mayor\u00eda de los casos."}}
+*3
+$3
+SET
+$205
+hepatitis a is a highly contagious liver infection caused by the hepatitis a virus. the virus is one of several types of hepatitis viruses that cause inflammation and affect your livers ability to function
+$257
+{"en": {"es": "hepatitis a es una infecci\u00f3n hep\u00e1tica altamente contagiosa causada por la hepatitis a virus. el virus es uno de varios tipos de virus de la hepatitis que causan inflamaci\u00f3n y afectan a su h\u00edgado capacidad para funcionar"}}
+*3
+$3
+SET
+$190
+osteoarthritis is the most common form of arthritis, affecting millions of people worldwide. it occurs when the protective cartilage that cushions the ends of your bones wears down over time
+$241
+{"en": {"es": "osteoartritis es la forma m\u00e1s com\u00fan de artritis, que afecta a millones de personas en todo el mundo. se produce cuando el cart\u00edlago protector que amortigua los extremos de sus huesos se desgasta con el tiempo"}}
+*3
+$3
+SET
+$258
+benign paroxysmal positional vertigo is one of the most common causes of vertigo — the sudden sensation that youre spinning or that the inside of your head is spinning. benign paroxysmal positional vertigo causes brief episodes of mild to intense dizziness
+$327
+{"en": {"es": "v\u00e9rtigo posicional benigno parox\u00edstico es una de las causas m\u00e1s comunes de v\u00e9rtigo \u2014 la sensaci\u00f3n repentina que est\u00e1s girando o que el interior de tu cabeza est\u00e1 girando. v\u00e9rtigo posicional parox\u00edstico benigno causa episodios breves de mareos leves a intensos"}}
+*3
+$3
+SET
+$297
+hypoglycemia is a condition in which your blood sugar level is lower than normal. glucose is your bodys main energy source. hypoglycemia is often related to diabetes treatment. but other drugs and a variety of conditions — many rare — can cause low blood sugar in people who dont have diabetes
+$273
+{"en": {"es": "La hipoglucemia es una afecci\u00f3n en la que su nivel de az\u00facar en sangre es m\u00e1s bajo de lo normal. La glucosa es la principal fuente de energ\u00eda del cuerpo. La hipoglucemia a menudo est\u00e1 relacionada con el tratamiento de la diabetes."}}
+*3
+$3
+SET
+$231
+acne vulgaris is the formation of comedones, papules, pustules, nodules, and/or cysts as a result of obstruction and inflammation of pilosebaceous units . acne develops on the face and upper trunk. it most often affects adolescents
+$274
+{"en": {"es": "acn\u00e9 vulgaris es la formaci\u00f3n de comedones, p\u00e1pulas, p\u00fastulas, n\u00f3dulos y/o quistes como resultado de la obstrucci\u00f3n e inflamaci\u00f3n de las unidades piloseb\u00e1ceas. acn\u00e9 se desarrolla en la cara y el tronco superior."}}
+*3
+$3
+SET
+$280
+diabetes is a disease that occurs when your blood glucose, also called blood sugar, is too high. blood glucose is your main source of energy and comes from the food you eat. insulin, a hormone made by the pancreas, helps glucose from food get into your cells to be used for energy
+$412
+{"en": {"es": "La diabetes es una enfermedad que ocurre cuando su glucosa en sangre, tambi\u00e9n llamada az\u00facar en sangre, es demasiado alta. La glucosa en sangre es su principal fuente de energ\u00eda y proviene de los alimentos que consume. La insulina, una hormona producida por el p\u00e1ncreas, ayuda a que la glucosa de los alimentos entre en sus c\u00e9lulas para ser utilizada como energ\u00eda."}}
+*3
+$3
+SET
+$265
+impetigo is a common and highly contagious skin infection that mainly affects infants and children. impetigo usually appears as red sores on the face, especially around a childs nose and mouth, and on hands and feet. the sores burst and develop honey-colored crusts
+$352
+{"en": {"es": "El imp\u00e9tigo es una infecci\u00f3n com\u00fan y altamente contagiosa de la piel que afecta principalmente a beb\u00e9s y ni\u00f1os. el imp\u00e9tigo generalmente aparece como llagas rojas en la cara, especialmente alrededor de un ni\u00f1o nariz y boca, y en las manos y pies. las llagas estallan y desarrollan costras color miel"}}
+*3
+$3
+SET
+$207
+hypertension , also known as high blood pressure , is a long-term medical condition in which the blood pressure in the arteries is persistently elevated. high blood pressure typically does not cause symptoms
+$298
+{"en": {"es": "hipertensi\u00f3n arterial, tambi\u00e9n conocida como presi\u00f3n arterial alta, es una condici\u00f3n m\u00e9dica a largo plazo en la que la presi\u00f3n arterial en las arterias es persistentemente elevada. la presi\u00f3n arterial alta t\u00edpicamente no causa s\u00edntomas"}}
+*3
+$3
+SET
+$257
+peptic ulcer disease is a break in the inner lining of the stomach, the first part of the small intestine, or sometimes the lower esophagus. an ulcer in the stomach is called a gastric ulcer, while one in the first part of the intestines is a duodenal ulcer
+$338
+{"en": {"es": "La \u00falcera p\u00e9ptica es una ruptura en el revestimiento interno del est\u00f3mago, la primera parte del intestino delgado, o a veces el es\u00f3fago inferior. una \u00falcera en el est\u00f3mago se llama \u00falcera g\u00e1strica, mientras que una en la primera parte de los intestinos es una \u00falcera duodenal"}}
+*3
+$3
+SET
+$150
+hemorrhoids, also spelled haemorrhoids, are vascular structures in the anal canal. in their ... other names, haemorrhoids, piles, hemorrhoidal disease
+$185
+{"en": {"es": "Las hemorroides, tambi\u00e9n deletreadas hemorroides, son estructuras vasculares en el canal anal.... en sus otros nombres, hemorroides, pilas, enfermedad hemorroidal"}}
+*3
+$3
+SET
+$167
+the common cold is a viral infection of your nose and throat . its usually harmless, although it might not feel that way. many types of viruses can cause a common cold
+$224
+{"en": {"es": "el resfriado com\u00fan es una infecci\u00f3n viral de la nariz y la garganta. es generalmente inofensivo, aunque puede no sentirse de esa manera. muchos tipos de virus pueden causar un resfriado com\u00fan"}}
+*3
+$3
+SET
+$257
+chickenpox is a highly contagious disease caused by the varicella-zoster virus . it can cause an itchy, blister-like rash. the rash first appears on the chest, back, and face, and then spreads over the entire body, causing between 250 and 500 itchy blisters
+$330
+{"en": {"es": "La varicela es una enfermedad altamente contagiosa causada por el virus de la varicela-z\u00f3ster. puede causar un sarpullido parecido a una ampolla con picor. la erupci\u00f3n aparece primero en el pecho, la espalda y la cara, y luego se disemina por todo el cuerpo, causando entre 250 y 500 ampollas con picor"}}
+*3
+$3
+SET
+$229
+cervical spondylosis is a general term for age-related wear and tear affecting the spinal disks in your neck. as the disks dehydrate and shrink, signs of osteoarthritis develop, including bony projections along the edges of bones
+$319
+{"en": {"es": "espondilosis cervical es un t\u00e9rmino general para el desgaste relacionado con la edad que afecta a los discos espinales en el cuello. a medida que los discos se deshidratan y encogen, se desarrollan signos de osteoartritis, incluyendo proyecciones \u00f3seas a lo largo de los bordes de los huesos"}}
+*3
+$3
+SET
+$213
+hyperthyroidism occurs when your thyroid gland produces too much of the hormone thyroxine. hyperthyroidism can accelerate your bodys metabolism, causing unintentional weight loss and a rapid or irregular heartbeat
+$273
+{"en": {"es": "hipertiroidismo se produce cuando la gl\u00e1ndula tiroides produce demasiado de la hormona tiroxina. hipertiroidismo puede acelerar el metabolismo de su cuerpo, causando p\u00e9rdida de peso no intencional y un ritmo card\u00edaco r\u00e1pido o irregular"}}
+*3
+$3
+SET
+$226
+urinary tract infection: an infection of the kidney, ureter, bladder, or urethra. abbreviated uti. not everyone with a uti has symptoms, but common symptoms include a frequent urge to urinate and pain or burning when urinating
+$285
+{"en": {"es": "infecci\u00f3n del tracto urinario: infecci\u00f3n del ri\u00f1\u00f3n, ur\u00e9ter, vejiga o uretra. uti abreviado. no todas las personas con un uti tienen s\u00edntomas, pero s\u00edntomas comunes incluyen una necesidad frecuente de orinar y dolor o ardor al orinar"}}
+*3
+$3
+SET
+$228
+a vein that has enlarged and twisted, often appearing as a bulging, blue blood vessel that is clearly visible through the skin. varicose veins are most common in older adults, particularly women, and occur especially on the legs
+$307
+{"en": {"es": "una vena que se ha agrandado y retorcido, a menudo apareciendo como un vaso sangu\u00edneo azul abultado que es claramente visible a trav\u00e9s de la piel. las venas varicosas son m\u00e1s comunes en los adultos mayores, particularmente las mujeres, y ocurren especialmente en las piernas"}}
+*3
+$3
+SET
+$234
+acquired immunodeficiency syndrome is a chronic, potentially life-threatening condition caused by the human immunodeficiency virus . by damaging your immune system, hiv interferes with your bodys ability to fight infection and disease
+$315
+{"en": {"es": "s\u00edndrome de inmunodeficiencia adquirida es una condici\u00f3n cr\u00f3nica, potencialmente potencialmente mortal causada por el virus de inmunodeficiencia humana. al da\u00f1ar su sistema inmunitario, hiv interfiere con su cuerpo capacidad para luchar contra la infecci\u00f3n y la enfermedad"}}
+*3
+$3
+SET
+$245
+intracerebral hemorrhage is when blood suddenly bursts into brain tissue, causing damage to your brain. symptoms usually appear suddenly during ich. they include headache, weakness, confusion, and paralysis, particularly on one side of your body
+$321
+{"en": {"es": "La hemorragia intracerebral es cuando la sangre estalla repentinamente en el tejido cerebral, causando da\u00f1o al cerebro. Los s\u00edntomas generalmente aparecen repentinamente durante el ic. incluyen dolor de cabeza, debilidad, confusi\u00f3n y par\u00e1lisis, particularmente en un lado del cuerpo."}}
+*3
+$3
+SET
+$261
+an acute illness characterized by fever caused by infection with the bacterium salmonella typhi. typhoid fever has an insidious onset, with fever, headache, constipation, malaise, chills, and muscle pain. diarrhea is uncommon, and vomiting is not usually severe
+$329
+{"en": {"es": "una enfermedad aguda caracterizada por fiebre causada por infecci\u00f3n con la bacteria salmonella tiphi. fiebre tifoidea tiene un inicio insidioso, con fiebre, dolor de cabeza, estre\u00f1imiento, malestar, escalofr\u00edos y dolor muscular. diarrea es poco com\u00fan, y v\u00f3mitos no es generalmente grave"}}
+*3
+$3
+SET
+$264
+hepatitis b is an infection of your liver. it can cause scarring of the organ, liver failure, and cancer. it can be fatal if it isnt treated. its spread when people come in contact with the blood, open sores, or body fluids of someone who has the hepatitis b virus
+$361
+{"en": {"es": "hepatitis b es una infecci\u00f3n de su h\u00edgado. puede causar cicatrizaci\u00f3n del \u00f3rgano, insuficiencia hep\u00e1tica y c\u00e1ncer. puede ser mortal si no se trata. su propagaci\u00f3n cuando las personas entran en contacto con la sangre, llagas abiertas, o l\u00edquidos corporales de alguien que tiene el virus de la hepatitis b"}}
+*3
+$3
+SET
+$317
+in humans, fungal infections occur when an invading fungus takes over an area of the body and is too much for the immune system to handle. fungi can live in the air, soil, water, and plants. there are also some fungi that live naturally in the human body. like many microbes, there are helpful fungi and harmful fungi
+$410
+{"en": {"es": "en los seres humanos, las infecciones f\u00fangicas ocurren cuando un hongo invasor se apodera de un \u00e1rea del cuerpo y es demasiado para que el sistema inmunitario pueda manejar. hongos pueden vivir en el aire, el suelo, el agua y las plantas. tambi\u00e9n hay algunos hongos que viven naturalmente en el cuerpo humano. como muchos microbios, hay hongos \u00fatiles y hongos da\u00f1inos"}}
+*3
+$3
+SET
+$240
+inflammation of the liver due to the hepatitis c virus , which is usually spread via blood transfusion , hemodialysis, and needle sticks. the damage hepatitis c does to the liver can lead to cirrhosis and its complications as well as cancer
+$325
+{"en": {"es": "inflamaci\u00f3n del h\u00edgado debido al virus de la hepatitis c, que por lo general se transmite a trav\u00e9s de transfusiones de sangre, hemodi\u00e1lisis y pinchazos de aguja. el da\u00f1o que la hepatitis c hace al h\u00edgado puede conducir a cirrosis y sus complicaciones, as\u00ed como c\u00e1ncer"}}
+*3
+$3
+SET
+$307
+a migraine can cause severe throbbing pain or a pulsing sensation, usually on one side of the head. its often accompanied by nausea, vomiting, and extreme sensitivity to light and sound. migraine attacks can last for hours to days, and the pain can be so severe that it interferes with your daily activities
+$375
+{"en": {"es": "una migra\u00f1a puede causar dolor agudo o una sensaci\u00f3n de pulsaci\u00f3n, generalmente en un lado de la cabeza. a menudo acompa\u00f1ado de n\u00e1useas, v\u00f3mitos y una sensibilidad extrema a la luz y el sonido. los ataques de migra\u00f1a pueden durar horas a d\u00edas, y el dolor puede ser tan grave que interfiere con sus actividades diarias"}}
+*3
+$3
+SET
+$298
+bronchial asthma is a medical condition which causes the airway path of the lungs to swell and narrow. due to this swelling, the air path produces excess mucus making it hard to breathe, which results in coughing, short breath, and wheezing. the disease is chronic and interferes with daily working
+$383
+{"en": {"es": "asma bronquial es una afecci\u00f3n m\u00e9dica que hace que la v\u00eda a\u00e9rea de los pulmones se hinche y se angoste. debido a esta hinchaz\u00f3n, la v\u00eda a\u00e9rea produce exceso de moco haciendo que sea dif\u00edcil respirar, lo que resulta en tos, respiraci\u00f3n corta y sibilancias. la enfermedad es cr\u00f3nica e interfiere con el trabajo diario"}}
+*3
+$3
+SET
+$264
+alcoholic hepatitis is a diseased, inflammatory condition of the liver caused by heavy alcohol consumption over an extended period of time. its also aggravated by binge drinking and ongoing alcohol use. if you develop this condition, you must stop drinking alcohol
+$326
+{"en": {"es": "hepatitis alcoh\u00f3lica es una enfermedad, inflamatoria del h\u00edgado causada por el consumo de alcohol pesado durante un per\u00edodo prolongado de tiempo. tambi\u00e9n se agrava por el consumo de atracones y el consumo de alcohol en curso. si desarrolla esta condici\u00f3n, debe dejar de beber alcohol"}}
+*3
+$3
+SET
+$261
+yellow staining of the skin and sclerae by abnormally high blood levels of the bile pigment bilirubin. the yellowing extends to other tissues and body fluids. jaundice was once called the "morbus regius" in the belief that only the touch of a king could cure it
+$329
+{"en": {"es": "tinci\u00f3n amarilla de la piel y las escleras por niveles anormalmente altos en la sangre del pigmento biliar bilirrubina. el amarillento se extiende a otros tejidos y fluidos corporales. ictericia fue una vez llamado el \"morbus regius\" en la creencia de que s\u00f3lo el toque de un rey podr\u00eda curarlo"}}
+*3
+$3
+SET
+$284
+a rare form of liver inflammation caused by infection with the hepatitis e virus . it is transmitted via food or drink handled by an infected person or through infected water supplies in areas where fecal matter may get into the water. hepatitis e does not cause chronic liver disease
+$385
+{"en": {"es": "una forma rara de inflamaci\u00f3n hep\u00e1tica causada por la infecci\u00f3n por el virus de la hepatitis e. se transmite a trav\u00e9s de alimentos o bebidas manejadas por una persona infectada o a trav\u00e9s de suministros de agua infectados en \u00e1reas donde la materia fecal puede entrar en el agua. hepatitis e no causa enfermedad hep\u00e1tica cr\u00f3nica"}}
+*3
+$3
+SET
+$193
+an acute infectious disease caused by a flavivirus , transmitted by aedes mosquitoes, and characterized by headache, severe joint pain, and a rash. — called also breakbone fever, dengue fever
+$266
+{"en": {"es": "una enfermedad infecciosa aguda causada por un flavivirus, transmitida por mosquitos aedes, y caracterizada por dolor de cabeza, dolor articular intenso y erupci\u00f3n cut\u00e1nea. \u2014 llamada tambi\u00e9n fiebre del quiebre, fiebre del dengue"}}
+*3
+$3
+SET
+$273
+hepatitis d, also known as the hepatitis delta virus, is an infection that causes the liver to become inflamed. this swelling can impair liver function and cause long-term liver problems, including liver scarring and cancer. the condition is caused by the hepatitis d virus
+$378
+{"en": {"es": "hepatitis d, tambi\u00e9n conocido como el virus delta de la hepatitis, es una infecci\u00f3n que hace que el h\u00edgado se inflama. esta hinchaz\u00f3n puede da\u00f1ar la funci\u00f3n hep\u00e1tica y causar problemas hep\u00e1ticos a largo plazo, incluyendo cicatrices hep\u00e1ticas y c\u00e1ncer. la afecci\u00f3n es causada por el virus de la hepatitis d"}}
+*3
+$3
+SET
+$206
+the death of heart muscle due to the loss of blood supply. the loss of blood supply is usually caused by a complete blockage of a coronary artery, one of the arteries that supplies blood to the heart muscle
+$290
+{"en": {"es": "la muerte del m\u00fasculo card\u00edaco debido a la p\u00e9rdida del suministro de sangre. la p\u00e9rdida del suministro de sangre suele ser causada por un bloqueo completo de una arteria coronaria, una de las arterias que suministra sangre al m\u00fasculo card\u00edaco"}}
+*3
+$3
+SET
+$244
+pneumonia is an infection in one or both lungs. bacteria, viruses, and fungi cause it. the infection causes inflammation in the air sacs in your lungs, which are called alveoli. the alveoli fill with fluid or pus, making it difficult to breathe
+$316
+{"en": {"es": "la neumon\u00eda es una infecci\u00f3n en uno o ambos pulmones. bacterias, virus y hongos lo causan. la infecci\u00f3n causa inflamaci\u00f3n en los sacos de aire en los pulmones, que se llaman alv\u00e9olos. los alv\u00e9olos se llenan de l\u00edquido o pus, haciendo que sea dif\u00edcil respirar"}}
+*3
+$3
+SET
+$244
+arthritis is the swelling and tenderness of one or more of your joints. the main symptoms of arthritis are joint pain and stiffness, which typically worsen with age. the most common types of arthritis are osteoarthritis and rheumatoid arthritis
+$305
+{"en": {"es": "artritis es la hinchaz\u00f3n y sensibilidad de una o m\u00e1s de sus articulaciones. los s\u00edntomas principales de la artritis son dolor y rigidez articulares, que generalmente empeoran con la edad. los tipos m\u00e1s comunes de artritis son la osteoartritis y la artritis reumatoide"}}
+*3
+$3
+SET
+$257
+gastroenteritis is an inflammation of the digestive tract, particularly the stomach, and large and small intestines. viral and bacterial gastroenteritis are intestinal infections associated with symptoms of diarrhea , abdominal cramps, nausea , and vomiting
+$303
+{"en": {"es": "gastroenteritis es una inflamaci\u00f3n del tracto digestivo, especialmente el est\u00f3mago, y los intestinos grandes y delgados. gastroenteritis viral y bacteriana son infecciones intestinales asociadas con s\u00edntomas de diarrea, calambres abdominales, n\u00e1useas y v\u00f3mitos"}}
+*3
+$3
+SET
+$262
+tuberculosis is an infectious disease usually caused by mycobacterium tuberculosis bacteria. tuberculosis generally affects the lungs, but can also affect other parts of the body. most infections show no symptoms, in which case it is known as latent tuberculosis
+$343
+{"en": {"es": "tuberculosis es una enfermedad infecciosa generalmente causada por la bacteria micobacterium tuberculosis. tuberculosis generalmente afecta a los pulmones, pero tambi\u00e9n puede afectar a otras partes del cuerpo. la mayor\u00eda de las infecciones no muestran s\u00edntomas, en cuyo caso se conoce como tuberculosis latente"}}
+*3
+$3
+SET
+$18
+foul smell ofurine
+$44
+{"en": {"es": "olor asqueroso de la urina"}}
+*3
+$3
+SET
+$9
+prognosis
+$33
+{"en": {"es": "pron\u00f3stico"}}
+*3
+$3
+SET
+$15
+stop irritation
+$42
+{"en": {"es": "parar la irritaci\u00f3n"}}
+*3
+$3
+SET
+$24
+consult nearest hospital
+$56
+{"en": {"es": "consultar el hospital m\u00e1s cercano"}}
+*3
+$3
+SET
+$14
+apply calamine
+$34
+{"en": {"es": "aplicar calamina"}}
+*3
+$3
+SET
+$13
+reduce stress
+$40
+{"en": {"es": "reducir el estr\u00e9s"}}
+*3
+$3
+SET
+$32
+wash hands with warm soapy water
+$61
+{"en": {"es": "lavarse las manos con agua tibia y jabonosa"}}
+*3
+$3
+SET
+$22
+avoid fatty spicy food
+$54
+{"en": {"es": "evitar los alimentos grasos picantes"}}
+*3
+$3
+SET
+$10
+cold baths
+$39
+{"en": {"es": "ba\u00f1os fr\u00edos"}}
+*3
+$3
+SET
+$13
+acetaminophen
+$31
+{"en": {"es": "acetaminofeno"}}
+*3
+$3
+SET
+$8
+lie down
+$33
+{"en": {"es": "Acu\u00e9state."}}
+*3
+$3
+SET
+$16
+lie down on side
+$41
+{"en": {"es": "Acu\u00e9state de lado."}}
+*3
+$3
+SET
+$10
+bath twice
+$37
+{"en": {"es": "ba\u00f1o dos veces"}}
+*3
+$3
+SET
+$18
+have balanced diet
+$45
+{"en": {"es": "tener una dieta equilibrada"}}
+*3
+$3
+SET
+$32
+soak affected area in warm water
+$61
+{"en": {"es": "empapar el \u00e1rea afectada en agua tibia"}}
+*3
+$3
+SET
+$10
+meditation
+$33
+{"en": {"es": "meditaci\u00f3n"}}
+*3
+$3
+SET
+$27
+drink vitamin c rich drinks
+$51
+{"en": {"es": "beber bebidas ricas en vitamina c"}}
+*3
+$3
+SET
+$19
+use neem in bathing
+$47
+{"en": {"es": "utilizar neem en el ba\u00f1o"}}
+*3
+$3
+SET
+$28
+use heating pad or cold pack
+$78
+{"en": {"es": "utilizar almohadilla de calefacci\u00f3n o paquete fr\u00edo"}}
+*3
+$3
+SET
+$11
+eat healthy
+$28
+{"en": {"es": "comer sano"}}
+*3
+$3
+SET
+$21
+drink plenty of water
+$34
+{"en": {"es": "beber mucha agua"}}
+*3
+$3
+SET
+$36
+lie down flat and raise the leg high
+$59
+{"en": {"es": "acostarse plana y levantar la pierna alta"}}
+*3
+$3
+SET
+$15
+avoid open cuts
+$40
+{"en": {"es": "evitar cortes abiertos"}}
+*3
+$3
+SET
+$7
+massage
+$24
+{"en": {"es": "masaje"}}
+*3
+$3
+SET
+$27
+eat high calorie vegitables
+$53
+{"en": {"es": "comer altas calor\u00edas vegetales"}}
+*3
+$3
+SET
+$25
+switch to loose cloothing
+$39
+{"en": {"es": "cambiar a algo suelto"}}
+*3
+$3
+SET
+$24
+stop alcohol consumption
+$47
+{"en": {"es": "detener el consumo de alcohol"}}
+*3
+$3
+SET
+$23
+drink papaya leaf juice
+$46
+{"en": {"es": "beber jugo de hoja de papaya"}}
+*3
+$3
+SET
+$14
+consult doctor
+$42
+{"en": {"es": "consultar al m\u00e9dico"}}
+*3
+$3
+SET
+$14
+call ambulance
+$40
+{"en": {"es": "llamar a la ambulancia"}}
+*3
+$3
+SET
+$8
+exercise
+$27
+{"en": {"es": "ejercicio"}}
+*3
+$3
+SET
+$32
+stop eating solid food for while
+$69
+{"en": {"es": "dejar de comer alimentos s\u00f3lidos por un tiempo"}}
+*3
+$3
+SET
+$11
+cover mouth
+$27
+{"en": {"es": "tapa boca"}}
+*3
+$3
+SET
+$15
+avoid oily food
+$48
+{"en": {"es": "evitar los alimentos aceitosos"}}
+*3
+$3
+SET
+$23
+cover area with bandage
+$49
+{"en": {"es": "cubrir el \u00e1rea con vendaje"}}
+*3
+$3
+SET
+$28
+stop bleeding using pressure
+$56
+{"en": {"es": "dejar de sangrar mediante presi\u00f3n"}}
+*3
+$3
+SET
+$29
+avoid lying down after eating
+$56
+{"en": {"es": "evitar acostarse despu\u00e9s de comer"}}
+*3
+$3
+SET
+$18
+anti itch medicine
+$53
+{"en": {"es": "medicamentos contra la picaz\u00f3n"}}
+*3
+$3
+SET
+$18
+wash hands through
+$35
+{"en": {"es": "lavarse las manos"}}
+*3
+$3
+SET
+$27
+avoid sudden change in body
+$56
+{"en": {"es": "evitar cambios repentinos en el cuerpo"}}
+*3
+$3
+SET
+$14
+check in pulse
+$36
+{"en": {"es": "comprobar el pulso"}}
+*3
+$3
+SET
+$15
+use antibiotics
+$42
+{"en": {"es": "uso de antibi\u00f3ticos"}}
+*3
+$3
+SET
+$10
+salt baths
+$35
+{"en": {"es": "ba\u00f1os de sal"}}
+*3
+$3
+SET
+$22
+consume probiotic food
+$53
+{"en": {"es": "consumir alimentos probi\u00f3ticos"}}
+*3
+$3
+SET
+$19
+consume witch hazel
+$44
+{"en": {"es": "consumir avellana de bruja"}}
+*3
+$3
+SET
+$11
+take vapour
+$29
+{"en": {"es": "tomar vapor"}}
+*3
+$3
+SET
+$19
+consume neem leaves
+$40
+{"en": {"es": "consumir hojas de neem"}}
+*3
+$3
+SET
+$25
+increase vitamin c intake
+$51
+{"en": {"es": "aumentar la ingesta de vitamina c"}}
+*3
+$3
+SET
+$12
+use oinments
+$33
+{"en": {"es": "Uso de oinments"}}
+*3
+$3
+SET
+$20
+wear ppe if possible
+$40
+{"en": {"es": "usar ppe si es posible"}}
+*3
+$3
+SET
+$18
+antibiotic therapy
+$42
+{"en": {"es": "terapia antibi\u00f3tica"}}
+*3
+$3
+SET
+$11
+vaccination
+$33
+{"en": {"es": "vacunaci\u00f3n"}}
+*3
+$3
+SET
+$34
+use detol or neem in bathing water
+$65
+{"en": {"es": "utilizar detol o neem en las aguas de ba\u00f1o"}}
+*3
+$3
+SET
+$17
+take deep breaths
+$40
+{"en": {"es": "respirar profundamente"}}
+*3
+$3
+SET
+$20
+consume milk thistle
+$44
+{"en": {"es": "consumir cardo l\u00e1cteo"}}
+*3
+$3
+SET
+$4
+rest
+$26
+{"en": {"es": "descanso"}}
+*3
+$3
+SET
+$10
+medication
+$30
+{"en": {"es": "medicamentos"}}
+*3
+$3
+SET
+$22
+chew or swallow asprin
+$44
+{"en": {"es": "masticar o tragar asperina"}}
+*3
+$3
+SET
+$24
+use hot and cold therapy
+$58
+{"en": {"es": "utilizar la terapia caliente y fr\u00eda"}}
+*3
+$3
+SET
+$30
+try taking small sips of water
+$62
+{"en": {"es": "tratar de tomar peque\u00f1os sorbos de agua"}}
+*3
+$3
+SET
+$17
+stop taking drugs
+$39
+{"en": {"es": "dejar de tomar drogas"}}
+*3
+$3
+SET
+$18
+avoid non veg food
+$51
+{"en": {"es": "evitar los alimentos no vegetales"}}
+*3
+$3
+SET
+$23
+maintain healthy weight
+$44
+{"en": {"es": "mantener un peso saludable"}}
+*3
+$3
+SET
+$9
+follow up
+$29
+{"en": {"es": "Seguimiento"}}
+*3
+$3
+SET
+$25
+avoid abrupt head movment
+$58
+{"en": {"es": "evitar el movimiento brusco de la cabeza"}}
+*3
+$3
+SET
+$19
+drink sugary drinks
+$42
+{"en": {"es": "beber bebidas azucaradas"}}
+*3
+$3
+SET
+$38
+remove scabs with wet compressed cloth
+$68
+{"en": {"es": "quitar las costras con tela h\u00fameda comprimida"}}
+*3
+$3
+SET
+$14
+eliminate milk
+$35
+{"en": {"es": "eliminar la leche"}}
+*3
+$3
+SET
+$25
+warm bath with epsom salt
+$50
+{"en": {"es": "ba\u00f1o caliente con sal epsom"}}
+*3
+$3
+SET
+$15
+avoid cold food
+$49
+{"en": {"es": "evitar los alimentos fr\u00edos"}}
+*3
+$3
+SET
+$12
+take vaccine
+$33
+{"en": {"es": "tomar la vacuna"}}
+*3
+$3
+SET
+$21
+take otc pain reliver
+$41
+{"en": {"es": "tomar otc dolor reliver"}}
+*3
+$3
+SET
+$14
+use lemon balm
+$49
+{"en": {"es": "usar b\u00e1lsamo de lim\u00f3n"}}
+*3
+$3
+SET
+$21
+drink cranberry juice
+$45
+{"en": {"es": "beber jugo de ar\u00e1ndano"}}
+*3
+$3
+SET
+$20
+use vein compression
+$45
+{"en": {"es": "usar compresi\u00f3n venosa"}}
+*3
+$3
+SET
+$22
+keep infected area dry
+$49
+{"en": {"es": "mantener seca la zona infectada"}}
+*3
+$3
+SET
+$28
+use polarized glasses in sun
+$47
+{"en": {"es": "usar gafas polarizadas al sol"}}
+*3
+$3
+SET
+$21
+get away from trigger
+$42
+{"en": {"es": "al\u00e9jate del gatillo"}}
+*3
+$3
+SET
+$33
+eat fruits and high fiberous food
+$57
+{"en": {"es": "comer frutas y alimentos altos en fibra"}}
+*3
+$3
+SET
+$19
+keep mosquitos away
+$51
+{"en": {"es": "Mantener alejados a los mosquitos"}}
+*3
+$3
+SET
+$9
+keep calm
+$39
+{"en": {"es": "Mant\u00e9n la calma."}}
+*3
+$3
+SET
+$15
+try acupuncture
+$40
+{"en": {"es": "intentar la acupuntura"}}
+*3
+$3
+SET
+$18
+keep mosquitos out
+$51
+{"en": {"es": "Mantener alejados a los mosquitos"}}
+*3
+$3
+SET
+$27
+use ice to compress itching
+$59
+{"en": {"es": "usar hielo para comprimir la picaz\u00f3n"}}
+*3
+$3
+SET
+$16
+get proper sleep
+$30
+{"en": {"es": "Duerme bien."}}
+*3
+$3
+SET
+$5
+relax
+$32
+{"en": {"es": "Rel\u00e1jate."}}
+*3
+$3
+SET
+$23
+avoid too many products
+$45
+{"en": {"es": "evitar demasiados productos"}}
+*3
+$3
+SET
+$13
+limit alcohol
+$36
+{"en": {"es": "limitar el alcohol"}}
+*3
+$3
+SET
+$21
+consume alovera juice
+$42
+{"en": {"es": "consumir jugo de alovera"}}
+*3
+$3
+SET
+$19
+keep fever in check
+$49
+{"en": {"es": "mantener la fiebre bajo control"}}
+*3
+$3
+SET
+$19
+avoid public places
+$50
+{"en": {"es": "evitar los lugares p\u00fablicos"}}
+*3
+$3
+SET
+$33
+take radioactive iodine treatment
+$55
+{"en": {"es": "tomar tratamiento con yodo radiactivo"}}
+*3
+$3
+SET
+$15
+take probiotics
+$40
+{"en": {"es": "tomar probi\u00f3ticos"}}
+*3
+$3
+SET
+$25
+dont stand still for long
+$55
+{"en": {"es": "No te quedes quieto por mucho tiempo."}}
+*3
+$3
+SET
+$16
+use clean cloths
+$41
+{"en": {"es": "usar pa\u00f1os limpios"}}
+*3
+$3
+SET
+$9
+seek help
+$30
+{"en": {"es": "buscar ayuda"}}
+*3
+$3
+SET
+$13
+keep hydrated
+$39
+{"en": {"es": "mantenerse hidratados"}}
+*3
+$3
+SET
+$21
+ease back into eating
+$47
+{"en": {"es": "facilidad para volver a comer"}}
