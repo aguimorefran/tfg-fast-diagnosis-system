@@ -1,22 +1,17 @@
 import pandas as pd
 import re
-import datetime
 
 from cassandradb import Cassandra_client
 from config import DATASET_FOLDER, BASE_LANG, LOAD_DISEASES
+from app.logger import logger as log
 from translator import translate
-
-# create only one instance of the translate function to avoid multiple connections
-translate_func = translate
 
 client = Cassandra_client()
 
 DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
 DATASET_LANG = "en"
 
-
 def clean_string(string):
-    # if AIDS is in string, return AIDS
     if string == 'AIDS':
         return string
     string = str(string)
@@ -45,7 +40,7 @@ def insert_symptom(symptom):
 
 
 def load_disease_symptoms():
-    print('Loading disease symptoms')
+    log.info('Loading disease symptoms')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_symptoms.csv')
     df = df.applymap(clean_string)
     df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
@@ -65,7 +60,7 @@ def load_disease_symptoms():
 
 
 def load_disease_description():
-    print('Loading disease description')
+    log.info('Loading disease description')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_description.csv')
     df = df.applymap(clean_string)
     df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
@@ -86,7 +81,7 @@ def load_disease_description():
 
 
 def load_symptom_severity():
-    print("Loading symptom severity")
+    log.info('Loading symptom severity')
     df = pd.read_csv(DISEASES_FOLDER + 'symptom_severity.csv')
     df = df.applymap(clean_string)
     df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
@@ -107,7 +102,7 @@ def load_symptom_severity():
 
 
 def update_disease_severity():
-    print('Updating disease severity')
+    log.info('Updating disease severity')
     disease_ids = "SELECT id FROM fds.diseases"
     disease_ids = [str(disease.id)
                    for disease in client.execute(disease_ids).all()]
@@ -146,7 +141,7 @@ def insert_precaution(precaution):
 
 
 def load_disease_precautions():
-    print("Loading disease precautions")
+    log.info('Loading disease precautions')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_precautions.csv')
     df = df.applymap(clean_string)
     df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
@@ -172,15 +167,15 @@ def load_disease_precautions():
         client.execute(query)
 
 
-print("Dataloader starting")
-
 if LOAD_DISEASES:
-    print("Loading diseases into database")
+    log.info('Loading diseases')
     load_disease_symptoms()
     load_disease_description()
     load_symptom_severity()
     update_disease_severity()
     load_disease_precautions()
-    print("Diseases loaded into database")
+    log.info('Diseases loaded in tables.')
+    log.info('Creating feature vectors')
+    
 else:
-    print("Skipping disease loading")
+    log.info('LOAD_DISEASES is False, skipping')
