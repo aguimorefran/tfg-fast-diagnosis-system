@@ -1,26 +1,33 @@
-# Translator
+# Translator microservice
 
-## Description
+Translator microservice is a service that provides an API to translate texts from one language to another. It is built using FastAPI and Redis for caching.
 
-Translator microservice. In charche of providing translations for the entire application.
-The microservice is launched at 'localhost:8000' by default, or 'TRANSLATOR_HOST:TRANSLATOR_PORT' if specified.
+## Features
 
-## Endpoints
-
-Once launched, visit http://localhost:8000/docs#/
+- Provides API endpoints for translating texts, creating new translators, and getting information about available translators.
+- Supports caching using Redis, to speed up translation requests.
+- Easy to deploy with Docker.
 
 ## Requirements
 
-Download the Pytorch package from [here](https://pypi.tuna.tsinghua.edu.cn/packages/b9/af/23c13cd340cd333f42de225ba3da3b64e1a70425546d1a59bfa42d465a5d/torch-1.12.1-cp37-cp37m-manylinux1_x86_64.whl#sha256=743784ccea0dc8f2a3fe6a536bec8c4763bd82c1352f314937cb4008d4805de1), and save it in 'translator/packages' folder with the name `torch-1.12.1-cp37-cp37m-manylinux1_x86_64.whl`.
+- Python 3.7 or later
+- Poetry for installing dependencies
+- Docker for containerization
 
-Before executing 'docker compose', run 'sh create_requirements.sh' to create the requirements.txt file for each service.
+## Quick Start
 
-## Env variables
+1. Clone the repository
+2. Install dependencies using `poetry install`
+3. Start the Redis server using `docker-compose up -d`
+4. Run the service using `uvicorn app.main:app --host 0.0.0.0 --port 8000`
 
-Check `.env` file for env variables. This file is later loaded by the `docker-compose.yml` file.
+## API
 
-## Run
+The Translator microservice provides the following endpoints:
 
-1. Dependencies. Either install them using poetry `poetry install`, or install them manually using the `pyproject.toml` file.
-2. Run `git lfs pull` to download the model files.
-3. Docker. Run `docker compose up --build` to build and run the docker containers.
+- `/healthcheck`: A healthcheck endpoint that returns a status of "ok" when the service is running.
+- `/cache/status`: Returns the status of the Redis cache and the number of keys it contains.
+- `/cache/dump`: Returns a dump of the Redis cache.
+- `/get_translators`: Returns the available initialized translators.
+- `/create_translator`: Creates a new translator.
+- `/translate`: Translates a text from the source language to the destination language.
