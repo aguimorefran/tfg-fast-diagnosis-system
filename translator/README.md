@@ -1,33 +1,42 @@
-# Translator microservice
+# Translator Microservice
 
-Translator microservice is a service that provides an API to translate texts from one language to another. It is built using FastAPI and Redis for caching.
+This microservice provides translation of text from one language to another. It uses a Redis cache to store translations for faster retrieval. 
 
 ## Features
-
-- Provides API endpoints for translating texts, creating new translators, and getting information about available translators.
-- Supports caching using Redis, to speed up translation requests.
-- Easy to deploy with Docker.
+- Translates text from one language to another using available translators.
+- Redis cache stores translations for faster retrieval.
+- Provides endpoints for checking the status of the cache and getting a dump of its contents.
 
 ## Requirements
-
-- Python 3.7 or later
-- Poetry for installing dependencies
-- Docker for containerization
+- Python 3.7
+- Poetry package manager
+- Redis
+- Docker (optional)
 
 ## Quick Start
+1. Clone the repository.
+2. Navigate to the `translator` directory.
+3. Create a `.env` file with the following variables:
+    - `REDIS_HOST`: the Redis host.
+    - `REDIS_PORT`: the Redis port.
+    - `REDIS_DB`: the Redis database to use.
+    - `TRANSLATORS`: a comma-separated list of translators in the form `src-lang-dst-lang`.
+    - `CLEAR_CACHE`: set to `true` to clear the Redis cache on startup, or `false` otherwise.
+4. Run `poetry install` to install the project dependencies.
+5. Start the server using `poetry run uvicorn app.main:app --reload`.
 
-1. Clone the repository
-2. Install dependencies using `poetry install`
-3. Start the Redis server using `docker-compose up -d`
-4. Run the service using `uvicorn app.main:app --host 0.0.0.0 --port 8000`
+### Docker Compose
+The microservice can also be run using Docker Compose. To do so, follow these steps:
+1. Navigate to the root directory of the project.
+2. Run `docker-compose up translator`.
+3. The server will be running at `http://localhost:8000`.
 
 ## API
+- `/healthcheck`: returns the status of the server.
+- `/cache/status`: returns the status of the Redis cache.
+- `/cache/dump`: returns a dump of the contents of the Redis cache.
+- `/get_translators`: returns a list of available translators.
+- `/create_translator`: creates a new translator for the given source and destination languages.
+- `/translate`: translates text from one language to another. (API endpoints are not described here.)
 
-The Translator microservice provides the following endpoints:
-
-- `/healthcheck`: A healthcheck endpoint that returns a status of "ok" when the service is running.
-- `/cache/status`: Returns the status of the Redis cache and the number of keys it contains.
-- `/cache/dump`: Returns a dump of the Redis cache.
-- `/get_translators`: Returns the available initialized translators.
-- `/create_translator`: Creates a new translator.
-- `/translate`: Translates a text from the source language to the destination language.
+For more information on how to use the API, please refer to the API documentation.
