@@ -12,6 +12,9 @@ DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
 DATASET_LANG = "en"
 
 def clean_string(string):
+    """
+    Cleans a string by removing parenthesis, underscores, and extra spaces.
+    """
     if string == 'AIDS':
         return string
     string = str(string)
@@ -24,6 +27,10 @@ def clean_string(string):
 
 
 def insert_symptom(symptom):
+    """
+    Inserts a symptom into the database if it does not exist.
+    Returns the symptom id.
+    """
     query = "SELECT * FROM fds.symptoms WHERE name = '{}' ALLOW FILTERING".format(
         symptom)
     result = client.execute(query).all()
@@ -40,6 +47,9 @@ def insert_symptom(symptom):
 
 
 def load_disease_symptoms():
+    """
+    Loads the disease symptoms from the csv file into the database.
+    """
     log.info('Loading disease symptoms')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_symptoms.csv')
     df = df.applymap(clean_string)
@@ -60,6 +70,9 @@ def load_disease_symptoms():
 
 
 def load_disease_description():
+    """
+    Loads the disease description from the csv file into the database.
+    """
     log.info('Loading disease description')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_description.csv')
     df = df.applymap(clean_string)
@@ -81,6 +94,9 @@ def load_disease_description():
 
 
 def load_symptom_severity():
+    """
+    Loads the symptom severity from the csv file into the database.
+    """
     log.info('Loading symptom severity')
     df = pd.read_csv(DISEASES_FOLDER + 'symptom_severity.csv')
     df = df.applymap(clean_string)
@@ -102,6 +118,9 @@ def load_symptom_severity():
 
 
 def update_disease_severity():
+    """
+    Updates the disease severity based on the symptom severity.
+    """
     log.info('Updating disease severity')
     disease_ids = "SELECT id FROM fds.diseases"
     disease_ids = [str(disease.id)
@@ -125,6 +144,9 @@ def update_disease_severity():
 
 
 def insert_precaution(precaution):
+    """
+    Inserts a precaution into the database if it does not exist.
+    """
     query = "SELECT * FROM fds.precautions WHERE name = '{}' ALLOW FILTERING".format(
         precaution)
     result = client.execute(query).all()
@@ -141,6 +163,9 @@ def insert_precaution(precaution):
 
 
 def load_disease_precautions():
+    """
+    Loads the disease precautions from the csv file into the database.
+    """
     log.info('Loading disease precautions')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_precautions.csv')
     df = df.applymap(clean_string)
