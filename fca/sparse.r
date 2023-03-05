@@ -14,7 +14,7 @@ if (!require("tidyr")) {
     install.packages("DBI", repos = "http://cran.r-project.org")
 }
 
-library(fcaR) #https://cran.rstudio.com/web/packages/fcaR/fcaR.pdf
+library(fcaR) # https://cran.rstudio.com/web/packages/fcaR/fcaR.pdf
 library(RJDBC)
 library(tidyverse)
 library(dplyr)
@@ -65,8 +65,28 @@ create_sparse_df <- function(conn, csv_filename) {
         arrange(disease_id)
 
     dir.create("fca/data", showWarnings = FALSE)
-    # write.csv(sparse_df, "fca/data/sparse.csv", row.names = FALSE)
     write.csv(sparse_df, "fca/data/" %>% paste(csv_filename, ".csv", sep = ""), row.names = FALSE)
+    return(sparse_df)
 }
 
-create_sparse_df(conn, "sparse")
+sparse_df <- create_sparse_df(conn, "sparse")
+
+# > str(sparse_df)
+# tibble [303 × 130] (S3: tbl_df/tbl/data.frame)
+#  $ disease_id                          : chr [1:303] "01a06be5-1038-40a9-b16f-f093899d5cc1" "02bb344d-d561-46be-909a-a62429efa3b1" "034d8cb0-da75-403a-8c7e-e0fc3ab72eb0" "035baccc-c491-4c3c-9b59-81dbfe477ac6" ...
+#  $ 4990f072-81f7-4107-8060-0237a464540d: num [1:303] 0 0 0 0 0 0 0 0 0 0 ...
+#  $ 618a4a72-aefe-4a03-88db-605e28fbde6e: num [1:303] 0 0 1 0 0 0 0 0 0 0 ...
+#  $ 84d67443-2188-4841-a636-af46a45e3c51: num [1:303] 0 0 0 0 0 0 0 0 0 0 ...
+# ....
+
+# convert to matrix
+sparse_matrix <- sparse_df %>%
+    as.matrix()
+rownames(sparse_matrix) <- sparse_df$disease_id
+sparse_matrix <- sparse_matrix[, -1]
+
+# convert matrix to numeric
+sparse_matrix <- as.numeric(sparse_matrix)
+
+
+fc_dis <- FormalContext$new(sparse_matrix)
