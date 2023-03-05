@@ -3,10 +3,29 @@ import re
 
 from cassandradb import Cassandra_client
 from config import DATASET_FOLDER, BASE_LANG, LOAD_DISEASES
-from app.logger import logger as log
-from translator import translate
+from translator import Translator
 
 client = Cassandra_client()
+
+trans = Translator('en', BASE_LANG)
+
+
+# class Translator:
+#     """
+#     Translator class to translate text from one language to another
+#     """
+#     def __init__(self, src_lang: str, dst_lang: str):
+#         self.src_lang = src_lang
+#         self.dst_lang = dst_lang
+#         self.cache = {}
+
+#     def translate(self, text: str):
+#         if text in self.cache[self.src_lang][self.dst_lang]:
+#             return self.cache[self.src_lang][self.dst_lang][text]
+#         else:
+#             translation = translate_api(self.src_lang, self.dst_lang, text)
+#             self.cache[self.src_lang][self.dst_lang][text] = translation
+#             return translation
 
 DISEASES_FOLDER = DATASET_FOLDER + 'diseases/'
 DATASET_LANG = "en"
@@ -50,10 +69,10 @@ def load_disease_symptoms():
     """
     Loads the disease symptoms from the csv file into the database.
     """
-    log.info('Loading disease symptoms')
+    print('Loading disease symptoms')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_symptoms.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
+    df = df.applymap(lambda x: trans.translate(x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -73,10 +92,10 @@ def load_disease_description():
     """
     Loads the disease description from the csv file into the database.
     """
-    log.info('Loading disease description')
+    print('Loading disease description')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_description.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
+    df = df.applymap(lambda x: trans.translate(x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -97,10 +116,10 @@ def load_symptom_severity():
     """
     Loads the symptom severity from the csv file into the database.
     """
-    log.info('Loading symptom severity')
+    print('Loading symptom severity')
     df = pd.read_csv(DISEASES_FOLDER + 'symptom_severity.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
+    df = df.applymap(lambda x: trans.translate(x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -121,7 +140,7 @@ def update_disease_severity():
     """
     Updates the disease severity based on the symptom severity.
     """
-    log.info('Updating disease severity')
+    print('Updating disease severity')
     disease_ids = "SELECT id FROM fds.diseases"
     disease_ids = [str(disease.id)
                    for disease in client.execute(disease_ids).all()]
@@ -166,10 +185,10 @@ def load_disease_precautions():
     """
     Loads the disease precautions from the csv file into the database.
     """
-    log.info('Loading disease precautions')
+    print('Loading disease precautions')
     df = pd.read_csv(DISEASES_FOLDER + 'disease_precautions.csv')
     df = df.applymap(clean_string)
-    df = df.applymap(lambda x: translate(DATASET_LANG, BASE_LANG, x))
+    df = df.applymap(lambda x: trans.translate(x))
     df = df.drop_duplicates()
     df.columns = [clean_string(col) for col in df.columns]
 
@@ -191,16 +210,37 @@ def load_disease_precautions():
             precaution_str, id)
         client.execute(query)
 
+def is_data_loaded():
+    """
+    Checks if all tables contain data.
+    Used to not load the data multiple times.
+    """
 
-if LOAD_DISEASES:
-    log.info('Loading diseases')
+    query = "SELECT * FROM fds.diseases"
+    result = client.execute(query).all()
+    if len(result) == 0:
+        return False
+
+    query = "SELECT * FROM fds.symptoms"
+    result = client.execute(query).all()
+    if len(result) == 0:
+        return False
+
+    query = "SELECT * FROM fds.precautions"
+    result = client.execute(query).all()
+    if len(result) == 0:
+        return False
+
+    return True
+
+if LOAD_DISEASES and not is_data_loaded():
+    print('Loading diseases')
     load_disease_symptoms()
     load_disease_description()
     load_symptom_severity()
     update_disease_severity()
     load_disease_precautions()
-    log.info('Diseases loaded in tables.')
-    log.info('Creating feature vectors')
-    
+    print('Diseases loaded in tables.')
+    print('Creating feature vectors')
 else:
-    log.info('LOAD_DISEASES is False, skipping')
+    print('LOAD_DISEASES or is_data_loaded is False. Skipping.')

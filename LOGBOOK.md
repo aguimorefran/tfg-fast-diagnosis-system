@@ -30,3 +30,11 @@
 ## 20/02/23
 
 - Put everything back on track.
+
+## 01/03/23
+
+- Dataloader now reads directly from Redis server instead of using the translator API. Dataloading time reduced from 15min to 1min.
+
+# 05/03/23
+
+- Sparse dataframe creator in R from Cassandra data. It saves the dataframe in a csv file.

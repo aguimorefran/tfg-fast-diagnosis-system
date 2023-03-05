@@ -18,5 +18,3 @@ BASE_LANG = os.environ['BASE_LANG']
 
 LOAD_DISEASES = os.environ['LOAD_DISEASES'] == "true"
 ALLERGY_DATASET = os.environ['ALLERGY_DATASET']
-
-FEATURES_FILE = os.environ['FEATURES_FILE']
