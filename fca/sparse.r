@@ -81,3 +81,20 @@ sparse_matrix <- sparse_df %>%
     as.matrix()
 
 rownames(sparse_matrix) <- tuples$disease_id
+
+for (i in 1:nrow(sparse_matrix)) {
+    for (j in 1:ncol(sparse_matrix)) {
+        if (sparse_matrix[i, j] != sparse_df[i, j + 1]) {
+            print("ERROR" %>% paste(i, j, sep = ","))
+        }
+    }
+}
+
+
+fc_dis <- FormalContext$new(sparse_matrix)
+fc_dis$find_concepts()
+
+fc_dis$concepts[3]
+
+# save the concepts to a R file
+save(fc_dis, file = "fca/data/fc_dis.RData")
