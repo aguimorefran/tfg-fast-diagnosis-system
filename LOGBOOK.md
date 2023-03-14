@@ -10,7 +10,7 @@
 
 - Translator module finished locally.
 
-## 30/08/22 - 31/08/22
+## 30/08/22
 
 - Translator module dockerized and harmony with redis MS.
 
@@ -37,4 +37,8 @@
 
 # 05/03/23
 
-- Sparse dataframe creator in R from Cassandra data. It saves the dataframe in a csv file.
+- Sparse dataframe creator in R from Cassandra data. It saves the dataframe in a csv file
+
+# 14/03/23
+
+- Investigation on how to use the fcaR library.

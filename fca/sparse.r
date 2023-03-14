@@ -14,11 +14,15 @@ if (!require("tidyr")) {
     install.packages("DBI", repos = "http://cran.r-project.org")
 }
 
-library(fcaR) # https://cran.rstudio.com/web/packages/fcaR/fcaR.pdf
+library(fcaR) 
 library(RJDBC)
 library(tidyverse)
 library(dplyr)
 library(tidyr)
+
+install.packages("BiocManager", repos = "http://cran.r-project.org")
+BiocManager::install("Rgraphviz")
+install.packages("hasseDiagram", repos = "http://cran.r-project.org")
 
 jdbc_driver_path <- "fca/resources/CassandraJDBC42.jar"
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
@@ -93,8 +97,5 @@ for (i in 1:nrow(sparse_matrix)) {
 
 fc_dis <- FormalContext$new(sparse_matrix)
 fc_dis$find_concepts()
-
-fc_dis$concepts[3]
-
-# save the concepts to a R file
-save(fc_dis, file = "fca/data/fc_dis.RData")
+fc_dis$concepts$sub(2)
+fc$concepts$plot()
