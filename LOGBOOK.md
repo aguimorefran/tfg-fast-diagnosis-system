@@ -41,4 +41,4 @@
 
 # 14/03/23
 
-- Investigation on how to use the fcaR library.
+- Research on how to use the fcaR library.

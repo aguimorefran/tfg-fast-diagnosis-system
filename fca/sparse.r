@@ -1,28 +1,17 @@
-if (!require("fcaR")) {
-    install.packages("fcaR", repos = "http://cran.r-project.org")
-}
-if (!require("RJDBC")) {
-    install.packages("RJDBC", repos = "http://cran.r-project.org")
-}
-if (!require("tidyverse")) {
-    install.packages("tidyverse", repos = "http://cran.r-project.org")
-}
-if (!require("dplyr")) {
-    install.packages("dplyr", repos = "http://cran.r-project.org")
-}
-if (!require("tidyr")) {
-    install.packages("DBI", repos = "http://cran.r-project.org")
-}
+chooseCRANmirror(ind = 1)
+install.packages(c("fcaR", "RJDBC", "tidyverse", "dplyr", "DBI"), dependencies = TRUE, type = "source", INSTALL_opts = "--no-lock", ask = FALSE, repos = "http://cran.r-project.org")
 
-library(fcaR) 
+library(fcaR)
 library(RJDBC)
 library(tidyverse)
 library(dplyr)
 library(tidyr)
 
-install.packages("BiocManager", repos = "http://cran.r-project.org")
-BiocManager::install("Rgraphviz")
-install.packages("hasseDiagram", repos = "http://cran.r-project.org")
+install.packages("BiocManager", dependencies = TRUE, type = "source", INSTALL_opts = "--no-lock", ask = FALSE, repos = "http://cran.r-project.org")
+BiocManager::install("Rgraphviz", ask=FALSE)
+
+install.packages("hasseDiagram", dependencies = TRUE, type = "source", INSTALL_opts = "--no-lock", ask = FALSE, repos = "http://cran.r-project.org")
+
 
 jdbc_driver_path <- "fca/resources/CassandraJDBC42.jar"
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
@@ -63,7 +52,7 @@ create_sparse_df <- function(conn, csv_filename) {
         ) %>%
         replace(is.na(.), 0) %>%
         arrange(disease_id)
-    
+
     dir.create("fca/data", showWarnings = FALSE)
     write.csv(sparse_df, "fca/data/" %>% paste(csv_filename, ".csv", sep = ""), row.names = FALSE)
     return(sparse_df)
@@ -96,6 +85,37 @@ for (i in 1:nrow(sparse_matrix)) {
 
 
 fc_dis <- FormalContext$new(sparse_matrix)
-fc_dis$find_concepts()
-fc_dis$concepts$sub(2)
-fc$concepts$plot()
+
+# CONCEPTS
+fc_dis$find_concepts(verbose = TRUE)
+concepts <- fc_dis$concepts
+
+# number of concepts 
+length(concepts)
+
+fc_red <- fc_dis$reduce()
+fc_red$find_concepts(verbose = TRUE)
+concepts_red <- fc_red$concepts
+
+# number of concepts
+length(concepts_red)
+
+# same number of concepts
+length(concepts) == length(concepts_red)
+
+support <- fc_dis$concepts$support()
+top_concepts <- fc_dis$concepts[support == max(support)]
+
+# create a function to get the top n concepts
+get_top_concepts <- function(fc, n) {
+    support <- fc$concepts$support()
+    top_concepts <- fc$concepts[support == max(support)]
+    for (i in 2:n) {
+        top_concepts <- c(top_concepts, fc$concepts[support == max(support[support < max(support)])])
+    }
+    return(top_concepts)
+}
+
+# plot a distribution curve of the support of the concepts. dont create a functiopn
+support <- fc_dis$concepts$support()
+hist(support, breaks = 100, main = "Distribution of the support of the concepts", xlab = "Support", ylab = "Number of concepts")
