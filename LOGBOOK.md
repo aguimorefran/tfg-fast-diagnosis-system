@@ -42,3 +42,19 @@
 # 14/03/23
 
 - Research on how to use the fcaR library.
+
+# 04/04/23
+
+- Starting the recommender system implementation
+  
+# 05/04/23
+
+- Closure
+
+# 07/04/23
+
+- Closure with symtoms with degrees. Hope it works.
+
+# 10/04/23
+
+- Somehow working overall structure. NextMinGen is not working properly. Still stuck with fcaR.
