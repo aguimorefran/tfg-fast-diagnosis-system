@@ -58,3 +58,7 @@
 # 10/04/23
 
 - Somehow working overall structure. NextMinGen is not working properly. Still stuck with fcaR.
+
+# 11/04/23
+
+- Bug fixing NextMinGen.
