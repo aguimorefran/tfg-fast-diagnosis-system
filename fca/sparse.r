@@ -1,5 +1,14 @@
 chooseCRANmirror(ind = 1)
-install.packages(c("fcaR", "RJDBC", "tidyverse", "dplyr", "DBI", "devtools"), dependencies = TRUE, type = "source", INSTALL_opts = "--no-lock", ask = FALSE, repos = "http://cran.r-project.org")
+# install.packages(c("fcaR", "RJDBC", "tidyverse", "dplyr", "DBI", "devtools"), dependencies = TRUE, type = "source", INSTALL_opts = "--no-lock", ask = FALSE, repos = "http://cran.r-project.org")
+
+if(!require(arules)) install.packages("arules")
+if(!require(fcaR)) install.packages("fcaR")
+if(!require(RJDBC)) install.packages("RJDBC")
+if(!require(dplyr)) install.packages("dplyr")
+if(!require(tidyr)) install.packages("tidyr")
+if(!require(devtools)) install.packages("devtools")
+if(!require(Matrix)) install.packages("Matrix")
+if(!require(tidyr)) install.packages("tidyr")
 
 library(arules)
 library(fcaR)
@@ -7,6 +16,8 @@ library(RJDBC)
 library(dplyr)
 library(tidyr)
 library(devtools)
+library(Matrix)
+library(tidyr)
 
 
 install.packages("BiocManager", dependencies = TRUE, type = "source", INSTALL_opts = "--no-lock", ask = FALSE, repos = "http://cran.r-project.org")
@@ -18,11 +29,11 @@ install.packages("hasseDiagram", dependencies = TRUE, type = "source", INSTALL_o
 jdbc_driver_path <- "fca/resources/CassandraJDBC42.jar"
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
 
-DISEASE_DEGREES <- 3
-
 if (!file.exists(jdbc_driver_path)) {
   stop("File not found: ", jdbc_driver_path)
 }
+
+########## STEP 1: Fetch data from Cassandra
 
 cassandra_host <- "0.0.0.0"
 cassandra_port <- 9042
@@ -36,132 +47,31 @@ symp_df <- dbGetQuery(conn, "SELECT * FROM fds.symptoms")
 
 relations <- dbGetQuery(conn, "SELECT * FROM fds.diseases_vt_symptoms")
 
-relations_df <- relations %>%
-  left_join(dis_df, by = c("id" = "id")) %>%
-  left_join(symp_df, by = c("symptoms_value" = "id")) %>%
-  rename(disease_name = name.x, symptom_name = name.y, disease_id = id, symptom_id = symptoms_value)
+########### STEP 2: Create the sparse matrix
 
-symptom_id_list <- symp_df$id
+# Primero, debemos convertir la columna "id" de los dataframes a factor para que coincidan los tipos de datos
+dis_df$id <- as.factor(dis_df$id)
+symp_df$id <- as.factor(symp_df$id)
 
-sparse_df <- relations_df %>%
-  select(disease_id, disease_name) %>%
-  distinct() %>%
-  arrange(disease_id)
+# Unimos los dataframes de enfermedades y síntomas
+merged_df <- merge(symp_df, relations, by.x = "id", by.y = "symptoms_value")
+merged_df <- merge(merged_df, dis_df, by.x = "id.y", by.y = "id")
 
-sparse_df <- relations_df %>%
-  pivot_wider(
-    id_cols = disease_id, names_from = symptom_id, values_from = symptom_id,
-    values_fn = function(x) ifelse(is.na(x), 0, 1)
-  ) %>%
-  replace(is.na(.), 0) %>%
-  arrange(disease_id)
+# Creamos dataframes separados para síntomas y enfermedades
+symptom_df <- merged_df[, c("id.x", "name.x")]
+colnames(symptom_df) <- c("id", "symptom")
+disease_df <- merged_df[, c("id.y", "name.y")]
+colnames(disease_df) <- c("id", "disease")
 
+# Hacemos una codificación one-hot para los síntomas y las enfermedades
+symptom_one_hot <- reshape2::dcast(symptom_df, id ~ symptom, length)
+disease_one_hot <- reshape2::dcast(disease_df, id ~ disease, length)
 
-tuples <- sparse_df %>%
-  select(disease_id) %>%
-  distinct() %>%
-  arrange(disease_id) %>%
-  mutate(rowid = row_number()) %>%
-  select(rowid, disease_id) %>%
-  collect()
+# Unimos los dataframes de síntomas y enfermedades
+final_df <- merge(symptom_one_hot, disease_one_hot, by = "id")
 
-# Crear la matriz dispersa eliminando la columna disease_id y convirtiendo el dataframe resultante en una matriz
-sparse_matrix <- as.matrix(sparse_df[, -1])
+# Eliminamos la columna id
+final_df$id <- NULL
 
-# Establecer los nombres de las filas de sparse_matrix como los valores de disease_id en sparse_df
-rownames(sparse_matrix) <- sparse_df$disease_id
-
-# Return the name of a symptom given its id
-symptom_name <- function(symptom_id) {
-  return(symp_df[symp_df$id == symptom_id, ]$name)
-}
-
-# Return the name of a disease given its id
-disease_name <- function(disease_id) {
-  return(dis_df[dis_df$id == disease_id, ]$name)
-}
-
-# fc <- FormalContext$new(sparse_matrix)
-# fc$find_implications(verbose = TRUE)
-# saveRDS(fc, "fca/resources/fc.rds")
-
-fc <- readRDS("fca/resources/fc.rds")
-
-implications <- fc$implications
-
-s1 <- "761d186a-8e4e-4129-a85c-510ec16522a3"
-s2 <- "8c96ca09-5c9e-44c1-9f5f-8ff51b3a2ea3"
-
-X <- c(s1)
-
-Sigma <- implications
-
-
-# NextMinGen(X, Sigma):
-# input:
-# X, set of attributes selected by the user
-# Sigma, set of implications describing the knowledge in the system
-# output:
-# Next, set of attribute sets which are the choices of the next step in the guided search
-# Gamma, reduced set of implications
-
-# repeat:
-# Gamma = Sigma; Sigma = emptyset
-# foreach A -> B in Gamma do:
-# if A subseteq X then X = X U B
-# else if B not subseteq X then Sigma = Sigma U {A \ X -> B \ X}
-# until Gamma = Sigma
-# Next = Minimals{A subseteq M | A -> B in Gamma for some B subseteq M}
-# return (Next, Gamma).
-
-NextMinGen <- function(X, Sigma) {
-  M <- Sigma$get_attributes()
-  repeat {
-    Gamma <- Sigma
-    Sigma <- ImplicationSet$new(attributes = M)
-
-    for (i in 1:Gamma$cardinality()) {
-      rule <- Gamma[i]
-      A <- rule$get_LHS_matrix()
-      B <- rule$get_RHS_matrix()
-
-      if (all(as.vector(A) %in% unlist(X))) {
-        X <- union(X, B)
-      } else if (!all(as.vector(B) %in% unlist(X))) { 
-        A[which(rownames(A) %in% X), ] <- 0
-        B[which(rownames(B) %in% X), ] <- 0
-        new_rule <- ImplicationSet$new(attributes = M, lhs = A, rhs = B)
-        Sigma$add(new_rule)
-      }
-    }
-
-    # Compare Gamma and Sigma to check if they are equal %~%
-    if (Gamma %~% Sigma) {
-      break
-    }
-
-
-  }
-}
-
-
-Minimals <- function(Gamma, X, M) {
-  minimal_sets <- list()
-
-  for (i in 1:Gamma$cardinality()) {
-    rule <- Gamma[i]
-    A <- rule$get_LHS_matrix()
-    B <- rule$get_RHS_matrix()
-
-
-  }
-}
-
-# Crear un ImplicationSet a partir de los datos planets
-fc_planets <- FormalContext$new(planets)
-fc_planets$find_implications()
-implications_planets <- fc_planets$implications
-Gamma <- implications_planets
-X
-
-mins <- Minimals(implications_planets)
+# Convertimos el dataframe final en una matriz dispersa
+sparse_matrix <- as(final_df, "sparseMatrix")
