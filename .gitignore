@@ -1,6 +1,8 @@
 *local*
 gather.sh
 rmd_creator.py
+*.csv
+*.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,windows,linux,redis
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,windows,linux,redis
