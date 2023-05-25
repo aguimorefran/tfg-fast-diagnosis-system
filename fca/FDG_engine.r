@@ -1,169 +1,88 @@
 # FAST DIAGNOSIS SYSTEM ENGINE
 # BASED ON FCA
+packages <- c("fcaR", "jsonlite", "Matrix")
+for (package in packages) {
+    if (!require(package, character.only = TRUE)) {
+        install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
+    }
+    library(package, character.only = TRUE)
+}
 
-!if (!require(fcaR)) install.packages("fcaR")
-library(fcaR)
 
-#' Generate sparse dataframe
-#'
-#' Generate a sparse dataframe from a CSV file.
-#' Saves dataframe, diseases and symptoms as RDS files.
-#'
-#' @param csv_file Path to the CSV file
-#'
-#' @param save_file Path to the RDS file
-#'
-#' @param diseases_file Path to the RDS file
-#'
-#' @param symptoms_file Path to the RDS file
-#'
-#' @return A dataframe with the sparse matrix
-generate_sparse_dataframe <- function(csv_file,
-                                      save_file,
-                                      diseases_file,
-                                      symptoms_file) {
-    data <- read.csv(
-        "fca/disease_symptoms.csv",
-        stringsAsFactors = FALSE,
-        na.strings = c("", "NA")
-    )
+get_value <- function(json_object, name, value) {
+    result <- NULL
+    if (is.null(json_object)) {
+        return(result)
+    }
 
-    data <- data.frame(lapply(data, tolower))
-    data <- data.frame(lapply(data, function(x) gsub(" ", "_", trimws(x))))
-    data <- data[!duplicated(data), ]
-
-    diseases <- unique(data$Disease)
-
-    symptoms <- unique(unlist(data[, -1]))
-
-    co_occurrence <- data.frame(
-        matrix(
-            0,
-            nrow = length(diseases),
-            ncol = length(symptoms)
-        )
-    )
-    colnames(co_occurrence) <- symptoms
-    rownames(co_occurrence) <- diseases
-
-    for (i in 1:nrow(data)) {
-        disease <- data$Disease[i]
-        for (j in 2:ncol(data)) {
-            symptom <- data[i, j]
-            if (!is.na(symptom)) {
-                co_occurrence[disease, symptom] <-
-                    co_occurrence[disease, symptom] + 1
+    if (name %in% names(json_object)) {
+        sub_json <- json_object[[name]]
+        if (is.list(sub_json)) {
+            if (value %in% names(sub_json)) {
+                result <- sub_json[[value]]
             }
         }
     }
 
-    # Normalize the co_occurrence matrix by the max count for each disease
-    co_occurrence <- co_occurrence / apply(co_occurrence, 1, max)
+    return(result)
+}
 
-    df <- data.frame(
+load_source_file <- function(filename, nrows, sparse = FALSE) {
+    df <- read.csv(filename, stringsAsFactors = FALSE)
+    df <- df[sample(nrow(df), min(nrow(df), nrows)), ]
+
+    df <- df[, c("AGE", "SEX", "EVIDENCES", "PATHOLOGY", "INITIAL_EVIDENCE")]
+    df$EVIDENCES <- gsub("\\[|\\]|'", "", df$EVIDENCES)
+    df$EVIDENCES <- sapply(strsplit(df$EVIDENCES, ","), function(x) trimws(x))
+    df$EVIDENCES <- sapply(df$EVIDENCES, trimws)
+    df$EVIDENCES <- sapply(df$EVIDENCES, function(x) gsub("@.*", "", x))
+    df$EVIDENCES <- sapply(df$EVIDENCES, function(x) gsub("_$", "", x))
+
+    # Categorize age
+    df$AGE <- cut(df$AGE, breaks = seq(0, 100, by = 20), labels = FALSE, include.lowest = TRUE)
+    df <- df[!is.na(df$AGE), ]
+    df$AGE <- paste0("AGE_", df$AGE)
+
+    if (!sparse) {
+        return(df)
+    }
+
+    # Create sparse dataframe
+    sparse_df <- data.frame(
         matrix(
             0,
-            nrow = nrow(data),
-            ncol = length(diseases) + length(symptoms)
+            nrow = nrow(df),
+            ncol = length(ev_names) + length(cond_names) + 6 + 2 # 6 for age categories, 2 for sex categories
         )
     )
-    colnames(df) <- c(diseases, symptoms)
+    colnames(sparse_df) <- c(ev_names, cond_names, paste0("AGE_", 1:6), "SEX_M", "SEX_F")
 
-    # Fill the dataframe based on the presence of diseases and symptoms
-    for (i in 1:nrow(data)) {
-        disease <- data$Disease[i]
-        df[i, disease] <- 1
-        for (j in 2:ncol(data)) {
-            symptom <- data[i, j]
-            if (!is.na(symptom)) {
-                df[i, symptom] <- co_occurrence[disease, symptom]
-            }
+    for (i in 1:nrow(df)) {
+        if (i %% 100 == 0) {
+            print(paste0("Row ", i, " of ", nrow(df)))
         }
+        row <- df[i, ]
+        evidence <- unlist(row$EVIDENCES)
+        pathology <- row$PATHOLOGY
+        initial_evidence <- row$INITIAL_EVIDENCE
+        age <- row$AGE
+        sex <- paste0("SEX_", row$SEX)
+
+        # set in df the columns that match evidences, conditions, pathology, age and sex
+        for (ev in evidence) {
+            sparse_df[i, ev] <- 1
+        }
+        sparse_df[i, pathology] <- 1
+        sparse_df[i, initial_evidence] <- 1
+        sparse_df[i, age] <- 1
+        sparse_df[i, sex] <- 1
     }
 
-    # Round to the lowest quartile  0, 0.25, 0.5, 0.75, 1
-    df[df < 0.25] <- 0
-    df[df >= 0.25 & df < 0.5] <- 0.25
-    df[df >= 0.5 & df < 0.75] <- 0.5
-    df[df >= 0.75 & df <= 1] <- 0.75
-
-
-
-    # Save the dataframe as an RDS file
-    if (is.null(df)) {
-        stop("No dataframe to save")
-    }
-    if (is.null(save_file)) {
-        stop("No file to be saved")
-    }
-    saveRDS(df, save_file)
-    saveRDS(diseases, diseases_file)
-    saveRDS(symptoms, symptoms_file)
-
-    return(df)
+    return(sparse_df)
 }
 
-#' Create set
-#'
-#' Create a set from a formal context, a vector of attributes and a vector of values.
-#' 
-#' @param S Source Set. If none is provided, a new one is created
-#'
-#' @param fc A formal context
-#'
-#' @param attributes A vector with the attributes of the set
-#'
-#' @param values A vector with the values of the set
-#'
-#' @return A set
-create_set <- function(source_S, fc, attributes, values) {
-    # check source_S == NULL
-    if (is.null(source_S)) {
-        S <- Set$new(fc$attributes)
-    } else {
-        S <- source_S$clone(deep =TRUE)
-    }
-    S$assign(attributes = attributes, values = values)
-
-    vector <- S$get_vector()
-    if (!any(vector[, 1] == 1)) {
-        stop("No attributes found")
-    }
-    return(S)
-}
-
-#' Diagnose
-#'
-#' Creates a recommendation from a formal context, a set and a set of target attributes.
-#'
-#' @param fc A formal context
-#'
-#' @param S A set
-#'
-#' @param target A target attribute
-#'
-#' @return A vector with the implications
-diagnose <- function(fc, S, target) {
-    d <- fc$implications$recommend(
-        S = S,
-        attribute_filter = target
-    )
-
-    d <- d[d != 0]
-    return(d)
-}
-
-#' Initialize formal context
-#'
-#' Initialize a formal context from a dataframe.
-#'
-#' @param df A dataframe
-#'
-#' @param save_file Path to the RDS file
-#'
-#' @return A formal context
-#'
-init_fc <- function(df, save_file) {
+init_fc <- function(df, save_file, debug = TRUE, concepts = FALSE) {
+    starttime <- Sys.time()
     if (file.exists(save_file)) {
         load <- readline("Load existing formal context? (y/n) ")
         if (load == "y") {
@@ -176,124 +95,376 @@ init_fc <- function(df, save_file) {
     if (warn == "n") {
         stop("Function aborted")
     }
+    if (debug) {
+        print("Generating formal context")
+    }
     fc <- FormalContext$new(df)
-    fc$find_implications()
+    if (debug) {
+        print("Generating implications")
+    }
+    fc$find_implications(verbose = debug, save_concepts = concepts)
 
     colMeans(fc$implications$size())
+    if (debug) {
+        print("Applying simplification rules")
+        print(colMeans(fc$implications$size()))
+    }
     fc$implications$apply_rules(rules = c("simplification", "rsimplification"), parallelize = TRUE)
-    colMeans(fc$implications$size())
 
-    saveRDS(fc, save_file)
-    return(fc)
+    if (debug) {
+        print(colMeans(fc$implications$size()))
+    }
+    endtime <- Sys.time()
+    res <- list(fc = fc, elapsed = endtime - starttime)
+
+    saveRDS(res, save_file)
+    return(res)
 }
 
-#' Min implication
-#'
-#' Get the implication with the smallest LHS and RHS
-#'
-#' @param imps ImplicationSet object
-#'
-#' @return An implication
-min_implication <- function(imps) {
-    size <- imps$size()
-    sorted_indices <- order(size[, "LHS"], size[, "RHS"])
-    min_idx <- sorted_indices[1]
-    return(imps[sorted_indices[1]])
+ask_symptom_console <- function(fc, symptom, scale, debug = FALSE) {
+    if (debug) {
+        print("################ ASKING SYMPTOM ################")
+    }
+
+    symptom <- readline("Symptom: ")
+
+    question <- paste0(
+        "Degree of ", symptom, " (", paste(scale, collapse = ", "), "): "
+    )
+    degree <- as.numeric(readline(question))
+    if (degree < 0 | degree > 1) {
+        stop("Degree must be between 0 and 1")
+    }
+    return(list(symptom = symptom, degree = degree))
 }
 
-#' Implication LHS names
-#'
-#' Get the names of the LHS of an implication
-#'
-#' @param imp An ImplicationSet
-#'
-#' @return A vector with the names of the LHS
-imp_LHS_names <- function(imp) {
-    lhs <- imp$get_LHS_matrix()
-    return(rownames(lhs)[rowSums(lhs) != 0])
+create_set <- function(fc, S0, symptoms, values, debug = FALSE) {
+    if (is.null(S0)) {
+        S <- Set$new(fc$attributes)
+    } else {
+        S <- S0$clone(deep = TRUE)
+    }
+    # S$assign(attributes = symptoms, values = values)
+    for (i in 1:length(symptoms)) {
+        S$assign(attributes = symptoms[i], values = values[i])
+    }
+    return(S)
 }
 
-#' Get closure
-#'
-#' Get the closure of a set in a formal context
-#'
-#' @param fc A formal context
-#'
-#' @param S A set
-#'
-#' @return Closure of the set S in the formal context fc
-get_closure <- function(fc, S) {
-    cl <- fc$implications$closure(S, reduce = TRUE)
-    cl$implications$apply_rules(c("simp", "rsimp", "reorder"), parallelize = TRUE)
-    closure <- cl$implications$filter(
-        rhs = diseases,
-        not_lhs = diseases,
-        drop = TRUE
+diagnose <- function(fc, S, target, debug = FALSE) {
+    if (debug) {
+        print("################ DIAGNOSING ################")
+    }
+    d <- fc$implications$recommend(
+        S,
+        attribute_filter = target
+    )
+    # return values > 0
+    return(names(d[d > 0]))
+}
+
+compute_closure <- function(fc, S, target, debug = FALSE) {
+    if (debug) {
+        print("################ COMPUTING CLOSURE ################")
+    }
+    closure <- fc$implications$closure(S, reduce = TRUE)
+    closure$implications$apply_rules(
+        c("simp", "rsimp", "reorder"),
+        parallelize = TRUE
+    )
+    closure$implications$filter(
+        rhs = target,
+        not_lhs = target, drop = TRUE
     )
     return(closure)
 }
 
-#' Get asked
-#'
-#' Calculate the attributes that were asked to the user
-#'
-#' @param S A set
-#'
-#' @return A vector with the asked attributes
-get_asked <- function(S) {
-    return(S$get_attributes()[S$get_vector()[, 1] != 0])
+get_remaining_attributes <- function(S, closure, symptoms) {
+    # get already asked symptoms
+    asked <- S$get_attributes()[S$get_vector()[, 1] > 0]
+
+    lhs <- closure$implications$get_LHS_matrix()
+    remaining <- rownames(lhs)[apply(lhs, 1, function(x) any(x == 1))]
+
+    # intersect remaining with symptoms and remove already asked symptoms
+    remaining <- intersect(remaining, symptoms)
+    remaining <- setdiff(remaining, asked)
+    return(remaining)
 }
 
-#' Ask degree console
-#'
-#' Ask the user for the degree of a symptom
-#'
-#' @param symptom A symptom
-#'
-#' @return The degree of the symptom
-ask_degree_console <- function(symptom) {
-    degree <- readline(paste("What is the degree of", symptom, "? (0, 0.25, 0.5, 0.75, 1) "))
-    degree <- as.numeric(degree)
-    if (degree != 0 & degree != 0.25 & degree != 0.5 & degree != 0.75 & degree != 1) {
-        stop("Invalid degree")
+ask_upgrade_symptoms <- function(fc, S) {
+    Svecs <- S$get_vector()
+    Satts <- S$get_attributes()
+    idx <- which(Svecs[, 1] > 0)
+    df <- data.frame(
+        symptom = Satts[idx],
+        degree = Svecs[idx, 1]
+    )
+
+    # For every symptom, ask if it should be upgraded if its grade is less tan 1
+    for (i in 1:nrow(df)) {
+        if (df$degree[i] < 1) {
+            question <- paste0(
+                "Upgrade ", df$symptom[i], " from ", df$degree[i], " to 1? (y/n) "
+            )
+            upgrade <- readline(question)
+            if (upgrade == "y") {
+                df$degree[i] <- 1
+            } else if (upgrade == "n") {
+                df$degree[i] <- 0
+            } else {
+                stop("Invalid input")
+            }
+        }
     }
-    return(degree)
+
+    # Create new set
+    S <- Set$new(fc$attributes)
+    for (i in 1:nrow(df)) {
+        S$assign(attributes = df$symptom[i], values = df$degree[i])
+    }
+
+    any_changes <- !identical(S$get_vector(), Svecs)
+
+    return(list(S = S, any_changes = any_changes, df = df))
 }
 
-sourcefile <- "fca/disease_symptoms.csv"
-savefile <- "fca/source_dataframe.rds"
-savefile_fc <- "fca/fc.rds"
-diseases_file <- "fca/diseases.rds"
-symptoms_file <- "fca/symptoms.rds"
+ask_new_symptom <- function(remaining, scale, debug = FALSE) {
+    if (debug) {
+        print("################ ASKING NEW SYMPTOM ################")
+    }
+    symptom <- readline("Input new symptom")
+    if (!symptom %in% remaining) {
+        print(paste0("Invalid input: ", symptom, " not in remaining symptoms"))
+        stop("Invalid symptom")
+    }
+    question <- paste0(
+        "Degree of ", symptom, " (", paste(scale, collapse = ", "), "): "
+    )
+    degree <- as.numeric(readline(question))
+    if (degree < 0 | degree > 1) {
+        stop("Degree must be between 0 and 1")
+    }
+    return(list(symptom = symptom, degree = degree))
+}
 
-generate_sparse_dataframe(sourcefile, savefile, diseases_file, symptoms_file)
-
-df <- readRDS(savefile)
-diseases <- readRDS(diseases_file)
-symptoms <- readRDS(symptoms_file)
-fc <- init_fc(df, savefile_fc)
-S <- create_set(NULL, fc, c("high_fever"), c(1))
-
-diag <- diagnose(fc, S, diseases)
-closure <- get_closure(fc, S)
-min_rule <- min_implication(closure)
-symps_to_ask <- imp_LHS_names(min_rule)
-degree <- ask_degree_console(symps_to_ask[1])
-
-S2 <- create_set(S, fc, symps_to_ask[1], degree)
-diag2 <- diagnose(fc, S2, diseases)
-diag2
-closure2 <- get_closure(fc, S2)
-min_rule2 <- min_implication(closure2)
+categorize_age <- function(age) {
+    cat_age <- cut(age, breaks = seq(0, 100, by = 20), labels = FALSE, include.lowest = TRUE)
+    cat_age <- paste0("AGE_", cat_age)
+    return(cat_age)
+}
 
 
-fc$implications$recommend(S = S2, attribute_filter = diseases)
+iterative_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scale, debug = FALSE) {
+    cat_age <- categorize_age(age)
+    S <- create_set(fc, NULL, c(sex, cat_age), c(1, 1))
+    i <- 1
+    diag <- c()
+    reamining_symps <- ev_names
 
-# Plot df as it is a sparse matrix
-library(ggplot2)
+    if (debug) {
+        print(paste0("Age category: ", cat_age))
+        print(paste0("Sex: ", sex))
+    }
 
-# Create an image of the size of the dataframe and fill it with the value
+    while (i < max_it && length(diag) == 0) {
+        if (debug) {
+            print(paste0("################ ITERATION ", i, " ################"))
+            print(paste0("Remaining symptoms: ", paste(length(reamining_symps), collapse = ", ")))
+        }
+        # STEP 1 ASK SYMPTOM
+        x <- ask_symptom_console(fc, cond_names, scale, debug)
 
-rct <- expand.grid(x = 1:nrow(df), y = 1:ncol(df))
-rct$fill <- as.vector(as.matrix(df))
-ggplot(rct, aes(x = x, y = y, fill = fill)) + geom_tile() + scale_fill_gradient(low = "white", high = "black")
+        # STEP 2 COMPUTE CLOSURE
+        S <- create_set(fc, S, x$symptom, x$degree)
+        S$print()
+        diag <- diagnose(fc, S, cond_names, debug)
+
+        # STEP 3 CHECK CLOSURE
+        if (length(diag) > 0) {
+            return(list(
+                diagnosis = diag,
+                set = S,
+                iteration = i
+            ))
+        }
+
+        # # STEP 4 ASK FOR IMPROVING
+        # x <- ask_upgrade_symptoms(fc, S)
+        # S <- x$S
+
+        # # STEP 4.1 CHECK IF ANY CHANGES
+        # S$print()
+
+        # # STEP 4.2 COMPUTE CLOSURE
+        # diag2 <- diagnose(fc, S, cond_names, debug)
+
+        # # STEP 4.3 CHECK CLOSURE
+        # if (length(diag2) > 0) {
+        #     return(list(
+        #         diagnosis = diag2,
+        #         set = S,
+        #         iteration = i
+        #     ))
+        # }
+
+
+        # STEP 5 REPEAT FROM STEP 1
+        i <- i + 1
+        if (i == max_it) {
+            print("Maximum number of iterations reached")
+            return(list(
+                diagnosis = NULL,
+                set = S,
+                iteration = i
+            ))
+        }
+        closure <- compute_closure(fc, S, cond_names, debug)
+        reamining_symps <- get_remaining_attributes(S, closure, ev_names)
+        print(paste0("Passing from ", length(ev_names), " to ", length(reamining_symps), " symptoms"))
+        print(paste0("Reduced by ", round(100 * (1 - length(reamining_symps) / length(ev_names)), 2), "%"))
+    }
+}
+
+
+automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scale, hardcoded_symptoms, debug = FALSE) {
+    cat_age <- age
+    S <- create_set(fc, NULL, c(sex, cat_age), c(1, 1))
+    i <- 1
+    diag <- c()
+    remaining_symps <- ev_names
+
+    if (debug) {
+        print(paste0("Age category: ", cat_age))
+        print(paste0("Sex: ", sex))
+    }
+
+    while (i < max_it && length(diag) == 0) {
+        if (debug) {
+            print(paste0("################ ITERATION ", i, " ################"))
+            print(paste0("Remaining symptoms: ", paste(length(remaining_symps), collapse = ", ")))
+        }
+        # STEP 1 ASK SYMPTOM
+        x <- hardcoded_symptoms[[i]]
+
+        # STEP 2 COMPUTE CLOSURE
+        S <- create_set(fc, S, x$symptom, x$degree)
+        S$print()
+        diag <- diagnose(fc, S, cond_names, debug)
+
+        # STEP 3 CHECK CLOSURE
+        if (length(diag) > 0) {
+            return(list(
+                diagnosis = diag,
+                iteration = i,
+                set = S,
+                closure = compute_closure(fc, S, cond_names, debug)
+            ))
+        }
+
+        # # STEP 4 COMPUTE CLOSURE
+        # diag2 <- diagnose(fc, S, cond_names, debug)
+
+        # # STEP 4.3 CHECK CLOSURE
+        # if (length(diag2) > 0) {
+        #     return(list(
+        #         diagnosis = diag2,
+        #         set = S,
+        #         iteration = i
+        #     ))
+        # }
+
+        # STEP 5 REPEAT FROM STEP 1
+        i <- i + 1
+        if (i == max_it) {
+            print("Maximum number of iterations reached")
+            return(list(
+                diagnosis = NULL,
+                iteration = i,
+                set = S,
+                closure = compute_closure(fc, S, cond_names, debug)
+            ))
+        }
+        closure <- compute_closure(fc, S, cond_names, debug)
+        remaining_symps <- get_remaining_attributes(S, closure, ev_names)
+        print(paste0("Passing from ", length(ev_names), " to ", length(remaining_symps), " symptoms"))
+        print(paste0("Reduced by ", round(100 * (1 - length(remaining_symps) / length(ev_names)), 2), "%"))
+    }
+}
+
+benchmark_model_from_csv <- function(fc, cond_names, ev_names, validate_df, max_it, scale, samples, debug = FALSE) {
+    # Initialize results dataframe
+    results <- data.frame(
+        row = integer(),
+        diagnosis = character(),
+        expected_diagnosis = character(),
+        iteration = integer(),
+        elapsed_time = numeric(),
+        error = logical(),
+        correct = logical()
+    )
+
+    # Initialize set list
+    set_list <- list()
+
+    # Take samples from the validation dataframe
+    set.seed(Sys.time())
+    validate_df <- validate_df[sample(nrow(validate_df), samples), ]
+
+    # Loop over each row in the validation dataframe. Reorganize the dataframe randomly
+    for (i in 1:nrow(validate_df)) {
+        # Extract information for automatic diagnosis
+        row <- validate_df[i, ]
+        sex <- ifelse(row$SEX_M == 1, "SEX_M", "SEX_F")
+        age <- paste0("AGE_", which(row[paste0("AGE_", 1:6)] == 1))
+        hardcoded_symptoms <- names(row)[row == 1]
+        hardcoded_symptoms <- hardcoded_symptoms[!hardcoded_symptoms %in% c(sex, age, cond_names)]
+
+        # Convert hardcoded_symptoms to list of lists
+        hardcoded_symptoms <- lapply(hardcoded_symptoms, function(symptom) list(symptom = symptom, degree = 1))
+
+        # Call automatic diagnosis function and measure elapsed time
+        start_time <- Sys.time()
+        error_occurred <- FALSE
+        d <- tryCatch(
+            {
+                automatic_diagnosis(
+                    fc = fc,
+                    cond_names = cond_names,
+                    ev_names = ev_names,
+                    sex = sex,
+                    age = age,
+                    max_it = max_it,
+                    scale = scale,
+                    hardcoded_symptoms = hardcoded_symptoms,
+                    debug = debug
+                )
+            },
+            error = function(e) {
+                error_occurred <- TRUE
+                print(paste0("Error in row ", i, ": ", e$message))
+                NULL
+            }
+        )
+
+        elapsed_time <- Sys.time() - start_time
+
+        # Add results to dataframe
+        results <- rbind(results, data.frame(
+            row = i,
+            diagnosis = paste(d$diagnosis, collapse = ", "),
+            expected_diagnosis = paste(names(row)[row == 1 & names(row) %in% cond_names], collapse = ", "),
+            iteration = d$iteration,
+            elapsed_time = elapsed_time,
+            error = error_occurred,
+            correct = all(names(row)[row == 1 & names(row) %in% cond_names] %in% d$diagnosis)
+        ))
+
+        # Print progress
+        if (i %% 100 == 0) {
+            print(paste0("Processed ", i, " rows"))
+        }
+    }
+
+    return(results = results)
+}
