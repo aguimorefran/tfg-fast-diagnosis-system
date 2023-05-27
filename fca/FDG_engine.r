@@ -109,7 +109,7 @@ init_fc <- function(df, save_file, debug = TRUE, concepts = FALSE) {
         print("Applying simplification rules")
         print(colMeans(fc$implications$size()))
     }
-    fc$implications$apply_rules(rules = c("simplification", "rsimplification"), parallelize = TRUE)
+    fc$implications$apply_rules(rules = c("simplification", "rsimplification"), parallelize = .Platform$OS.type == "unix")
 
     if (debug) {
         print(colMeans(fc$implications$size()))
@@ -144,7 +144,6 @@ create_set <- function(fc, S0, symptoms, values, debug = FALSE) {
     } else {
         S <- S0$clone(deep = TRUE)
     }
-    # S$assign(attributes = symptoms, values = values)
     for (i in 1:length(symptoms)) {
         S$assign(attributes = symptoms[i], values = values[i])
     }
@@ -170,26 +169,13 @@ compute_closure <- function(fc, S, target, debug = FALSE) {
     closure <- fc$implications$closure(S, reduce = TRUE)
     closure$implications$apply_rules(
         c("simp", "rsimp", "reorder"),
-        parallelize = TRUE
+        parallelize = .Platform$OS.type == "unix"
     )
     closure$implications$filter(
         rhs = target,
         not_lhs = target, drop = TRUE
     )
     return(closure)
-}
-
-get_remaining_attributes <- function(S, closure, symptoms) {
-    # get already asked symptoms
-    asked <- S$get_attributes()[S$get_vector()[, 1] > 0]
-
-    lhs <- closure$implications$get_LHS_matrix()
-    remaining <- rownames(lhs)[apply(lhs, 1, function(x) any(x == 1))]
-
-    # intersect remaining with symptoms and remove already asked symptoms
-    remaining <- intersect(remaining, symptoms)
-    remaining <- setdiff(remaining, asked)
-    return(remaining)
 }
 
 ask_upgrade_symptoms <- function(fc, S) {
@@ -201,7 +187,6 @@ ask_upgrade_symptoms <- function(fc, S) {
         degree = Svecs[idx, 1]
     )
 
-    # For every symptom, ask if it should be upgraded if its grade is less tan 1
     for (i in 1:nrow(df)) {
         if (df$degree[i] < 1) {
             question <- paste0(
@@ -254,85 +239,11 @@ categorize_age <- function(age) {
     return(cat_age)
 }
 
-
-iterative_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scale, debug = FALSE) {
-    cat_age <- categorize_age(age)
-    S <- create_set(fc, NULL, c(sex, cat_age), c(1, 1))
-    i <- 1
-    diag <- c()
-    reamining_symps <- ev_names
-
-    if (debug) {
-        print(paste0("Age category: ", cat_age))
-        print(paste0("Sex: ", sex))
-    }
-
-    while (i < max_it && length(diag) == 0) {
-        if (debug) {
-            print(paste0("################ ITERATION ", i, " ################"))
-            print(paste0("Remaining symptoms: ", paste(length(reamining_symps), collapse = ", ")))
-        }
-        # STEP 1 ASK SYMPTOM
-        x <- ask_symptom_console(fc, cond_names, scale, debug)
-
-        # STEP 2 COMPUTE CLOSURE
-        S <- create_set(fc, S, x$symptom, x$degree)
-        S$print()
-        diag <- diagnose(fc, S, cond_names, debug)
-
-        # STEP 3 CHECK CLOSURE
-        if (length(diag) > 0) {
-            return(list(
-                diagnosis = diag,
-                set = S,
-                iteration = i
-            ))
-        }
-
-        # # STEP 4 ASK FOR IMPROVING
-        # x <- ask_upgrade_symptoms(fc, S)
-        # S <- x$S
-
-        # # STEP 4.1 CHECK IF ANY CHANGES
-        # S$print()
-
-        # # STEP 4.2 COMPUTE CLOSURE
-        # diag2 <- diagnose(fc, S, cond_names, debug)
-
-        # # STEP 4.3 CHECK CLOSURE
-        # if (length(diag2) > 0) {
-        #     return(list(
-        #         diagnosis = diag2,
-        #         set = S,
-        #         iteration = i
-        #     ))
-        # }
-
-
-        # STEP 5 REPEAT FROM STEP 1
-        i <- i + 1
-        if (i == max_it) {
-            print("Maximum number of iterations reached")
-            return(list(
-                diagnosis = NULL,
-                set = S,
-                iteration = i
-            ))
-        }
-        closure <- compute_closure(fc, S, cond_names, debug)
-        reamining_symps <- get_remaining_attributes(S, closure, ev_names)
-        print(paste0("Passing from ", length(ev_names), " to ", length(reamining_symps), " symptoms"))
-        print(paste0("Reduced by ", round(100 * (1 - length(reamining_symps) / length(ev_names)), 2), "%"))
-    }
-}
-
-
 automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scale, hardcoded_symptoms, debug = FALSE) {
     cat_age <- age
     S <- create_set(fc, NULL, c(sex, cat_age), c(1, 1))
     i <- 1
     diag <- c()
-    remaining_symps <- ev_names
 
     if (debug) {
         print(paste0("Age category: ", cat_age))
@@ -342,37 +253,26 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
     while (i < max_it && length(diag) == 0) {
         if (debug) {
             print(paste0("################ ITERATION ", i, " ################"))
-            print(paste0("Remaining symptoms: ", paste(length(remaining_symps), collapse = ", ")))
         }
         # STEP 1 ASK SYMPTOM
         x <- hardcoded_symptoms[[i]]
 
         # STEP 2 COMPUTE CLOSURE
         S <- create_set(fc, S, x$symptom, x$degree)
-        S$print()
         diag <- diagnose(fc, S, cond_names, debug)
 
         # STEP 3 CHECK CLOSURE
         if (length(diag) > 0) {
+            if (debug) {
+                print("################ DIAGNOSIS FOUND ################")
+                print(paste0("Diagnosis: ", diag))
+            }
             return(list(
                 diagnosis = diag,
                 iteration = i,
-                set = S,
-                closure = compute_closure(fc, S, cond_names, debug)
+                set = S
             ))
         }
-
-        # # STEP 4 COMPUTE CLOSURE
-        # diag2 <- diagnose(fc, S, cond_names, debug)
-
-        # # STEP 4.3 CHECK CLOSURE
-        # if (length(diag2) > 0) {
-        #     return(list(
-        #         diagnosis = diag2,
-        #         set = S,
-        #         iteration = i
-        #     ))
-        # }
 
         # STEP 5 REPEAT FROM STEP 1
         i <- i + 1
@@ -381,53 +281,38 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
             return(list(
                 diagnosis = NULL,
                 iteration = i,
-                set = S,
-                closure = compute_closure(fc, S, cond_names, debug)
+                set = S
             ))
         }
-        closure <- compute_closure(fc, S, cond_names, debug)
-        remaining_symps <- get_remaining_attributes(S, closure, ev_names)
-        print(paste0("Passing from ", length(ev_names), " to ", length(remaining_symps), " symptoms"))
-        print(paste0("Reduced by ", round(100 * (1 - length(remaining_symps) / length(ev_names)), 2), "%"))
     }
 }
 
-benchmark_model_from_csv <- function(fc, cond_names, ev_names, validate_df, max_it, scale, samples, debug = FALSE) {
-    # Initialize results dataframe
+benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, samples = nrow(df), debug = FALSE) {
     results <- data.frame(
-        row = integer(),
-        diagnosis = character(),
-        expected_diagnosis = character(),
-        iteration = integer(),
-        elapsed_time = numeric(),
-        error = logical(),
-        correct = logical()
+        Iteration = integer(),
+        Final_Diagnosis = character(),
+        Score = double(),
+        Error = character()
     )
 
-    # Initialize set list
-    set_list <- list()
+    # Select random samples from the dataframe
+    set.seed(42)
+    df <- df[sample(nrow(df), samples), ]
 
-    # Take samples from the validation dataframe
-    set.seed(Sys.time())
-    validate_df <- validate_df[sample(nrow(validate_df), samples), ]
-
-    # Loop over each row in the validation dataframe. Reorganize the dataframe randomly
-    for (i in 1:nrow(validate_df)) {
-        # Extract information for automatic diagnosis
-        row <- validate_df[i, ]
-        sex <- ifelse(row$SEX_M == 1, "SEX_M", "SEX_F")
-        age <- paste0("AGE_", which(row[paste0("AGE_", 1:6)] == 1))
-        hardcoded_symptoms <- names(row)[row == 1]
-        hardcoded_symptoms <- hardcoded_symptoms[!hardcoded_symptoms %in% c(sex, age, cond_names)]
-
-        # Convert hardcoded_symptoms to list of lists
-        hardcoded_symptoms <- lapply(hardcoded_symptoms, function(symptom) list(symptom = symptom, degree = 1))
-
-        # Call automatic diagnosis function and measure elapsed time
-        start_time <- Sys.time()
-        error_occurred <- FALSE
-        d <- tryCatch(
+    for (i in 1:nrow(df)) {
+        errorOccurred <- FALSE
+        result <- try(
             {
+                row <- df[i, ]
+                sex <- ifelse(row$SEX_M == 1, "SEX_M", "SEX_F")
+                age <- paste0("AGE_", which(row[paste0("AGE_", 1:6)] == 1))
+                hardcoded_symptoms <- names(row)[row == 1]
+                hardcoded_symptoms <- hardcoded_symptoms[!hardcoded_symptoms %in% c(sex, age, cond_names)]
+                hardcoded_symptoms <- lapply(hardcoded_symptoms, function(symptom) list(symptom = symptom, degree = 1))
+
+                # Get the actual pathology name from the column names
+                pathology <- names(row)[row == 1 & names(row) %in% cond_names]
+
                 automatic_diagnosis(
                     fc = fc,
                     cond_names = cond_names,
@@ -440,31 +325,68 @@ benchmark_model_from_csv <- function(fc, cond_names, ev_names, validate_df, max_
                     debug = debug
                 )
             },
-            error = function(e) {
-                error_occurred <- TRUE
-                print(paste0("Error in row ", i, ": ", e$message))
-                NULL
-            }
+            silent = TRUE
         )
 
-        elapsed_time <- Sys.time() - start_time
+        if (inherits(result, "try-error")) {
+            errorOccurred <- TRUE
+            error_msg <- as.character(result)
+            results <- rbind(results, data.frame(
+                Iteration = NA,
+                Final_Diagnosis = NA,
+                Pathology = NA,
+                Score = NA,
+                Error = error_msg
+            ))
+        }
 
-        # Add results to dataframe
-        results <- rbind(results, data.frame(
-            row = i,
-            diagnosis = paste(d$diagnosis, collapse = ", "),
-            expected_diagnosis = paste(names(row)[row == 1 & names(row) %in% cond_names], collapse = ", "),
-            iteration = d$iteration,
-            elapsed_time = elapsed_time,
-            error = error_occurred,
-            correct = all(names(row)[row == 1 & names(row) %in% cond_names] %in% d$diagnosis)
-        ))
-
-        # Print progress
-        if (i %% 100 == 0) {
-            print(paste0("Processed ", i, " rows"))
+        if (!errorOccurred) {
+            if (is.null(result$diagnosis) || length(result$diagnosis) == 0) {
+                final_diagnosis <- "NA"
+                score <- 0
+            } else {
+                final_diagnosis <- paste(result$diagnosis, collapse = ",")
+                if (pathology %in% result$diagnosis) {
+                    score <- 1 / length(result$diagnosis)
+                } else {
+                    score <- 0
+                }
+            }
+            results <- rbind(results, data.frame(
+                Iteration = result$iteration,
+                Final_Diagnosis = as.character(final_diagnosis),
+                Pathology = as.character(pathology),
+                Score = as.numeric(score),
+                Error = ""
+            ))
+        }
+        #Print progress each 10%
+        if (i %% (samples / 10) == 0) {
+            print(paste0("Progress: ", round(i / samples * 100, 2), "%"))
         }
     }
 
-    return(results = results)
+    return(results)
+}
+
+bench_summary <- function(benchmark_df) {
+    total_tests <- nrow(benchmark_df)
+    error_cases <- sum(benchmark_df$Error != "")
+    error_rate <- error_cases / total_tests
+    mean_score <- mean(benchmark_df$Score, na.rm = TRUE)
+    max_score <- max(benchmark_df$Score, na.rm = TRUE)
+    correct_diagnoses <- sum(benchmark_df$Score == 1, na.rm = TRUE)
+    correct_rate <- correct_diagnoses / total_tests
+
+    result_summary <- data.frame(
+        Total_Tests = total_tests,
+        Error_Cases = error_cases,
+        Error_Rate = error_rate,
+        Mean_Score = mean_score,
+        Max_Score = max_score,
+        Correct_Diagnoses = correct_diagnoses,
+        Correct_Rate = correct_rate
+    )
+
+    return(result_summary)
 }
