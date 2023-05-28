@@ -16,16 +16,16 @@ ev_names <- names(evidences)
 cond_names <- names(conditions)
 
 # Load training data
-n_rows_fc <- 1000
+n_rows_fc <- 2500
 age_range <- 10
 
 train_sparse_df <- load_source_file(train_file, n_rows_fc, sparse = TRUE, age_range = age_range)
 validate_sparse_df <- load_source_file(validate_file, 1000, sparse = TRUE, age_range = age_range)
 
-# fc_savename <- paste0(format(Sys.Date(), "%d%m%y"), "_", n_rows_fc, "_", age_range)
+fc_savename <- paste0(format(Sys.Date(), "%d%m%y"), "_", n_rows_fc, "_", age_range)
 
 # Init fc
-# initfc <- init_fc(train_sparse_df, fc_savename, debug = TRUE, concepts = FALSE)
+initfc <- init_fc(train_sparse_df, fc_savename, debug = TRUE, concepts = FALSE)
 
 initfc <- readRDS("270523_1000_10")
 
