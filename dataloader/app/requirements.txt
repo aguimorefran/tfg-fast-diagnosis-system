@@ -1,0 +1,3 @@
+pandas
+uuid
+cassandra-driver

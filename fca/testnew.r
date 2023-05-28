@@ -16,7 +16,7 @@ ev_names <- names(evidences)
 cond_names <- names(conditions)
 
 # Load training data
-n_rows_fc <- 2500
+n_rows_fc <- 1500
 age_range <- 10
 
 train_sparse_df <- load_source_file(train_file, n_rows_fc, sparse = TRUE, age_range = age_range)
@@ -27,7 +27,7 @@ fc_savename <- paste0(format(Sys.Date(), "%d%m%y"), "_", n_rows_fc, "_", age_ran
 # Init fc
 initfc <- init_fc(train_sparse_df, fc_savename, debug = TRUE, concepts = FALSE)
 
-initfc <- readRDS("270523_1000_10")
+initfc <- readRDS(fc_savename)
 
 fc <- initfc$fc
 elapsed <- initfc$elapsed
@@ -44,5 +44,5 @@ b <- benchmark(
   scale = scale,
   debug = F,
   samples = samples,
-  train_rows = 1000
+  train_rows = n_rows_fc
 )

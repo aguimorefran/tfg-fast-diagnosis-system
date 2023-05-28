@@ -4,6 +4,7 @@ rmd_creator.py
 *.csv
 *.json
 !fca/benchmarks/benchmark_results.csv
+data/*
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,windows,linux,redis
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,windows,linux,redis
@@ -17,9 +18,6 @@ translator/packages/
 
 *.rdb
 
-
-### Cassandra ###
-cassandra/data
 
 ### Linux ###
 *~
