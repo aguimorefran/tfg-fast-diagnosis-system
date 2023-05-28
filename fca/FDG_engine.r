@@ -1,13 +1,12 @@
 # FAST DIAGNOSIS SYSTEM ENGINE
 # BASED ON FCA
-packages <- c("fcaR", "jsonlite", "Matrix")
+packages <- c("fcaR", "jsonlite", "Matrix", "ggplot2", "ggthemes")
 for (package in packages) {
     if (!require(package, character.only = TRUE)) {
         install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
     }
     library(package, character.only = TRUE)
 }
-
 
 get_value <- function(json_object, name, value) {
     result <- NULL
@@ -27,7 +26,7 @@ get_value <- function(json_object, name, value) {
     return(result)
 }
 
-load_source_file <- function(filename, nrows, sparse = FALSE) {
+load_source_file <- function(filename, nrows, age_range = 10, sparse = FALSE) {
     df <- read.csv(filename, stringsAsFactors = FALSE)
     df <- df[sample(nrow(df), min(nrow(df), nrows)), ]
 
@@ -39,7 +38,8 @@ load_source_file <- function(filename, nrows, sparse = FALSE) {
     df$EVIDENCES <- sapply(df$EVIDENCES, function(x) gsub("_$", "", x))
 
     # Categorize age
-    df$AGE <- cut(df$AGE, breaks = seq(0, 100, by = 20), labels = FALSE, include.lowest = TRUE)
+    num_age_categories <- ceiling(100 / age_range)
+    df$AGE <- cut(df$AGE, breaks = seq(0, 100, by = age_range), labels = FALSE, include.lowest = TRUE)
     df <- df[!is.na(df$AGE), ]
     df$AGE <- paste0("AGE_", df$AGE)
 
@@ -52,10 +52,10 @@ load_source_file <- function(filename, nrows, sparse = FALSE) {
         matrix(
             0,
             nrow = nrow(df),
-            ncol = length(ev_names) + length(cond_names) + 6 + 2 # 6 for age categories, 2 for sex categories
+            ncol = length(ev_names) + length(cond_names) + num_age_categories + 2 # num_age_categories for age categories, 2 for sex categories
         )
     )
-    colnames(sparse_df) <- c(ev_names, cond_names, paste0("AGE_", 1:6), "SEX_M", "SEX_F")
+    colnames(sparse_df) <- c(ev_names, cond_names, paste0("AGE_", 1:num_age_categories), "SEX_M", "SEX_F")
 
     for (i in 1:nrow(df)) {
         if (i %% 100 == 0) {
@@ -80,6 +80,7 @@ load_source_file <- function(filename, nrows, sparse = FALSE) {
 
     return(sparse_df)
 }
+
 
 init_fc <- function(df, save_file, debug = TRUE, concepts = FALSE) {
     starttime <- Sys.time()
@@ -287,7 +288,53 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
     }
 }
 
-benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, samples = nrow(df), debug = FALSE) {
+save_benchmark <- function(benchmark_results, n) {
+  
+    # Compute basic statistics
+    mean_score <- mean(benchmark_results$Score, na.rm = TRUE)
+    error_count <- sum(benchmark_results$Error != "", na.rm = TRUE)
+    mean_iterations <- mean(benchmark_results$Iteration, na.rm = TRUE)
+    successful_diagnoses <- sum(benchmark_results$Score > 0, na.rm = TRUE)
+    failed_diagnoses <- sum(benchmark_results$Score == 0, na.rm = TRUE)
+    proportion_successful <- successful_diagnoses / nrow(benchmark_results)
+    proportion_failed <- failed_diagnoses / nrow(benchmark_results)
+    
+    # Create benchmark result row
+    benchmark_row <- data.frame(
+        n = n,
+        errors = error_count,
+        score = mean_score,
+        mean_iterations = mean_iterations,
+        successful_diagnoses = successful_diagnoses,
+        failed_diagnoses = failed_diagnoses,
+        proportion_successful = proportion_successful,
+        proportion_failed = proportion_failed,
+        date_added = Sys.Date()
+    )
+
+    # Update CSV file
+    dir_name <- "fca/benchmarks"
+    if (!dir.exists(dir_name)) {
+        dir.create(dir_name, recursive = TRUE)
+    }
+    csv_path <- paste0(dir_name, "/benchmark_results.csv")
+    
+    if (file.exists(csv_path)) {
+        # If the file already exists, load it and append the new row
+        existing_data <- read.csv(csv_path, stringsAsFactors = FALSE, check.names = FALSE)
+        new_data <- rbind(existing_data, benchmark_row)
+    } else {
+        # If the file doesn't exist, create it with the new row
+        new_data <- benchmark_row
+    }
+    
+    write.csv(new_data, csv_path, row.names = FALSE, quote = FALSE)
+    
+    return(new_data)
+}
+
+
+benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, samples = nrow(df), debug = FALSE) {
     results <- data.frame(
         Iteration = integer(),
         Final_Diagnosis = character(),
@@ -310,7 +357,6 @@ benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, samples = nro
                 hardcoded_symptoms <- hardcoded_symptoms[!hardcoded_symptoms %in% c(sex, age, cond_names)]
                 hardcoded_symptoms <- lapply(hardcoded_symptoms, function(symptom) list(symptom = symptom, degree = 1))
 
-                # Get the actual pathology name from the column names
                 pathology <- names(row)[row == 1 & names(row) %in% cond_names]
 
                 automatic_diagnosis(
@@ -341,6 +387,9 @@ benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, samples = nro
         }
 
         if (!errorOccurred) {
+            if (debug) {
+                print(paste0("################ PATHOLOGY: ", pathology, " ################"))
+            }
             if (is.null(result$diagnosis) || length(result$diagnosis) == 0) {
                 final_diagnosis <- "NA"
                 score <- 0
@@ -360,33 +409,11 @@ benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, samples = nro
                 Error = ""
             ))
         }
-        #Print progress each 10%
-        if (i %% (samples / 10) == 0) {
-            print(paste0("Progress: ", round(i / samples * 100, 2), "%"))
-        }
+        print(paste0("Progress: ", round(i / samples * 100, 2), "%"))
     }
 
+    # Save results
+    save_benchmark(results, n = train_rows)
+
     return(results)
-}
-
-bench_summary <- function(benchmark_df) {
-    total_tests <- nrow(benchmark_df)
-    error_cases <- sum(benchmark_df$Error != "")
-    error_rate <- error_cases / total_tests
-    mean_score <- mean(benchmark_df$Score, na.rm = TRUE)
-    max_score <- max(benchmark_df$Score, na.rm = TRUE)
-    correct_diagnoses <- sum(benchmark_df$Score == 1, na.rm = TRUE)
-    correct_rate <- correct_diagnoses / total_tests
-
-    result_summary <- data.frame(
-        Total_Tests = total_tests,
-        Error_Cases = error_cases,
-        Error_Rate = error_rate,
-        Mean_Score = mean_score,
-        Max_Score = max_score,
-        Correct_Diagnoses = correct_diagnoses,
-        Correct_Rate = correct_rate
-    )
-
-    return(result_summary)
 }

@@ -1,0 +1,4 @@
+n,errors,score,mean_iterations,successful_diagnoses,failed_diagnoses,proportion_successful,proportion_failed,date_added
+200,0,0.289387755102041,7.74,74,26,0.74,0.26,2023-05-28
+500,0,0.358163265306122,9.56,75,25,0.75,0.25,19505
+1000,1,0.570191713048856,9.81818181818182,78,21,0.78,0.21,19505
