@@ -1,6 +1,6 @@
 # FAST DIAGNOSIS SYSTEM ENGINE
 # BASED ON FCA
-packages <- c("fcaR", "jsonlite", "Matrix", "ggplot2", "ggthemes")
+packages <- c("fcaR", "jsonlite", "Matrix", "RJDBC")
 for (package in packages) {
     if (!require(package, character.only = TRUE)) {
         install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
@@ -8,25 +8,16 @@ for (package in packages) {
     library(package, character.only = TRUE)
 }
 
-get_value <- function(json_object, name, value) {
-    result <- NULL
-    if (is.null(json_object)) {
-        return(result)
-    }
+jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
 
-    if (name %in% names(json_object)) {
-        sub_json <- json_object[[name]]
-        if (is.list(sub_json)) {
-            if (value %in% names(sub_json)) {
-                result <- sub_json[[value]]
-            }
-        }
-    }
-
-    return(result)
-}
-
-load_source_file <- function(filename, nrows, age_range = 10, sparse = FALSE) {
+#' @title Load source file
+#' @description Load CSV source file and return a data frame
+#' @param filename CSV file name
+#' @param nrows Number of rows to load
+#' @param age_range Age range to use for age categories
+#' @param sparse Whether to return a sparse data frame or not
+#' @return A data frame
+load_source_file <- function(filename, nrows, cond_names, ev_names, age_range = 10, sparse = FALSE) {
     df <- read.csv(filename, stringsAsFactors = FALSE)
     df <- df[sample(nrow(df), min(nrow(df), nrows)), ]
 
@@ -37,7 +28,6 @@ load_source_file <- function(filename, nrows, age_range = 10, sparse = FALSE) {
     df$EVIDENCES <- sapply(df$EVIDENCES, function(x) gsub("@.*", "", x))
     df$EVIDENCES <- sapply(df$EVIDENCES, function(x) gsub("_$", "", x))
 
-    # Categorize age
     num_age_categories <- ceiling(100 / age_range)
     df$AGE <- cut(df$AGE, breaks = seq(0, 100, by = age_range), labels = FALSE, include.lowest = TRUE)
     df <- df[!is.na(df$AGE), ]
@@ -47,7 +37,6 @@ load_source_file <- function(filename, nrows, age_range = 10, sparse = FALSE) {
         return(df)
     }
 
-    # Create sparse dataframe
     sparse_df <- data.frame(
         matrix(
             0,
@@ -68,7 +57,6 @@ load_source_file <- function(filename, nrows, age_range = 10, sparse = FALSE) {
         age <- row$AGE
         sex <- paste0("SEX_", row$SEX)
 
-        # set in df the columns that match evidences, conditions, pathology, age and sex
         for (ev in evidence) {
             sparse_df[i, ev] <- 1
         }
@@ -81,7 +69,13 @@ load_source_file <- function(filename, nrows, age_range = 10, sparse = FALSE) {
     return(sparse_df)
 }
 
-
+#' @title Initialize fcaR::FormalContext object
+#' @description Initialize a fcaR::FormalContext object from a sparse data frame
+#' @param df A sparse data frame
+#' @param save_file File to save the object to
+#' @param debug Whether to print debug messages or not
+#' @param concepts Whether to compute concepts or not
+#' @return A list containing the FormalContext object and the elapsed time
 init_fc <- function(df, save_file, debug = TRUE, concepts = FALSE) {
     starttime <- Sys.time()
     if (file.exists(save_file)) {
@@ -122,6 +116,13 @@ init_fc <- function(df, save_file, debug = TRUE, concepts = FALSE) {
     return(res)
 }
 
+#' @title Ask symptom console
+#' @description Ask symptom and degree from console to the user
+#' @param fc A fcaR::FormalContext object
+#' @param symptom A symptom
+#' @param scale A scale
+#' @param debug Whether to print debug messages or not
+#' @return A list containing the symptom and the degree
 ask_symptom_console <- function(fc, symptom, scale, debug = FALSE) {
     if (debug) {
         print("################ ASKING SYMPTOM ################")
@@ -139,6 +140,7 @@ ask_symptom_console <- function(fc, symptom, scale, debug = FALSE) {
     return(list(symptom = symptom, degree = degree))
 }
 
+#' @title Create a fcaR::Set object
 create_set <- function(fc, S0, symptoms, values, debug = FALSE) {
     if (is.null(S0)) {
         S <- Set$new(fc$attributes)
@@ -159,7 +161,6 @@ diagnose <- function(fc, S, target, debug = FALSE) {
         S,
         attribute_filter = target
     )
-    # return values > 0
     return(names(d[d > 0]))
 }
 
@@ -289,7 +290,6 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
 }
 
 save_benchmark <- function(benchmark_results, n) {
-  
     # Compute basic statistics
     mean_score <- mean(benchmark_results$Score, na.rm = TRUE)
     error_count <- sum(benchmark_results$Error != "", na.rm = TRUE)
@@ -298,7 +298,7 @@ save_benchmark <- function(benchmark_results, n) {
     failed_diagnoses <- sum(benchmark_results$Score == 0, na.rm = TRUE)
     proportion_successful <- successful_diagnoses / nrow(benchmark_results)
     proportion_failed <- failed_diagnoses / nrow(benchmark_results)
-    
+
     # Create benchmark result row
     benchmark_row <- data.frame(
         n = n,
@@ -318,7 +318,7 @@ save_benchmark <- function(benchmark_results, n) {
         dir.create(dir_name, recursive = TRUE)
     }
     csv_path <- paste0(dir_name, "/benchmark_results.csv")
-    
+
     if (file.exists(csv_path)) {
         # If the file already exists, load it and append the new row
         existing_data <- read.csv(csv_path, stringsAsFactors = FALSE, check.names = FALSE)
@@ -327,12 +327,11 @@ save_benchmark <- function(benchmark_results, n) {
         # If the file doesn't exist, create it with the new row
         new_data <- benchmark_row
     }
-    
+
     write.csv(new_data, csv_path, row.names = FALSE, quote = FALSE)
-    
+
     return(new_data)
 }
-
 
 benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, samples = nrow(df), debug = FALSE) {
     results <- data.frame(

@@ -10,13 +10,24 @@ services:
     networks:
       - FDSnet
     healthcheck:
-      test: ["CMD", "cqlsh", "-u", "cassandra", "-p", "cassandra", "-e", "describe cluster"]
+      test:
+        [
+          "CMD",
+          "cqlsh",
+          "-u",
+          "cassandra",
+          "-p",
+          "cassandra",
+          "-e",
+          "describe cluster"
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
 
   dataloader:
-    build: 
+    container_name: dataloader
+    build:
       context: ./dataloader
       dockerfile: Dockerfile
     depends_on:
