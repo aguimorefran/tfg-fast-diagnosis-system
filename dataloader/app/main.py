@@ -4,6 +4,7 @@ import pandas as pd
 import uuid
 import os
 import logging
+import json
 
 logging.basicConfig(level=logging.INFO)
 
@@ -13,53 +14,145 @@ auth_provider = PlainTextAuthProvider(
     username='cassandra', password='cassandra')
 cluster = Cluster(['cassandra'], port=9042, auth_provider=auth_provider)
 session = cluster.connect()
+dataset_dir = os.path.join('resources', 'dataset')
 
-session.execute("""
-    CREATE KEYSPACE IF NOT EXISTS fds 
-    WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' }
-""")
 
-session.set_keyspace('fds')
+def load_medical_cases():
+    """
+    Load medical cases from csv files into Cassandra
 
-session.execute("""
-    CREATE TABLE IF NOT EXISTS casos_clinicos (
-        id UUID PRIMARY KEY,
-        AGE int,
-        SEX text,
-        EVIDENCES text,
-        PATHOLOGY text,
-        INITIAL_EVIDENCE text
-    )
-""")
+    Parameters
+    ----------
+    None
 
-result = session.execute("SELECT COUNT(*) FROM casos_clinicos")
-inserted_n = 0
-if result[0].count > 0:
-    logging.info("La tabla ya tiene datos, no se cargará ningún dato nuevo.")
-else:
-    csv_dir = os.path.join('resources', 'dataset')
-    csv_files = ['release_test_patients.csv',
-                 'release_train_patients.csv', 'release_validate_patients.csv']
+    Returns
+    -------
+    None
+    """
+    logging.info("Loading medical cases into Cassandra")
+    session.execute("""
+        CREATE KEYSPACE IF NOT EXISTS fds 
+        WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' }
+    """)
 
-    for csv_file in csv_files:
-        df = pd.read_csv(os.path.join(csv_dir, csv_file))
+    session.set_keyspace('fds')
 
-        df = df[['AGE', 'SEX', 'EVIDENCES', 'PATHOLOGY', 'INITIAL_EVIDENCE']]
+    session.execute("""
+        CREATE TABLE IF NOT EXISTS clinical_cases (
+            id UUID PRIMARY KEY,
+            AGE int,
+            SEX text,
+            EVIDENCES text,
+            PATHOLOGY text,
+            INITIAL_EVIDENCE text
+        )
+    """)
 
-        for index, row in df.iterrows():
-            session.execute(
-                """
-                INSERT INTO casos_clinicos (id, AGE, SEX, EVIDENCES, PATHOLOGY, INITIAL_EVIDENCE)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                """,
-                (uuid.uuid4(), row['AGE'], row['SEX'], row['EVIDENCES'],
-                 row['PATHOLOGY'], row['INITIAL_EVIDENCE'])
-            )
-            inserted_n += 1
-            if inserted_n % (df.shape[0] // 20) == 0:
-                logging.info(f"{inserted_n / df.shape[0] * 100}% inserted from {csv_file}, {inserted_n} inserted in total")
-            if inserted_n >= MAX_INSERTS:
-                logging.info(f"Inserted {inserted_n} rows, stopping")
-                break
+    result = session.execute("SELECT COUNT(*) FROM clinical_cases")
+    inserted_n = 0
+    if result[0].count > 0:
+        logging.info("La tabla ya tiene datos, no se cargará ningún dato nuevo.")
+    else:
+        csv_files = ['release_test_patients.csv',
+                    'release_train_patients.csv', 'release_validate_patients.csv']
 
-    logging.info("Datos cargados correctamente")
+        for csv_file in csv_files:
+            df = pd.read_csv(os.path.join(dataset_dir, csv_file))
+
+            df = df[['AGE', 'SEX', 'EVIDENCES', 'PATHOLOGY', 'INITIAL_EVIDENCE']]
+
+            for index, row in df.iterrows():
+                session.execute(
+                    """
+                    INSERT INTO clinical_cases (id, AGE, SEX, EVIDENCES, PATHOLOGY, INITIAL_EVIDENCE)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
+                    (uuid.uuid4(), row['AGE'], row['SEX'], row['EVIDENCES'],
+                    row['PATHOLOGY'], row['INITIAL_EVIDENCE'])
+                )
+                inserted_n += 1
+                if inserted_n % (df.shape[0] // 20) == 0:
+                    logging.info("%s%% inserted from %s, %s inserted in total", round(inserted_n / df.shape[0] * 100), csv_file, inserted_n)
+                if inserted_n >= MAX_INSERTS:
+                    logging.info("Inserted MAX_ROWS=%s, stopping", inserted_n)
+                    break
+
+        logging.info("Medical cases loaded successfully")
+
+
+def load_cond_names():
+    """
+    Load condition names from json file into Cassandra
+    """
+    logging.info("Loading condition names into Cassandra")
+
+    result = session.execute("SELECT COUNT(*) FROM conditions")
+    if result[0].count > 0:
+        logging.info("Table conditions already has data, not loading.")
+        return
+
+    session.execute("""
+        CREATE TABLE IF NOT EXISTS conditions (
+            id UUID PRIMARY KEY,
+            name text
+        )
+    """)
+
+    cond_file = os.path.join(dataset_dir, 'release_conditions.json')
+    with open(cond_file) as f:
+        conditions = json.load(f)
+    
+    counter = 0
+    for name in conditions.keys():
+        session.execute(
+            """
+            INSERT INTO conditions (id, name)
+            VALUES (%s, %s)
+            """,
+            (uuid.uuid4(), name)
+        )
+        counter += 1
+
+    logging.info("Conditions loaded successfully. %s conditions loaded", counter)
+
+
+def load_ev_names():
+    """
+    Load evidence names from json file into Cassandra
+    """
+    logging.info("Loading evidence names into Cassandra")
+
+    result = session.execute("SELECT COUNT(*) FROM evidences")
+    if result[0].count > 0:
+        logging.info("Table evidences already has data, not loading.")
+        return
+
+    session.execute("""
+        CREATE TABLE IF NOT EXISTS evidences (
+            id UUID PRIMARY KEY,
+            name text
+        )
+    """)
+
+    ev_file = os.path.join(dataset_dir, 'release_evidences.json')
+    with open(ev_file) as f:
+        evidences = json.load(f)
+
+    counter = 0
+    for name in evidences.keys():
+        session.execute(
+            """
+            INSERT INTO evidences (id, name)
+            VALUES (%s, %s)
+            """,
+            (uuid.uuid4(), name)
+        )
+        counter += 1
+
+    logging.info("Evidences loaded successfully. %s evidences loaded", counter)
+
+
+if __name__ == "__main__":
+    load_medical_cases()
+    load_cond_names()
+    load_ev_names()

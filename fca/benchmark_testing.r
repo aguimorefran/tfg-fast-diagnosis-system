@@ -2,8 +2,8 @@ source("fca/FDS_dataloader.r")
 source("fca/FDS_engine.r")
 
 age_range = 10
-rowstrain = 500
-rowsvalidate = 100
+rowstrain = 2500
+rowsvalidate = 5000
 dfs <- fetch_train_validate(rowstrain = rowstrain, rowsvalidate = rowsvalidate, age_range = age_range)
 
 fc_savefolder <- "fca/resources/formalcontexts/"
@@ -13,7 +13,7 @@ fc_savename
 
 train_sparse_df <- dfs$train_df
 validate_sparse_df <- dfs$validate_df
-initfc <- init_fc(train_sparse_df, fc_savename, debug = TRUE, concepts = FALSE)
+initfc <- init_fc(train_sparse_df, fc_savename, debug = TRUE, concepts = TRUE)
 initfc <- readRDS(fc_savename)
 
 fc <- initfc$fc

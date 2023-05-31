@@ -21,7 +21,7 @@ cassdrv <- JDBC(jdbc_driver_class, jdbc_driver_path, identifier.quote = "`")
 cassandra_host <- "0.0.0.0"
 port <- 9042
 keyspace <- "fds"
-table <- "casos_clinicos"
+table <- "clinical_cases"
 age_range <- 10
 
 
