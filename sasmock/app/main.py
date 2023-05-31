@@ -56,12 +56,20 @@ async def startup_event():
         )
     """)
 
-    for name in names_f:
-        session.execute("INSERT INTO names_f (name) VALUES (%s)", (name,))
-    for name in names_m:
-        session.execute("INSERT INTO names_m (name) VALUES (%s)", (name,))
-    for surname in surnames:
-        session.execute("INSERT INTO surnames (surname) VALUES (%s)", (surname,))
+    result = session.execute("SELECT COUNT(*) FROM names_f")
+    if result[0].count == 0:
+        for name in names_f:
+            session.execute("INSERT INTO names_f (name) VALUES (%s)", (name,))
+
+    result = session.execute("SELECT COUNT(*) FROM names_m")
+    if result[0].count == 0:        
+        for name in names_m:
+            session.execute("INSERT INTO names_m (name) VALUES (%s)", (name,))
+
+    result = session.execute("SELECT COUNT(*) FROM surnames")
+    if result[0].count == 0:
+        for surname in surnames:
+            session.execute("INSERT INTO surnames (surname) VALUES (%s)", (surname,))
 
 
 @app.get("/patient/{dni}")
