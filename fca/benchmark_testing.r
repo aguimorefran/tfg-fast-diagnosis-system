@@ -2,7 +2,7 @@ source("fca/FDS_dataloader.r")
 source("fca/FDS_engine.r")
 
 age_range <- 10
-rowstrain <- 2000
+rowstrain <- 3000
 rowsvalidate <- 5000
 dfs <- fetch_train_validate(rowstrain = rowstrain, rowsvalidate = rowsvalidate, age_range = age_range)
 
@@ -15,11 +15,11 @@ train_sparse_df <- dfs$train_df
 validate_sparse_df <- dfs$validate_df
 
 fc <- create_formal_context(train_sparse_df, fc_savename)
-fc <- apply_rules_formal_context(fc_savename)
+# fc <- apply_rules_formal_context(fc_savename)
 
 scale <- c(.75, 1)
-samples <- 100
-set.seed(Sys.time())
+samples <- 500
+set.seed(as.integer(as.numeric(Sys.time()) * 10^6))
 b <- benchmark(
   df = validate_sparse_df,
   fc = fc,

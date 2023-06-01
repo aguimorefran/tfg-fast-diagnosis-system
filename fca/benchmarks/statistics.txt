@@ -1,0 +1,59 @@
+Head of the data:
+     n errors     score mean_iterations successful_diagnoses failed_diagnoses
+1  200      0 0.2893878        7.740000                   74               26
+2  500      0 0.3581633        9.560000                   75               25
+3 1000      1 0.5701917        9.818182                   78               21
+4  100      0 0.1012245        6.140000                   64               36
+5 2000      2 0.6770096        9.163265                   83               15
+6 2000      5 0.7105339        9.622222                  434               61
+  proportion_successful proportion_failed date_added
+1                 0.740             0.260 2023-05-28
+2                 0.750             0.250      19505
+3                 0.780             0.210      19505
+4                 0.640             0.360      19509
+5                 0.830             0.150      19509
+6                 0.868             0.122      19509
+
+Summary of the data:
+       n              errors          score        mean_iterations
+ Min.   : 100.0   Min.   :0.000   Min.   :0.1012   Min.   :6.140  
+ 1st Qu.: 275.0   1st Qu.:0.000   1st Qu.:0.3066   1st Qu.:8.096  
+ Median : 750.0   Median :0.500   Median :0.4642   Median :9.362  
+ Mean   : 966.7   Mean   :1.333   Mean   :0.4511   Mean   :8.674  
+ 3rd Qu.:1750.0   3rd Qu.:1.750   3rd Qu.:0.6503   3rd Qu.:9.607  
+ Max.   :2000.0   Max.   :5.000   Max.   :0.7105   Max.   :9.818  
+ successful_diagnoses failed_diagnoses proportion_successful proportion_failed
+ Min.   : 64.00       Min.   :15.00    Min.   :0.6400        Min.   :0.1220   
+ 1st Qu.: 74.25       1st Qu.:22.00    1st Qu.:0.7425        1st Qu.:0.1650   
+ Median : 76.50       Median :25.50    Median :0.7650        Median :0.2300   
+ Mean   :134.67       Mean   :30.67    Mean   :0.7680        Mean   :0.2253   
+ 3rd Qu.: 81.75       3rd Qu.:33.50    3rd Qu.:0.8175        3rd Qu.:0.2575   
+ Max.   :434.00       Max.   :61.00    Max.   :0.8680        Max.   :0.3600   
+  date_added       
+ Length:6          
+ Class :character  
+ Mode  :character  
+                   
+                   
+                   
+
+Regression model summary:
+
+Call:
+lm(formula = score ~ n, data = benchmarks)
+
+Residuals:
+       1        2        3        4        5        6 
+ 0.04092  0.03041  0.11030 -0.12082 -0.04716 -0.01364 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)   
+(Intercept) 1.956e-01  5.774e-02   3.388  0.02758 * 
+n           2.643e-04  4.637e-05   5.699  0.00469 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.08912 on 4 degrees of freedom
+Multiple R-squared:  0.8903,	Adjusted R-squared:  0.8629 
+F-statistic: 32.48 on 1 and 4 DF,  p-value: 0.004686
+

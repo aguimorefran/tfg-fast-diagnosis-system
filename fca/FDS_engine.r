@@ -1,6 +1,6 @@
 # FAST DIAGNOSIS SYSTEM ENGINE
 # BASED ON FCA
-packages <- c("fcaR", "Matrix", "RJDBC")
+packages <- c("fcaR", "Matrix", "RJDBC", "ggplot2", "dplyr", "tidyr")
 for (package in packages) {
     if (!require(package, character.only = TRUE)) {
         install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
@@ -20,10 +20,10 @@ create_formal_context <- function(df, save_file, debug = TRUE, concepts = FALSE)
         }
     }
 
-    warn <- readline("This function takes long to run. Continue? (y/n) ")
-    if (warn == "n") {
-        stop("Function aborted")
-    }
+    # warn <- readline("This function takes long to run. Continue? (y/n) ")
+    # if (warn == "n") {
+    #     stop("Function aborted")
+    # }
     if (debug) {
         print("Generating formal context")
     }
@@ -263,7 +263,6 @@ save_benchmark <- function(benchmark_results, n) {
         date_added = Sys.Date()
     )
 
-    # Update CSV file
     dir_name <- "fca/benchmarks"
     if (!dir.exists(dir_name)) {
         dir.create(dir_name, recursive = TRUE)
@@ -271,11 +270,9 @@ save_benchmark <- function(benchmark_results, n) {
     csv_path <- paste0(dir_name, "/benchmark_results.csv")
 
     if (file.exists(csv_path)) {
-        # If the file already exists, load it and append the new row
         existing_data <- read.csv(csv_path, stringsAsFactors = FALSE, check.names = FALSE)
         new_data <- rbind(existing_data, benchmark_row)
     } else {
-        # If the file doesn't exist, create it with the new row
         new_data <- benchmark_row
     }
 
@@ -283,7 +280,71 @@ save_benchmark <- function(benchmark_results, n) {
 
     return(new_data)
 }
+analyze_benchmarks <- function() {
+    dir_name <- "fca/benchmarks"
+    if (!dir.exists(dir_name)) {
+        dir.create(dir_name, recursive = TRUE)
+    }
+    csv_path <- paste0(dir_name, "/benchmark_results.csv")
 
+    benchmarks <- read.csv(csv_path)
+
+    print("Head of the data:")
+    print(head(benchmarks))
+
+    print("Summary of the data:")
+    print(summary(benchmarks))
+
+    scatter_plot <- ggplot(benchmarks, aes(x = n, y = score)) +
+        geom_point() +
+        geom_smooth(method = lm) +
+        labs(
+            title = "Scatterplot of n vs Score",
+            x = "n",
+            y = "Score",
+            caption = "Linear regression line fitted"
+        ) +
+        theme_light()
+
+    ggsave(filename = paste0(dir_name, "/scatter_plot.png"), plot = scatter_plot)
+
+    bar_plot <- benchmarks %>%
+        gather("Diagnosis_Type", "Proportion", proportion_successful:proportion_failed) %>%
+        ggplot(aes(x = Diagnosis_Type, y = Proportion)) +
+        geom_bar(stat = "identity") +
+        labs(
+            title = "Bar chart of Successful vs Failed Diagnoses",
+            x = "Diagnosis Type",
+            y = "Proportion"
+        ) +
+        theme_light()
+
+    ggsave(filename = paste0(dir_name, "/bar_plot.png"), plot = bar_plot)
+
+    hist_plot <- ggplot(benchmarks, aes(x = mean_iterations)) +
+        geom_histogram(bins = 30, fill = "steelblue") +
+        labs(
+            title = "Histogram of Mean Iterations",
+            x = "Mean Iterations",
+            y = "Frequency"
+        ) +
+        theme_light()
+
+    ggsave(filename = paste0(dir_name, "/hist_plot.png"), plot = hist_plot)
+
+    regression_model <- lm(score ~ n, data = benchmarks)
+    print(summary(regression_model))
+
+    # Save summary statistics to a txt file
+    sink(paste0(dir_name, "/statistics.txt"))
+    cat("Head of the data:\n")
+    print(head(benchmarks))
+    cat("\nSummary of the data:\n")
+    print(summary(benchmarks))
+    cat("\nRegression model summary:\n")
+    print(summary(regression_model))
+    sink()
+}
 benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, samples = nrow(df), debug = FALSE) {
     results <- data.frame(
         Iteration = integer(),
@@ -292,7 +353,6 @@ benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, s
         Error = character()
     )
 
-    # Select random samples from the dataframe
     set.seed(42)
     df <- df[sample(nrow(df), samples), ]
 
@@ -364,6 +424,7 @@ benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, s
 
     # Save results
     save_benchmark(results, n = train_rows)
+    analyze_benchmarks()
 
     return(results)
 }
