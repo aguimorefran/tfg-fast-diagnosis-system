@@ -1,23 +1,21 @@
 source("fca/FDS_dataloader.r")
 source("fca/FDS_engine.r")
 
-age_range = 10
-rowstrain = 2500
-rowsvalidate = 5000
+age_range <- 10
+rowstrain <- 2000
+rowsvalidate <- 5000
 dfs <- fetch_train_validate(rowstrain = rowstrain, rowsvalidate = rowsvalidate, age_range = age_range)
 
-fc_savefolder <- "fca/resources/formalcontexts/"
+fc_savefolder <- "fca/formalcontexts/"
 fc_savename <- paste0(format(Sys.Date(), "%d%m%y"), "_", rowstrain, "_", age_range)
 fc_savename <- paste0(fc_savefolder, fc_savename, ".rds")
 fc_savename
 
 train_sparse_df <- dfs$train_df
 validate_sparse_df <- dfs$validate_df
-initfc <- init_fc(train_sparse_df, fc_savename, debug = TRUE, concepts = TRUE)
-initfc <- readRDS(fc_savename)
 
-fc <- initfc$fc
-elapsed <- initfc$elapsed
+fc <- create_formal_context(train_sparse_df, fc_savename)
+fc <- apply_rules_formal_context(fc_savename)
 
 scale <- c(.75, 1)
 samples <- 100
@@ -31,5 +29,5 @@ b <- benchmark(
   scale = scale,
   debug = F,
   samples = samples,
-  train_rows = n_rows_fc
+  train_rows = rowstrain
 )

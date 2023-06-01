@@ -8,7 +8,7 @@ import json
 
 logging.basicConfig(level=logging.INFO)
 
-MAX_INSERTS = 500000
+MAX_INSERTS = 10000
 
 auth_provider = PlainTextAuthProvider(
     username='cassandra', password='cassandra')
@@ -37,47 +37,52 @@ def load_medical_cases():
 
     session.set_keyspace('fds')
 
-    session.execute("""
-        CREATE TABLE IF NOT EXISTS clinical_cases (
-            id UUID PRIMARY KEY,
-            AGE int,
-            SEX text,
-            EVIDENCES text,
-            PATHOLOGY text,
-            INITIAL_EVIDENCE text
-        )
-    """)
+    tables = ['train_cases', 'validate_cases', 'test_cases']
+    for table in tables:
+        session.execute(f"""
+            CREATE TABLE IF NOT EXISTS {table} (
+                id UUID PRIMARY KEY,
+                AGE int,
+                SEX text,
+                EVIDENCES text,
+                PATHOLOGY text,
+                INITIAL_EVIDENCE text
+            )
+        """)
 
-    result = session.execute("SELECT COUNT(*) FROM clinical_cases")
-    inserted_n = 0
-    if result[0].count > 0:
-        logging.info("La tabla ya tiene datos, no se cargará ningún dato nuevo.")
-    else:
-        csv_files = ['release_test_patients.csv',
-                    'release_train_patients.csv', 'release_validate_patients.csv']
+    csv_files = {
+        'train_cases': 'release_train_patients.csv', 
+        'validate_cases': 'release_validate_patients.csv',
+        'test_cases': 'release_test_patients.csv'
+    }
 
-        for csv_file in csv_files:
-            df = pd.read_csv(os.path.join(dataset_dir, csv_file))
+    for table, csv_file in csv_files.items():
+        result = session.execute(f"SELECT COUNT(*) FROM {table}")
+        inserted_n = 0
+        if result[0].count > 0:
+            logging.info(f"La tabla {table} ya tiene datos, no se cargará ningún dato nuevo.")
+            continue
 
-            df = df[['AGE', 'SEX', 'EVIDENCES', 'PATHOLOGY', 'INITIAL_EVIDENCE']]
+        df = pd.read_csv(os.path.join(dataset_dir, csv_file))
 
-            for index, row in df.iterrows():
-                session.execute(
-                    """
-                    INSERT INTO clinical_cases (id, AGE, SEX, EVIDENCES, PATHOLOGY, INITIAL_EVIDENCE)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    """,
-                    (uuid.uuid4(), row['AGE'], row['SEX'], row['EVIDENCES'],
-                    row['PATHOLOGY'], row['INITIAL_EVIDENCE'])
-                )
-                inserted_n += 1
-                if inserted_n % (df.shape[0] // 20) == 0:
-                    logging.info("%s%% inserted from %s, %s inserted in total", round(inserted_n / df.shape[0] * 100), csv_file, inserted_n)
-                if inserted_n >= MAX_INSERTS:
-                    logging.info("Inserted MAX_ROWS=%s, stopping", inserted_n)
-                    break
+        df = df[['AGE', 'SEX', 'EVIDENCES', 'PATHOLOGY', 'INITIAL_EVIDENCE']]
 
-        logging.info("Medical cases loaded successfully")
+        for index, row in df.iterrows():
+            session.execute(
+                f"""
+                INSERT INTO {table} (id, AGE, SEX, EVIDENCES, PATHOLOGY, INITIAL_EVIDENCE)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (uuid.uuid4(), row['AGE'], row['SEX'], row['EVIDENCES'], row['PATHOLOGY'], row['INITIAL_EVIDENCE'])
+            )
+            inserted_n += 1
+            if inserted_n % (df.shape[0] // 20) == 0:
+                logging.info("%s%% inserted from %s, %s inserted in total", round(inserted_n / df.shape[0] * 100), csv_file, inserted_n)
+            if inserted_n >= MAX_INSERTS:
+                logging.info("Inserted MAX_ROWS=%s, stopping", inserted_n)
+                break
+
+    logging.info("Medical cases loaded successfully")
 
 
 def load_cond_names():
@@ -86,17 +91,17 @@ def load_cond_names():
     """
     logging.info("Loading condition names into Cassandra")
 
-    result = session.execute("SELECT COUNT(*) FROM conditions")
-    if result[0].count > 0:
-        logging.info("Table conditions already has data, not loading.")
-        return
-
     session.execute("""
         CREATE TABLE IF NOT EXISTS conditions (
             id UUID PRIMARY KEY,
             name text
         )
     """)
+
+    result = session.execute("SELECT COUNT(*) FROM conditions")
+    if result[0].count > 0:
+        logging.info("Table conditions already has data, not loading.")
+        return
 
     cond_file = os.path.join(dataset_dir, 'release_conditions.json')
     with open(cond_file) as f:
@@ -122,17 +127,18 @@ def load_ev_names():
     """
     logging.info("Loading evidence names into Cassandra")
 
-    result = session.execute("SELECT COUNT(*) FROM evidences")
-    if result[0].count > 0:
-        logging.info("Table evidences already has data, not loading.")
-        return
-
     session.execute("""
         CREATE TABLE IF NOT EXISTS evidences (
             id UUID PRIMARY KEY,
             name text
         )
     """)
+
+    result = session.execute("SELECT COUNT(*) FROM evidences")
+    if result[0].count > 0:
+        logging.info("Table evidences already has data, not loading.")
+        return
+
 
     ev_file = os.path.join(dataset_dir, 'release_evidences.json')
     with open(ev_file) as f:

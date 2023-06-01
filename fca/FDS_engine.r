@@ -10,14 +10,7 @@ for (package in packages) {
 
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
 
-#' @title Initialize fcaR::FormalContext object
-#' @description Initialize a fcaR::FormalContext object from a sparse data frame
-#' @param df A sparse data frame
-#' @param save_file File to save the object to
-#' @param debug Whether to print debug messages or not
-#' @param concepts Whether to compute concepts or not
-#' @return A list containing the FormalContext object and the elapsed time
-init_fc <- function(df, save_file, debug = TRUE, concepts = FALSE) {
+create_formal_context <- function(df, save_file, debug = TRUE, concepts = FALSE) {
     starttime <- Sys.time()
     if (file.exists(save_file)) {
         load <- readline("Load existing formal context? (y/n) ")
@@ -40,22 +33,39 @@ init_fc <- function(df, save_file, debug = TRUE, concepts = FALSE) {
     }
     fc$find_implications(verbose = debug, save_concepts = concepts)
 
+    endtime <- Sys.time()
+    print(paste0("Elapsed time: ", endtime - starttime))
+
+    saveRDS(fc, save_file)
+    return(fc)
+}
+
+
+apply_rules_formal_context <- function(fc_file, debug = TRUE) {
+    if (!file.exists(fc_file)) {
+        stop("File does not exist")
+    }
+
+    fc <- readRDS(fc_file)
+
     colMeans(fc$implications$size())
     if (debug) {
         print("Applying simplification rules")
         print(colMeans(fc$implications$size()))
     }
+    starttime <- Sys.time()
     fc$implications$apply_rules(rules = c("simplification", "rsimplification"), parallelize = .Platform$OS.type == "unix")
 
     if (debug) {
         print(colMeans(fc$implications$size()))
     }
     endtime <- Sys.time()
-    res <- list(fc = fc, elapsed = endtime - starttime)
+    print(paste0("Elapsed time: ", endtime - starttime))
 
-    saveRDS(res, save_file)
-    return(res)
+    saveRDS(fc, fc_file)
+    return(fc)
 }
+
 
 #' @title Ask symptom console
 #' @description Ask symptom and degree from console to the user
