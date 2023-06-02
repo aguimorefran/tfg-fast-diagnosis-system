@@ -1,5 +1,6 @@
 source("fca/FDS_dataloader.r")
 source("fca/FDS_engine.r")
+source("fca/FDS_benchmark.r")
 
 age_range <- 10
 rowstrain <- 2000
@@ -25,13 +26,24 @@ fc <- readRDS("fca/formalcontexts/010623_3000_10.rds")
 
 scale <- c(.75, 1)
 set.seed(as.integer(as.numeric(Sys.time()) * 10^6) + rowstrain)
-b <- benchmark(
-  df = validate_sparse_df,
+# b <- benchmark(
+#   df = validate_sparse_df,
+#   fc = fc,
+#   cond_names = cond_names,
+#   ev_names = ev_names,
+#   max_it = 20,
+#   scale = scale,
+#   debug = F,
+#   train_rows = rowstrain
+# )
+
+d <- manual_diagnosis(
   fc = fc,
   cond_names = cond_names,
   ev_names = ev_names,
-  max_it = 20,
+  sex = "SEX_M",
+  age = 30,
   scale = scale,
-  debug = F,
-  train_rows = rowstrain
+  max_it = 20,
+  debug = T
 )
