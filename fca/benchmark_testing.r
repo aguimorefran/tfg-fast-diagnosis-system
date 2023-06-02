@@ -14,6 +14,9 @@ fc_savename
 train_sparse_df <- dfs$train_df
 validate_sparse_df <- dfs$validate_df
 
+cond_names <- fetch_conditions()
+ev_names <- fetch_evidences()
+
 # fc <- create_formal_context(train_sparse_df, fc_savename)
 # fc <- apply_rules_formal_context(fc_savename)
 

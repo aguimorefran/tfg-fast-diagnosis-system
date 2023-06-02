@@ -184,3 +184,18 @@ fetch_train_validate <- function(rowstrain, rowsvalidate, age_range) {
 
     return(list(train_df = train_df, validate_df = validate_df))
 }
+
+
+fetch_conditions <- function() {
+    conn <- dbConnect(cassdrv, paste0("jdbc:cassandra://", cassandra_host, ":", port, ";AuthMech=0;Keyspace=", keyspace))
+    result <- dbGetQuery(conn, sprintf("SELECT * FROM %s.%s", keyspace, "conditions"))$name
+    dbDisconnect(conn)
+    return(result)
+}
+
+fetch_evidences <- function() {
+    conn <- dbConnect(cassdrv, paste0("jdbc:cassandra://", cassandra_host, ":", port, ";AuthMech=0;Keyspace=", keyspace))
+    result <- dbGetQuery(conn, sprintf("SELECT * FROM %s.%s", keyspace, "evidences"))$name
+    dbDisconnect(conn)
+    return(result)
+}
