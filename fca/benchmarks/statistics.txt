@@ -15,45 +15,70 @@ Head of the data:
 6                 0.868             0.122      19509
 
 Summary of the data:
-       n              errors          score        mean_iterations
- Min.   : 100.0   Min.   :0.000   Min.   :0.1012   Min.   :6.140  
- 1st Qu.: 275.0   1st Qu.:0.000   1st Qu.:0.3066   1st Qu.:8.096  
- Median : 750.0   Median :0.500   Median :0.4642   Median :9.362  
- Mean   : 966.7   Mean   :1.333   Mean   :0.4511   Mean   :8.674  
- 3rd Qu.:1750.0   3rd Qu.:1.750   3rd Qu.:0.6503   3rd Qu.:9.607  
- Max.   :2000.0   Max.   :5.000   Max.   :0.7105   Max.   :9.818  
+       n            errors          score        mean_iterations
+ Min.   : 100   Min.   : 0.00   Min.   :0.1012   Min.   :6.140  
+ 1st Qu.: 625   1st Qu.: 0.25   1st Qu.:0.4112   1st Qu.:9.218  
+ Median :2000   Median : 1.50   Median :0.6938   Median :9.492  
+ Mean   :1680   Mean   : 9.40   Mean   :0.5858   Mean   :9.000  
+ 3rd Qu.:2750   3rd Qu.: 5.75   3rd Qu.:0.7730   3rd Qu.:9.582  
+ Max.   :3000   Max.   :43.00   Max.   :0.8236   Max.   :9.818  
  successful_diagnoses failed_diagnoses proportion_successful proportion_failed
- Min.   : 64.00       Min.   :15.00    Min.   :0.6400        Min.   :0.1220   
- 1st Qu.: 74.25       1st Qu.:22.00    1st Qu.:0.7425        1st Qu.:0.1650   
- Median : 76.50       Median :25.50    Median :0.7650        Median :0.2300   
- Mean   :134.67       Mean   :30.67    Mean   :0.7680        Mean   :0.2253   
- 3rd Qu.: 81.75       3rd Qu.:33.50    3rd Qu.:0.8175        3rd Qu.:0.2575   
- Max.   :434.00       Max.   :61.00    Max.   :0.8680        Max.   :0.3600   
+ Min.   :  64.00      Min.   :  8.0    Min.   :0.6400        Min.   :0.07247  
+ 1st Qu.:  75.75      1st Qu.: 22.0    1st Qu.:0.7575        1st Qu.:0.09268  
+ Median :  87.00      Median : 31.0    Median :0.8490        Median :0.13600  
+ Mean   : 487.70      Mean   : 60.3    Mean   :0.8195        Mean   :0.17032  
+ 3rd Qu.: 446.75      3rd Qu.: 56.5    3rd Qu.:0.8938        3rd Qu.:0.24000  
+ Max.   :1800.00      Max.   :224.0    Max.   :0.9100        Max.   :0.36000  
   date_added       
- Length:6          
+ Length:10         
  Class :character  
  Mode  :character  
                    
                    
                    
 
-Regression model summary:
+Linear regression model summary:
 
 Call:
 lm(formula = score ~ n, data = benchmarks)
 
 Residuals:
-       1        2        3        4        5        6 
- 0.04092  0.03041  0.11030 -0.12082 -0.04716 -0.01364 
+     Min       1Q   Median       3Q      Max 
+-0.15884 -0.03691  0.01217  0.05034  0.12456 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)   
-(Intercept) 1.956e-01  5.774e-02   3.388  0.02758 * 
-n           2.643e-04  4.637e-05   5.699  0.00469 **
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 2.394e-01  4.843e-02   4.944  0.00113 ** 
+n           2.062e-04  2.413e-05   8.546 2.71e-05 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.08912 on 4 degrees of freedom
-Multiple R-squared:  0.8903,	Adjusted R-squared:  0.8629 
-F-statistic: 32.48 on 1 and 4 DF,  p-value: 0.004686
+Residual standard error: 0.08384 on 8 degrees of freedom
+Multiple R-squared:  0.9013,	Adjusted R-squared:  0.8889 
+F-statistic: 73.04 on 1 and 8 DF,  p-value: 2.706e-05
 
+
+Approx. number of rows for R2 > 0.9 in linear regression:  3204 
+
+Logarithmic regression model summary:
+
+Call:
+lm(formula = score ~ log(n), data = benchmarks)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.070142 -0.002436  0.001114  0.020113  0.048504 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -0.842853   0.068433  -12.32 1.76e-06 ***
+log(n)       0.204544   0.009666   21.16 2.61e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.03535 on 8 degrees of freedom
+Multiple R-squared:  0.9824,	Adjusted R-squared:  0.9803 
+F-statistic: 447.8 on 1 and 8 DF,  p-value: 2.613e-08
+
+
+Approx. number of rows for R2 > 0.9 in logarithmic regression:  5018 

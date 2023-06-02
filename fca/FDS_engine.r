@@ -241,7 +241,6 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
 }
 
 save_benchmark <- function(benchmark_results, n) {
-    # Compute basic statistics
     mean_score <- mean(benchmark_results$Score, na.rm = TRUE)
     error_count <- sum(benchmark_results$Error != "", na.rm = TRUE)
     mean_iterations <- mean(benchmark_results$Iteration, na.rm = TRUE)
@@ -250,7 +249,6 @@ save_benchmark <- function(benchmark_results, n) {
     proportion_successful <- successful_diagnoses / nrow(benchmark_results)
     proportion_failed <- failed_diagnoses / nrow(benchmark_results)
 
-    # Create benchmark result row
     benchmark_row <- data.frame(
         n = n,
         errors = error_count,
@@ -297,54 +295,62 @@ analyze_benchmarks <- function() {
 
     scatter_plot <- ggplot(benchmarks, aes(x = n, y = score)) +
         geom_point() +
-        geom_smooth(method = lm) +
+        geom_smooth(method = lm, se = FALSE, color = "blue") +
+        geom_smooth(method = "loess", formula = "y ~ log(x)", se = FALSE, color = "red") +
         labs(
-            title = "Scatterplot of n vs Score",
+            title = "Scatterplot of n vs Score with Linear and Logarithmic Regression",
             x = "n",
             y = "Score",
-            caption = "Linear regression line fitted"
+            caption = "Blue: Linear regression line; Red: Logarithmic regression line"
         ) +
         theme_light()
 
     ggsave(filename = paste0(dir_name, "/scatter_plot.png"), plot = scatter_plot)
 
-    bar_plot <- benchmarks %>%
-        gather("Diagnosis_Type", "Proportion", proportion_successful:proportion_failed) %>%
-        ggplot(aes(x = Diagnosis_Type, y = Proportion)) +
-        geom_bar(stat = "identity") +
+    box_plot <- ggplot(benchmarks, aes(x = factor(n), y = score)) +
+        geom_boxplot() +
         labs(
-            title = "Bar chart of Successful vs Failed Diagnoses",
-            x = "Diagnosis Type",
-            y = "Proportion"
+            title = "Boxplot of Score by n",
+            x = "n",
+            y = "Score"
         ) +
         theme_light()
 
-    ggsave(filename = paste0(dir_name, "/bar_plot.png"), plot = bar_plot)
+    ggsave(filename = paste0(dir_name, "/box_plot.png"), plot = box_plot)
 
-    hist_plot <- ggplot(benchmarks, aes(x = mean_iterations)) +
-        geom_histogram(bins = 30, fill = "steelblue") +
+    density_plot <- ggplot(benchmarks, aes(x = score)) +
+        geom_density(fill = "steelblue") +
         labs(
-            title = "Histogram of Mean Iterations",
-            x = "Mean Iterations",
-            y = "Frequency"
+            title = "Density plot of Score",
+            x = "Score"
         ) +
         theme_light()
 
-    ggsave(filename = paste0(dir_name, "/hist_plot.png"), plot = hist_plot)
+    ggsave(filename = paste0(dir_name, "/density_plot.png"), plot = density_plot)
 
-    regression_model <- lm(score ~ n, data = benchmarks)
-    print(summary(regression_model))
+    linear_regression_model <- lm(score ~ n, data = benchmarks)
+    print(summary(linear_regression_model))
+    n_linear <- (0.9 - linear_regression_model$coefficients[1]) / linear_regression_model$coefficients[2]
 
-    # Save summary statistics to a txt file
+    log_regression_model <- lm(score ~ log(n), data = benchmarks)
+    print(summary(log_regression_model))
+    n_log <- exp((0.9 - log_regression_model$coefficients[1]) / log_regression_model$coefficients[2])
+
     sink(paste0(dir_name, "/statistics.txt"))
     cat("Head of the data:\n")
     print(head(benchmarks))
     cat("\nSummary of the data:\n")
     print(summary(benchmarks))
-    cat("\nRegression model summary:\n")
-    print(summary(regression_model))
+    cat("\nLinear regression model summary:\n")
+    print(summary(linear_regression_model))
+    cat("\nApprox. number of rows for R2 > 0.9 in linear regression: ", round(n_linear, 0), "\n")
+    cat("\nLogarithmic regression model summary:\n")
+    print(summary(log_regression_model))
+    cat("\nApprox. number of rows for R2 > 0.9 in logarithmic regression: ", round(n_log, 0), "\n")
     sink()
 }
+
+
 benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, samples = nrow(df), debug = FALSE) {
     results <- data.frame(
         Iteration = integer(),
