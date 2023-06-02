@@ -1,23 +1,20 @@
 # FAST DIAGNOSIS SYSTEM CONNECTION
-packages <- c("httr", "jsonlite", "redux")
+packages <- c("redux", "httr", "jpeg")
 for (package in packages) {
     if (!require(package, character.only = TRUE)) {
-        install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
+        install.packages(package, dependencies = TRUE)
     }
     library(package, character.only = TRUE)
 }
 
-redis_host <- "redis"
-redis_port <- 6379
-fastapi_host <- "http://fastapi:8000"
+fastapi_host <- "http://localhost:8000"
 
-h <- redux::hiredis()
-r <- redux::redis_api(h$connect(redis_host, redis_port))
+h <- hiredis(host = "localhost", port = 6379, db=0)
 
 get_medical_data <- function(dni) {
     key <- paste0("medical_data:", dni)
 
-    data <- r$get(key)
+    data <- h$GET(key)
     if (!is.null(data)) {
         return(jsonlite::fromJSON(data))
     }
@@ -29,11 +26,11 @@ get_medical_data <- function(dni) {
         stop("Error fetching medical data")
     }
 
-    r$set(key, data, ex = 3600) # expires after 1 hour
+    h$SET(key, data, EX = 3600)
 
     return(jsonlite::fromJSON(data))
 }
 
-
-dni <- "79059848Q"
+dni <- "18900233Y"
 medical_data <- get_medical_data(dni)
+medical_data

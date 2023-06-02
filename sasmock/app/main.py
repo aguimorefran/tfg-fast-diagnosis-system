@@ -91,7 +91,14 @@ async def read_patient(dni: str):
     surnames = " ".join(random.sample([row.surname for row in session.execute('SELECT surname FROM surnames')], 2))
 
     symptoms = random.sample(evidences, random.randint(1, 2))
-    diseases = random.sample(conditions, random.randint(0, 2))
+
+    diseases = []
+    for condition in random.sample(conditions, random.randint(0, 2)):
+        disease_time = random.randint(0, 9)
+        diseases.append({
+            "name": condition,
+            "time": disease_time
+        })
     
     return {
         "dni": dni,
