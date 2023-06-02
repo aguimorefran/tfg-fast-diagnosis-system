@@ -67,31 +67,6 @@ apply_rules_formal_context <- function(fc_file, debug = TRUE) {
 }
 
 
-#' @title Ask symptom console
-#' @description Ask symptom and degree from console to the user
-#' @param fc A fcaR::FormalContext object
-#' @param symptom A symptom
-#' @param scale A scale
-#' @param debug Whether to print debug messages or not
-#' @return A list containing the symptom and the degree
-ask_symptom_console <- function(fc, symptom, scale, debug = FALSE) {
-    if (debug) {
-        print("################ ASKING SYMPTOM ################")
-    }
-
-    symptom <- readline("Symptom: ")
-
-    question <- paste0(
-        "Degree of ", symptom, " (", paste(scale, collapse = ", "), "): "
-    )
-    degree <- as.numeric(readline(question))
-    if (degree < 0 | degree > 1) {
-        stop("Degree must be between 0 and 1")
-    }
-    return(list(symptom = symptom, degree = degree))
-}
-
-#' @title Create a fcaR::Set object
 create_set <- function(fc, S0, symptoms, values, debug = FALSE) {
     if (is.null(S0)) {
         S <- Set$new(fc$attributes)
@@ -295,4 +270,61 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
             ))
         }
     }
+}
+
+
+##########################################################################
+source("FDS_dataloader.r")
+
+fc <- readRDS("formalcontexts/010623_3000_10.rds")
+cond_names <- fetch_conditions()
+
+
+get_diagnosis <- function(patient_data) {
+    tryCatch(
+        {
+            patient_data <- jsonlite::fromJSON(patient_data)
+        },
+        error = function(e) {
+            return(jsonlite::toJSON(list(status = "error", diagnosis = "Error al parsear el JSON.")))
+        }
+    )
+
+    sex <- toupper(patient_data$sex)
+    if (!sex %in% c("SEX_M", "SEX_F")) {
+        return(jsonlite::toJSON(list(status = "error", diagnosis = "Sexo incorrecto. Debe ser 'SEX_M' o 'SEX_F'.")))
+    }
+
+    age <- patient_data$age
+    cat_age <- categorize_age(age)
+
+    symptoms <- unlist(strsplit(patient_data$symptoms, ","))
+    values <- as.numeric(unlist(strsplit(patient_data$degrees, ",")))
+
+    print(symptoms)
+    print(values)
+    print(cat_age)
+    print(sex)
+
+    S <- create_set(fc, NULL, c(sex, cat_age), c(1, 1))
+    S <- create_set(fc, S, symptoms, values)
+
+    print(S)
+
+    result <- diagnose(fc, S, cond_names)
+
+    status <- ifelse(length(result) > 0 & length(result) < length(cond_names),
+        "success",
+        ifelse(length(result) == 0,
+            "missing_symptoms",
+            "error"
+        )
+    )
+
+    response <- list(
+        status = status,
+        diagnosis = result
+    )
+
+    return(jsonlite::toJSON(response))
 }
