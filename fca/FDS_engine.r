@@ -274,9 +274,9 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
 
 
 ##########################################################################
-source("FDS_dataloader.r")
+source("fca/FDS_dataloader.r")
 
-fc <- readRDS("formalcontexts/010623_3000_10.rds")
+fc <- readRDS("fca/formalcontexts/010623_3000_10.rds")
 cond_names <- fetch_conditions()
 
 
@@ -326,5 +326,5 @@ get_diagnosis <- function(patient_data) {
         diagnosis = result
     )
 
-    return(jsonlite::toJSON(response))
+    return(response)
 }

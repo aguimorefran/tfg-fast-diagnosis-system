@@ -14,7 +14,7 @@ for (package in packages) {
 # ev_names <- names(evidences)
 # cond_names <- names(conditions)
 
-jdbc_driver_path <- "resources/CassandraJDBC42.jar"
+jdbc_driver_path <- "fca/resources/CassandraJDBC42.jar"
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
 cassdrv <- JDBC(jdbc_driver_class, jdbc_driver_path, identifier.quote = "`")
 

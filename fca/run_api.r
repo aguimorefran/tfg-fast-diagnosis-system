@@ -1,5 +1,5 @@
-install.packages("plumber", dependencies = TRUE, repos = "http://cran.us.r-project.org")
+install.packages("plumber")
 library(plumber)
 
-r <- plumb("fca/service.r")
+r <- plumb("fca/FDS_api.r")
 r$run(port=8005)
