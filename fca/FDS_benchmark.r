@@ -54,6 +54,56 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
     }
 }
 
+
+manual_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scale, debug = FALSE) {
+    cat_age <- age
+    S <- create_set(fc, NULL, c(sex, cat_age), c(1, 1))
+    i <- 1
+    diag <- c()
+
+    if (debug) {
+        print(paste0("Age category: ", cat_age))
+        print(paste0("Sex: ", sex))
+    }
+
+    while (i < max_it && length(diag) == 0) {
+        if (debug) {
+            print(paste0("################ ITERATION ", i, " ################"))
+        }
+
+        # STEP 1 ASK SYMPTOM
+        x <- ask_new_symptom(ev_names, scale, debug)
+
+        # STEP 2 COMPUTE CLOSURE
+        S <- create_set(fc, S, x$symptom, x$degree)
+        diag <- diagnose(fc, S, cond_names, debug)
+
+        # STEP 3 CHECK CLOSURE
+        if (length(diag) > 0) {
+            if (debug) {
+                print("################ DIAGNOSIS FOUND ################")
+                print(paste0("Diagnosis: ", diag))
+            }
+            return(list(
+                diagnosis = diag,
+                iteration = i,
+                set = S
+            ))
+        }
+
+        # STEP 5 REPEAT FROM STEP 1
+        i <- i + 1
+        if (i == max_it) {
+            print("Maximum number of iterations reached")
+            return(list(
+                diagnosis = NULL,
+                iteration = i,
+                set = S
+            ))
+        }
+    }
+}
+
 save_benchmark <- function(benchmark_results, n) {
     mean_score <- mean(benchmark_results$Score, na.rm = TRUE)
     error_count <- sum(benchmark_results$Error != "", na.rm = TRUE)
@@ -165,7 +215,7 @@ analyze_benchmarks <- function() {
 }
 
 
-benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, samples = nrow(df), debug = FALSE) {
+benchmark <- function(train_sparse_df, fc, cond_names, ev_names, max_it, scale, train_rows, samples = nrow(train_sparse_df), debug = FALSE) {
     results <- data.frame(
         Iteration = integer(),
         Final_Diagnosis = character(),
@@ -174,7 +224,7 @@ benchmark <- function(df, fc, cond_names, ev_names, max_it, scale, train_rows, s
     )
 
     set.seed(42)
-    df <- df[sample(nrow(df), samples), ]
+    df <- train_sparse_df[sample(nrow(train_sparse_df), samples), ]
 
     for (i in 1:nrow(df)) {
         errorOccurred <- FALSE
