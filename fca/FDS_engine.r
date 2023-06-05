@@ -106,42 +106,6 @@ compute_closure <- function(fc, S, target, debug = FALSE) {
     return(closure)
 }
 
-ask_upgrade_symptoms <- function(fc, S) {
-    Svecs <- S$get_vector()
-    Satts <- S$get_attributes()
-    idx <- which(Svecs[, 1] > 0)
-    df <- data.frame(
-        symptom = Satts[idx],
-        degree = Svecs[idx, 1]
-    )
-
-    for (i in 1:nrow(df)) {
-        if (df$degree[i] < 1) {
-            question <- paste0(
-                "Upgrade ", df$symptom[i], " from ", df$degree[i], " to 1? (y/n) "
-            )
-            upgrade <- readline(question)
-            if (upgrade == "y") {
-                df$degree[i] <- 1
-            } else if (upgrade == "n") {
-                df$degree[i] <- 0
-            } else {
-                stop("Invalid input")
-            }
-        }
-    }
-
-    # Create new set
-    S <- Set$new(fc$attributes)
-    for (i in 1:nrow(df)) {
-        S$assign(attributes = df$symptom[i], values = df$degree[i])
-    }
-
-    any_changes <- !identical(S$get_vector(), Svecs)
-
-    return(list(S = S, any_changes = any_changes, df = df))
-}
-
 ask_new_symptom <- function(ev_names, scale, debug = FALSE) {
     scale <- as.character(scale)
     if (debug) {
@@ -274,9 +238,9 @@ automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scal
 
 
 ##########################################################################
-source("fca/FDS_dataloader.r")
+source("FDS_dataloader.r")
 
-fc <- readRDS("fca/formalcontexts/010623_3000_10.rds")
+fc <- readRDS("formalcontexts/010623_3000_10.rds")
 cond_names <- fetch_conditions()
 
 
@@ -298,13 +262,8 @@ get_diagnosis <- function(patient_data) {
     age <- patient_data$age
     cat_age <- categorize_age(age)
 
-    symptoms <- unlist(strsplit(patient_data$symptoms, ","))
-    values <- as.numeric(unlist(strsplit(patient_data$degrees, ",")))
-
-    print(symptoms)
-    print(values)
-    print(cat_age)
-    print(sex)
+    symptoms <- patient_data$symptoms$name
+    values <- patient_data$symptoms$degree
 
     S <- create_set(fc, NULL, c(sex, cat_age), c(1, 1))
     S <- create_set(fc, S, symptoms, values)

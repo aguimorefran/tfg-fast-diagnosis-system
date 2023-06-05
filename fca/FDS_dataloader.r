@@ -7,14 +7,7 @@ for (package in packages) {
     library(package, character.only = TRUE)
 }
 
-# evidences_file <- "fca/resources/dataset/release_evidences.json"
-# conditions_file <- "fca/resources/dataset/release_conditions.json"
-# evidences <- fromJSON(evidences_file)
-# conditions <- fromJSON(conditions_file)
-# ev_names <- names(evidences)
-# cond_names <- names(conditions)
-
-jdbc_driver_path <- "fca/resources/CassandraJDBC42.jar"
+jdbc_driver_path <- "resources/CassandraJDBC42.jar"
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
 cassdrv <- JDBC(jdbc_driver_class, jdbc_driver_path, identifier.quote = "`")
 
@@ -26,14 +19,22 @@ age_range <- 10
 
 
 fetch_dataframes_cassandra <- function(cassandra_host, port, keyspace, table, rowstrain, rowsvalidate) {
-    conn <- dbConnect(cassdrv, paste0("jdbc:cassandra://", cassandra_host, ":", port, ";AuthMech=0;Keyspace=", keyspace))
+    conn <- dbConnect(
+        cassdrv,
+        paste0(
+            "jdbc:cassandra://", cassandra_host, ":", port, ";AuthMech=0;Keyspace=", keyspace
+        )
+    )
 
     result <- dbGetQuery(conn, sprintf("SELECT id FROM %s.%s", keyspace, table))
     ids <- result$id
     ids <- ids[sample(length(ids))]
     ids <- ids[1:(rowstrain + rowsvalidate)]
 
-    result <- dbGetQuery(conn, sprintf("SELECT * FROM %s.%s WHERE id IN (%s)", keyspace, table, paste(ids, collapse = ",")))
+    result <- dbGetQuery(
+        conn,
+        sprintf("SELECT * FROM %s.%s WHERE id IN (%s)", keyspace, table, paste(ids, collapse = ","))
+    )
     dbDisconnect(conn)
 
     df <- as.data.frame(result)
@@ -44,14 +45,6 @@ fetch_dataframes_cassandra <- function(cassandra_host, port, keyspace, table, ro
     return(list(train_df = train_df, validate_df = validate_df))
 }
 
-#' @title Convert to sparse
-#' @description Converts a dataframe to a sparse dataframe
-#' @param df Dataframe to convert
-#' @param nrows Number of rows to sample
-#' @param cond_names Names of the conditions
-#' @param ev_names Names of the evidences
-#' @param age_range Age range to use for age discretization
-#' @return A sparse dataframe
 convert_to_sparse <- function(df, nrows, cond_names, ev_names, age_range = 10) {
     df <- df[sample(nrow(df), min(nrow(df), nrows)), ]
     df <- df[, c("age", "sex", "evidences", "pathology", "initial_evidence")]
@@ -98,12 +91,7 @@ convert_to_sparse <- function(df, nrows, cond_names, ev_names, age_range = 10) {
     return(sparse_df)
 }
 
-#' @title Fetch train and validate dataframes
-#' @description Fetches train and validate dataframes from Cassandra's clinical cases table
-#' @param rowstrain Number of rows to fetch for training
-#' @param rowsvalidate Number of rows to fetch for validation
-#' @return A list with two dataframes: train_df and validate_df
-fetch_train_validate <- function(rowstrain, rowsvalidate, age_range) {
+fetch_train_validate <- function(rowstrain, rowsvalidate, age_range, cond_names, ev_names) {
     dfs <- fetch_dataframes_cassandra(cassandra_host, port, keyspace, table, rowstrain, rowsvalidate)
     train_df <- dfs$train_df
     validate_df <- dfs$validate_df
