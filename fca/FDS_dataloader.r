@@ -1,17 +1,12 @@
 # FAST DIAGNOSIS SYSTEM DATALOADER
-packages <- c("RJDBC", "jsonlite")
-for (package in packages) {
-    if (!require(package, character.only = TRUE)) {
-        install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
-    }
-    library(package, character.only = TRUE)
-}
+library("RJDBC")
+library("jsonlite")
 
 jdbc_driver_path <- "resources/CassandraJDBC42.jar"
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
 cassdrv <- JDBC(jdbc_driver_class, jdbc_driver_path, identifier.quote = "`")
 
-cassandra_host <- "0.0.0.0"
+cassandra_host <- "cassandra"
 port <- 9042
 keyspace <- "fds"
 table <- "train_cases"

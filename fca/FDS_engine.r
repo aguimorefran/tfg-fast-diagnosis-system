@@ -1,12 +1,11 @@
 # FAST DIAGNOSIS SYSTEM ENGINE
 # BASED ON FCA
-packages <- c("fcaR", "Matrix", "RJDBC", "ggplot2", "dplyr", "tidyr")
-for (package in packages) {
-    if (!require(package, character.only = TRUE)) {
-        install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
-    }
-    library(package, character.only = TRUE)
-}
+library("fcaR")
+library("Matrix")
+library("RJDBC")
+library("ggplot2")
+library("dplyr")
+library("tidyr")
 
 jdbc_driver_class <- "com.simba.cassandra.jdbc42.Driver"
 
@@ -184,7 +183,8 @@ get_diagnosis <- function(patient_data) {
 
     response <- list(
         status = status,
-        diagnosis = result
+        diagnosis = result,
+        patient_data = patient_data
     )
 
     return(response)

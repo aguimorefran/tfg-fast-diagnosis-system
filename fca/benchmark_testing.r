@@ -1,13 +1,13 @@
-source("fca/FDS_dataloader.r")
-source("fca/FDS_engine.r")
-source("fca/FDS_benchmark.r")
+source("FDS_dataloader.r")
+source("FDS_engine.r")
+source("FDS_benchmark.r")
 
 age_range <- 10
 rowstrain <- 2000
 rowsvalidate <- 1000
 dfs <- fetch_train_validate(rowstrain = rowstrain, rowsvalidate = rowsvalidate, age_range = age_range)
 
-fc_savefolder <- "fca/formalcontexts/"
+fc_savefolder <- "formalcontexts/"
 fc_savename <- paste0(format(Sys.Date(), "%d%m%y"), "_", rowstrain, "_", age_range)
 fc_savename <- paste0(fc_savefolder, fc_savename, ".rds")
 fc_savename
@@ -22,7 +22,7 @@ ev_names <- fetch_evidences()
 # fc <- apply_rules_formal_context(fc_savename)
 
 # Load RDS fca/formalcontexts/010623_2000_10.rds
-fc <- readRDS("fca/formalcontexts/010623_3000_10.rds")
+fc <- readRDS("formalcontexts/010623_3000_10.rds")
 
 scale <- c(.75, 1)
 set.seed(as.integer(as.numeric(Sys.time()) * 10^6) + rowstrain)

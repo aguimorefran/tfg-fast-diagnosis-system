@@ -1,10 +1,9 @@
-packages <- c("fcaR", "Matrix", "RJDBC", "ggplot2", "dplyr", "tidyr")
-for (package in packages) {
-    if (!require(package, character.only = TRUE)) {
-        install.packages(package, dependencies = TRUE, repos = "http://cran.us.r-project.org")
-    }
-    library(package, character.only = TRUE)
-}
+library("fcaR")
+library("Matrix")
+library("RJDBC")
+library("ggplot2")
+library("dplyr")
+library("tidyr")
 
 automatic_diagnosis <- function(fc, cond_names, ev_names, sex, age, max_it, scale, hardcoded_symptoms, debug = FALSE) {
     cat_age <- age
@@ -125,7 +124,7 @@ save_benchmark <- function(benchmark_results, n) {
         date_added = Sys.Date()
     )
 
-    dir_name <- "fca/benchmarks"
+    dir_name <- "benchmarks"
     if (!dir.exists(dir_name)) {
         dir.create(dir_name, recursive = TRUE)
     }
