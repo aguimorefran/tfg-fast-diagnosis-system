@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Paciente</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+
+<body>
+    <header>
+        <img src="../static/logo.png">
+        <h1>Fast Diagnosis System</h1>
+        <h3>Sistema de Diagnóstico Rápido</h3>
+    </header>
+
+    <form method="post">
+        <label for="dni">Introduce tu DNI:</label>
+        <input type="text" id="dni" name="dni" required>
+        <input type="submit" value="Obtener información del paciente">
+    </form>
+
+    {% if patient %}
+    <div class="patient-data">
+        <h2>Datos del paciente:</h2>
+        <!-- Aquí se imprimirán los datos del paciente -->
+        <p>Nombre: {{patient.name}}</p>
+        <p>Apellidos: {{patient.surnames}}</p>
+        <p>Edad: {{patient.age}}</p>
+        <p>Sexo: {{patient.sex}}</p>
+    </div>
+    <div class="options">
+        <button>Ver antiguos chats</button>
+        <button>Nuevo diagnóstico</button>
+        <button>Seguir diagnóstico</button>
+    </div>
+    {% endif %}
+    {% if error %}
+    <p>{{error}}</p>
+    {% endif %}
+</body>
+
+</html>
