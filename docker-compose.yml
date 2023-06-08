@@ -76,12 +76,6 @@ services:
     build:
       context: ./orq
       dockerfile: Dockerfile
-    depends_on:
-      - cassandra
-      - redis
-      - dataloader
-      - sasmock
-      - fca-engine
     ports:
       - "8010:8010"
     networks:
