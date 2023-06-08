@@ -71,6 +71,22 @@ services:
     networks:
       - FDSnet
 
+  orq:
+    container_name: orquestator
+    build:
+      context: ./orq
+      dockerfile: Dockerfile
+    depends_on:
+      - cassandra
+      - redis
+      - dataloader
+      - sasmock
+      - fca-engine
+    ports:
+      - "8010:8010"
+    networks:
+      - FDSnet
+
 networks:
   FDSnet:
     driver: bridge

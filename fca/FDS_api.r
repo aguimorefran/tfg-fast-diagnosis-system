@@ -6,3 +6,9 @@ source("FDS_engine.r")
 function(patient_data) {
   get_diagnosis(patient_data)
 }
+
+#* Ping endpoint
+#* @get /ping
+function() {
+  return("OK")
+}

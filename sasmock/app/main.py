@@ -109,3 +109,8 @@ async def read_patient(dni: str):
         "symptoms": symptoms,
         "diseases": diseases
     }
+
+
+@app.get("/ping")
+async def ping():
+    return {"message": "OK"}
