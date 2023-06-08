@@ -94,7 +94,9 @@ def load_cond_names():
     session.execute("""
         CREATE TABLE IF NOT EXISTS conditions (
             id UUID PRIMARY KEY,
-            name text
+            name text,
+            severity int,
+            name_english text
         )
     """)
 
@@ -108,17 +110,21 @@ def load_cond_names():
         conditions = json.load(f)
     
     counter = 0
-    for name in conditions.keys():
+    for name, details in conditions.items():
+        severity = details.get('severity', None)
+        name_english = details.get('cond-name-eng', None)
+        
         session.execute(
             """
-            INSERT INTO conditions (id, name)
-            VALUES (%s, %s)
+            INSERT INTO conditions (id, name, severity, name_english)
+            VALUES (%s, %s, %s, %s)
             """,
-            (uuid.uuid4(), name)
+            (uuid.uuid4(), name, severity, name_english)
         )
         counter += 1
 
     logging.info("Conditions loaded successfully. %s conditions loaded", counter)
+
 
 
 def load_ev_names():
@@ -130,7 +136,8 @@ def load_ev_names():
     session.execute("""
         CREATE TABLE IF NOT EXISTS evidences (
             id UUID PRIMARY KEY,
-            name text
+            name text,
+            question_en text
         )
     """)
 
@@ -139,23 +146,26 @@ def load_ev_names():
         logging.info("Table evidences already has data, not loading.")
         return
 
-
     ev_file = os.path.join(dataset_dir, 'release_evidences.json')
     with open(ev_file) as f:
         evidences = json.load(f)
-
+    
     counter = 0
-    for name in evidences.keys():
-        session.execute(
-            """
-            INSERT INTO evidences (id, name)
-            VALUES (%s, %s)
-            """,
-            (uuid.uuid4(), name)
-        )
-        counter += 1
-
+    for name, ev in evidences.items():
+        try:
+            session.execute(
+                """
+                INSERT INTO evidences (id, name, question_en)
+                VALUES (%s, %s, %s)
+                """,
+                (uuid.uuid4(), name, ev.get('question_en', None))
+            )
+            counter += 1
+        except Exception as e:
+            logging.error(f"Error when inserting evidence {name} into Cassandra: {str(e)}")
+            
     logging.info("Evidences loaded successfully. %s evidences loaded", counter)
+
 
 
 if __name__ == "__main__":

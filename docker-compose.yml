@@ -24,7 +24,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-    mem_limit: 5g
+    mem_limit: 10g
 
   redis:
     image: redis:latest
