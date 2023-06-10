@@ -52,3 +52,13 @@ async def ping_all():
         "sasmock": sas_status,
         "redis": redis_status
     }
+
+
+@app.get("/get_patient_data/{dni}")
+async def get_patient_data(dni: str):
+    try:
+        response_sas = requests.get(f"http://sasmock:8000/patient/{dni}")
+        response_sas.raise_for_status()
+        return response_sas.json()
+    except:
+        raise HTTPException(status_code=404, detail="Patient not found")
