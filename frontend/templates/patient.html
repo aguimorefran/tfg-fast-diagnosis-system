@@ -1,42 +1,35 @@
-<!DOCTYPE html>
-<html>
+<!-- patient.html -->
+{% extends "layout.html" %}
 
-<head>
-    <title>Paciente</title>
-    <link rel="stylesheet" href="../static/styles.css">
-</head>
+{% block title %}
+Paciente
+{% endblock %}
 
-<body>
-    <header>
-        <img src="../static/logo.png">
-        <h1>Fast Diagnosis System</h1>
-        <h3>Sistema de Diagnóstico Rápido</h3>
-    </header>
+{% block content %}
+<form method="post">
+    <label for="dni">Introduce tu DNI:</label>
+    <input type="text" id="dni" name="dni" required>
+    <input type="submit" value="Obtener información del paciente">
+</form>
 
-    <form method="post">
-        <label for="dni">Introduce tu DNI:</label>
-        <input type="text" id="dni" name="dni" required>
-        <input type="submit" value="Obtener información del paciente">
-    </form>
-
+<div class="content">
     {% if patient %}
     <div class="patient-data">
         <h2>Datos del paciente:</h2>
-        <!-- Aquí se imprimirán los datos del paciente -->
-        <p>Nombre: {{patient.name}}</p>
-        <p>Apellidos: {{patient.surnames}}</p>
-        <p>Edad: {{patient.age}}</p>
-        <p>Sexo: {{patient.sex}}</p>
+        <p>Nombre: {{ patient.name }}</p>
+        <p>Apellidos: {{ patient.surnames }}</p>
+        <p>Edad: {{ patient.age }}</p>
+        <p>Sexo: {{ patient.sex }}</p>
     </div>
-    <div class="options">
-        <button>Ver antiguos chats</button>
-        <button>Nuevo diagnóstico</button>
-        <button>Seguir diagnóstico</button>
+    <div class="patient-actions">
+        <button onclick="location.href='/cita'">Pedir cita</button>
+        <button onclick="location.href='/diagnosticos'">Ver antiguos diagnósticos</button>
+        <button onclick="location.href='/nuevo-diagnostico'" style="background-color: gold;">Nuevo diagnóstico</button>
+    </div>
+    {% elif error %}
+    <div class="error-message">
+        <p>{{ error }}</p>
     </div>
     {% endif %}
-    {% if error %}
-    <p>{{error}}</p>
-    {% endif %}
-</body>
-
-</html>
+</div>
+{% endblock %}

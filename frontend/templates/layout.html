@@ -1,0 +1,22 @@
+<!-- layout.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <header>
+        <div id="header-content">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" id="logo">
+            <h1>Fast Diagnosis System</h1>
+            <button onclick="location.href='/portal'" class="small-button">Portal</button>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+</body>
+
+</html>

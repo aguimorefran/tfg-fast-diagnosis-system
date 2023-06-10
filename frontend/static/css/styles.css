@@ -1,15 +1,18 @@
-body {
-    text-align: center;
+#header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: radial-gradient(circle at center, white, lightblue);
 }
 
-header {
-    margin-bottom: 50px;
+#logo {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
 }
 
-header img {
-    width: 250px;
-    height: 250px;
+header {
+    padding: 10px;
 }
 
 .portal-button {
@@ -21,4 +24,15 @@ header img {
     border: none;
     border-radius: 5px;
     font-size: 20px;
+}
+
+.small-button {
+    display: block;
+    width: 100px;
+    height: 25px;
+    margin: 20px auto;
+    background-color: lightblue;
+    border: none;
+    border-radius: 5px;
+    font-size: 10px;
 }

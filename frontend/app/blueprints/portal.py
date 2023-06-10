@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 
-bp = Blueprint('portal', __name__, url_prefix='/')
+portal_bp = Blueprint('portal', __name__, url_prefix='/portal')
 
-@bp.route('/portal', methods=['GET'])
+@portal_bp.route('/', methods=['GET'])
 def portal():
     return render_template('portal.html')
