@@ -90,7 +90,7 @@ async def read_patient(dni: str):
     
     if patient_data is None:
         conditions = [row.name for row in session.execute('SELECT name FROM conditions')]
-        evidences = [row.name for row in session.execute('SELECT name FROM evidences')]
+        evidences = [{"name": row.name, "question": row.question_en} for row in session.execute('SELECT name, question_en FROM evidences')]
         
         age = random.randint(1, 100)
         sex = random.choice(["M", "F"])
@@ -128,6 +128,7 @@ async def read_patient(dni: str):
         patient_data = json.loads(patient_data)
     
     return patient_data
+
 
 
 

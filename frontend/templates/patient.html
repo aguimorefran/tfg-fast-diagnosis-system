@@ -33,16 +33,23 @@ Paciente
                 </tr>
                 <tr>
                     <td><b>Síntomas:</b></td>
-                    <td>{{ patient.symptoms|join(', ')|capitalize }}</td>
+                    <td>{% if patient.symptoms|length == 0 %}--{% else %}{% for symptom in patient.symptoms %}
+                        <a href="javascript:void(0);" onclick='showSymptomInfo({{ symptom | tojson | safe }})'>
+                            {{ symptom.name }} <i>(Más información)</i>
+                        </a><br>
+                        {% if not loop.last %}{% endif %}{% endfor %}
+                        {% endif %}
+                    </td>
                 </tr>
+
                 <tr>
                     <td><b>Enfermedades:</b></td>
                     <td>{% if patient.diseases|length == 0 %}--{% else %}{% for disease in patient.diseases %}
-                        {{ disease.name }} (Hace {{ disease.time }} años)<br>{% if not loop.last %}{% endif %}{%
-                        endfor %}
+                        {{ disease.name }} (Hace {{ disease.time }} años)<br>{% if not loop.last %}{% endif %}{% endfor
+                        %}
                         {% endif %}
                     </td>
-
+                </tr>
             </table>
         </div>
         {% endif %}
@@ -57,4 +64,12 @@ Paciente
         {% endif %}
     </div>
 </div>
+
+<script>
+    function showSymptomInfo(symptom) {
+        var info = "Nombre: " + symptom.name + "\n" + "Pregunta: " + symptom.question;
+        alert(info);
+    }
+</script>
+
 {% endblock %}
