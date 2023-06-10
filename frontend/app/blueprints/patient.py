@@ -8,7 +8,7 @@ def paciente():
     patient_data = None
     if request.method == 'POST':
         dni = request.form.get('dni')
-        response = requests.get(f'http://sasmock:8000/patient/{dni}')
+        response = requests.get(f'http://0.0.0.0:8000/patient/{dni}')
         if response.status_code == 200:
             patient_data = response.json()
         else:

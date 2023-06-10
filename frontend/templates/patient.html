@@ -1,4 +1,3 @@
-<!-- patient.html -->
 {% extends "layout.html" %}
 
 {% block title %}
@@ -6,30 +5,56 @@ Paciente
 {% endblock %}
 
 {% block content %}
-<form method="post">
-    <label for="dni">Introduce tu DNI:</label>
-    <input type="text" id="dni" name="dni" required>
-    <input type="submit" value="Obtener información del paciente">
-</form>
+<div class="row">
+    <div class="column">
+        <form method="post">
+            <label for="dni">Introduce tu DNI:</label>
+            <input type="text" id="dni" name="dni" required>
+            <input type="submit" value="Obtener información del paciente" class="small-button">
+        </form>
+        {% if patient %}
+        <div class="patient-data">
+            <table>
+                <tr>
+                    <td><b>Nombre:</b></td>
+                    <td>{{ patient.name }}</td>
+                </tr>
+                <tr>
+                    <td><b>Apellidos:</b></td>
+                    <td>{{ patient.surnames }}</td>
+                </tr>
+                <tr>
+                    <td><b>Edad:</b></td>
+                    <td>{{ patient.age }}</td>
+                </tr>
+                <tr>
+                    <td><b>Sexo:</b></td>
+                    <td>{{ patient.sex }}</td>
+                </tr>
+                <tr>
+                    <td><b>Síntomas:</b></td>
+                    <td>{{ patient.symptoms|join(', ')|capitalize }}</td>
+                </tr>
+                <tr>
+                    <td><b>Enfermedades:</b></td>
+                    <td>{% if patient.diseases|length == 0 %}--{% else %}{% for disease in patient.diseases %}
+                        {{ disease.name }} (Hace {{ disease.time }} años)<br>{% if not loop.last %}{% endif %}{%
+                        endfor %}
+                        {% endif %}
+                    </td>
 
-<div class="content">
-    {% if patient %}
-    <div class="patient-data">
-        <h2>Datos del paciente:</h2>
-        <p>Nombre: {{ patient.name }}</p>
-        <p>Apellidos: {{ patient.surnames }}</p>
-        <p>Edad: {{ patient.age }}</p>
-        <p>Sexo: {{ patient.sex }}</p>
+            </table>
+        </div>
+        {% endif %}
     </div>
-    <div class="patient-actions">
-        <button onclick="location.href='/cita'">Pedir cita</button>
-        <button onclick="location.href='/diagnosticos'">Ver antiguos diagnósticos</button>
-        <button onclick="location.href='/nuevo-diagnostico'" style="background-color: gold;">Nuevo diagnóstico</button>
+    <div class="column">
+        {% if patient %}
+        <div class="patient-actions">
+            <button onclick="location.href='/cita'" class="small-button">Pedir cita</button>
+            <button onclick="location.href='/diagnosticos'" class="small-button">Ver antiguos diagnósticos</button>
+            <button onclick="location.href='/nuevo-diagnostico'" class="gold-button">Nuevo diagnóstico</button>
+        </div>
+        {% endif %}
     </div>
-    {% elif error %}
-    <div class="error-message">
-        <p>{{ error }}</p>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

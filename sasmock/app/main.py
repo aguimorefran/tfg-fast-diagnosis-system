@@ -3,6 +3,11 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from typing import List
 import random
+import redis
+import json
+
+REDIS_DB = 1
+r = None 
 
 app = FastAPI()
 auth_provider = PlainTextAuthProvider(username='cassandra', password='cassandra')
@@ -33,6 +38,9 @@ def check_dni(dni):
 
 @app.on_event("startup")
 async def startup_event():
+    global r 
+    r = redis.Redis(host='redis', port=6379, db=REDIS_DB)
+
     with open('names_f.txt', 'r') as f:
         names_f = [line.strip() for line in f.readlines()]
     with open('names_m.txt', 'r') as f:
@@ -74,41 +82,53 @@ async def startup_event():
 
 @app.get("/patient/{dni}")
 async def read_patient(dni: str):
+    global r
     if not check_dni(dni):
         raise HTTPException(status_code=400, detail="Invalid DNI")
 
-    conditions = [row.name for row in session.execute('SELECT name FROM conditions')]
-    evidences = [row.name for row in session.execute('SELECT name FROM evidences')]
+    patient_data = r.get(dni)
     
-    age = random.randint(1, 100)
-    sex = random.choice(["M", "F"])
+    if patient_data is None:
+        conditions = [row.name for row in session.execute('SELECT name FROM conditions')]
+        evidences = [row.name for row in session.execute('SELECT name FROM evidences')]
+        
+        age = random.randint(1, 100)
+        sex = random.choice(["M", "F"])
+        
+        if sex == "M":
+            name = random.choice([row.name for row in session.execute('SELECT name FROM names_m')])
+        else:
+            name = random.choice([row.name for row in session.execute('SELECT name FROM names_f')])
+
+        surnames = " ".join(random.sample([row.surname for row in session.execute('SELECT surname FROM surnames')], 2))
+
+        symptoms = random.sample(evidences, random.randint(1, 2))
+
+        diseases = []
+        for condition in random.sample(conditions, random.randint(0, 2)):
+            disease_time = random.randint(0, 9)
+            diseases.append({
+                "name": condition,
+                "time": disease_time
+            })
+        
+        patient_data = {
+            "dni": dni,
+            "name": name,
+            "surnames": surnames,
+            "age": age,
+            "sex": sex,
+            "symptoms": symptoms,
+            "diseases": diseases
+        }
+        
+        r.setex(dni, 300, json.dumps(patient_data))
     
-    if sex == "M":
-        name = random.choice([row.name for row in session.execute('SELECT name FROM names_m')])
     else:
-        name = random.choice([row.name for row in session.execute('SELECT name FROM names_f')])
-
-    surnames = " ".join(random.sample([row.surname for row in session.execute('SELECT surname FROM surnames')], 2))
-
-    symptoms = random.sample(evidences, random.randint(1, 2))
-
-    diseases = []
-    for condition in random.sample(conditions, random.randint(0, 2)):
-        disease_time = random.randint(0, 9)
-        diseases.append({
-            "name": condition,
-            "time": disease_time
-        })
+        patient_data = json.loads(patient_data)
     
-    return {
-        "dni": dni,
-        "name": name,
-        "surnames": surnames,
-        "age": age,
-        "sex": sex,
-        "symptoms": symptoms,
-        "diseases": diseases
-    }
+    return patient_data
+
 
 
 @app.get("/ping")
