@@ -1,10 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
+from typing import Optional
+from pydantic import BaseModel
+
+from conversation import start_or_continue_conversation, add_symptom, check_previous_diagnosis, get_active_session
+
 import requests
 import redis
 
 app = FastAPI()
+
+class SymptomModel(BaseModel):
+    symptom: str
+    grade: str
 
 def check_redis(host='redis', port=6379):
     try:
@@ -54,7 +63,7 @@ async def ping_all():
     }
 
 
-@app.get("/get_patient_data/{dni}")
+@app.get("/api/get_patient_data/{dni}")
 async def get_patient_data(dni: str):
     try:
         response_sas = requests.get(f"http://sasmock:8000/patient/{dni}")
@@ -62,3 +71,48 @@ async def get_patient_data(dni: str):
         return response_sas.json()
     except:
         raise HTTPException(status_code=404, detail="Patient not found")
+
+@app.get("/conversation/{dni}")
+async def start_or_continue_conversation_endpoint(dni: str, continue_existing: Optional[bool] = False):
+    try:
+        symptoms, grades = start_or_continue_conversation(dni, continue_existing)
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+
+    return {
+        "status": "success",
+        "symptoms": symptoms,
+        "grades": grades
+    }
+
+@app.post("/conversation/{dni}/symptom")
+async def add_symptom_endpoint(dni: str, symptom_data: SymptomModel):
+    diagnosis_response = add_symptom(dni, symptom_data.symptom, symptom_data.grade)
+
+    return {
+        "status": diagnosis_response['status'],
+        "diagnosis": diagnosis_response['diagnosis'],
+    }
+
+@app.get("/conversation/{dni}/end")
+async def end_conversation(dni: str):
+    diagnosis = check_previous_diagnosis(dni)
+    if not diagnosis:
+        raise HTTPException(status_code=404, detail=f"No diagnosis found for patient {dni}")
+
+    return {
+        "status": "success",
+        "diagnosis": diagnosis,
+    }
+
+@app.get("/conversation/{dni}/check")
+async def check_conversation(dni: str):
+    session_data = get_active_session(dni)
+    if not session_data:
+        raise HTTPException(status_code=404, detail=f"No active session found for patient {dni}")
+
+    return {
+        "status": "success",
+        "symptoms": session_data['symptoms'],
+        "grades": session_data['grades']
+    }
