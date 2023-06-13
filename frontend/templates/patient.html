@@ -57,10 +57,12 @@ Paciente
     <div class="column">
         {% if patient %}
         <div class="patient-actions">
-            <a href="/cita" class="small-button">Pedir cita</a>
+            <!-- <a href="/cita" class="small-button">Pedir cita</a>
             <a href="/diagnosticos" class="small-button">Ver antiguos diagnósticos</a>
-            <a href="/diagnosis/{{ patient.dni }}" class="gold-button">Nuevo diagnóstico</a>
-
+            <a href="/diagnosis/{{ patient.dni }}" class="gold-button">Nuevo diagnóstico</a> -->
+            <button onclick="goToDiagnosis('{{ patient.dni }}')" class="gold-button">Nuevo diagnóstico</button>
+            <button onclick="goToDiagnosis('{{ patient.dni }}')" class="small-button">Ver antiguos diagnósticos</button>
+            <button onclick="goToDiagnosis('{{ patient.dni }}')" class="small-button">Pedir cita</button>
 
 
         </div>
@@ -80,6 +82,7 @@ Paciente
         window.location.href = '/diagnosis/' + dni;
     }
 </script>
+
 
 
 {% endblock %}
