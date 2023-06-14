@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from typing import Optional
@@ -8,6 +9,15 @@ import redis
 import json
 
 app = FastAPI()
+
+# Configuración de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def check_redis(host='redis', port=6379):
     try:
