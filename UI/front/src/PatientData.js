@@ -1,13 +1,27 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Chat from './Chat';
 import axios from 'axios';
 
 const PatientData = () => {
     const [dni, setDni] = useState('');
     const [patientData, setPatientData] = useState(null);
+    const [isChatOpen, setIsChatOpen] = useState(false);
+
+    const generateRandomDNI = () => {
+        let dniNum = Math.floor(Math.random() * 100000000);
+        let dniChar = 'TRWAGMYFPDXBNJZSQVHLCKE';
+        let letter = dniChar.charAt(dniNum % 23);
+
+        let randomDNI = ('00000000' + dniNum.toString()).slice(-8) + letter;
+        setDni(randomDNI);
+    };
 
     const handleDniChange = (event) => {
         setDni(event.target.value);
+    };
+
+    const handleOpenChat = () => {
+        setIsChatOpen(true);
     };
 
     const searchPatientData = async () => {
@@ -66,15 +80,12 @@ const PatientData = () => {
                             </tr>
                         ))}
                     </table>
-                    <div>
-                        <Link to={{
-                            pathname: '/diagnose',
-                            state: { patientData }
-                        }}>
-                            Nuevo diagnóstico
-                        </Link>
-
-                    </div>
+                    <button onClick={handleOpenChat} disabled={isChatOpen}>
+                        Abrir chat
+                    </button>
+                    {isChatOpen && (
+                        <Chat patientData={{ sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: [] }} />
+                    )}
                 </div>
             );
         }
@@ -84,6 +95,7 @@ const PatientData = () => {
         <div>
             <input type="text" value={dni} onChange={handleDniChange} placeholder="Introduce DNI" />
             <button onClick={searchPatientData}>Buscar Paciente</button>
+            <button onClick={generateRandomDNI}>DNI Aleatorio</button>
             {renderPatientData()}
         </div>
     );
