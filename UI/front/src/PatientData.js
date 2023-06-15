@@ -36,6 +36,9 @@ const PatientData = () => {
     const renderPatientData = () => {
         if (patientData) {
             const { dni, name, surnames, age, sex, symptoms, diseases } = patientData;
+            const sympNames = symptoms.map(symptom => symptom.name);
+            const sympDegrees = Array(sympNames.length).fill(1);
+            const symps = sympNames.map((name, index) => ({ name, degree: sympDegrees[index] }));
 
             return (
                 <div>
@@ -84,7 +87,9 @@ const PatientData = () => {
                         Abrir chat
                     </button>
                     {isChatOpen && (
-                        <Chat patientData={{ sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: [] }} />
+                        // <Chat patientData={{ sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: patientData.symptoms }} />
+                        // chatSymtoms={patientData.symptoms.names and degrees 1
+                        <Chat patientData={{ sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: symps }} />
                     )}
                 </div>
             );
