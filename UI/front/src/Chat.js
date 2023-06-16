@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-
 const Chat = ({ patientData }) => {
     const [symptoms, setSymptoms] = useState([]);
     const [enteredSymptoms, setEnteredSymptoms] = useState(patientData);
@@ -24,8 +23,9 @@ const Chat = ({ patientData }) => {
         fetchSymptoms();
     }, []);
 
+
     const handleSymptomClick = async (symptom) => {
-        const degree = window.prompt('Por favor, introduzca un grado para el síntoma:', '1');
+        const degree = window.prompt('Por favor, introduzca un grado para el síntoma\nSÍNTOMA: ' + symptom.name + '\nDESCRIPCIÓN: ' + symptom.question_en, '1');
         if (degree == null || degree === '') {
             console.log('No se introdujo un grado.');
             return;
@@ -33,7 +33,7 @@ const Chat = ({ patientData }) => {
 
         const updatedSymptoms = enteredSymptoms.symptoms.concat({
             name: symptom.name,
-            degree: parseInt(degree, 10),
+            degree: parseFloat(degree),
         });
 
         const updatedPatientData = {
@@ -48,6 +48,23 @@ const Chat = ({ patientData }) => {
             const response = await axios.post('http://localhost:8010/diagnose_json', updatedPatientData);
             console.log(response.data);
             const diagnosisResponse = response.data;
+
+
+            if (['error', 'success'].includes(diagnosisResponse.status[0])) {
+                const steps = updatedPatientData.symptoms.slice(patientData.symptoms.length);
+                const conversationData = {
+                    dni: patientData.dni,
+                    status: diagnosisResponse.status[0],
+                    diagnosis: diagnosisResponse.status[0] === 'success' ? diagnosisResponse.diagnosis.join(', ') : '',
+                    symptoms: patientData.symptoms,
+                    steps: steps,
+                    number_steps: steps.length,
+                };
+
+                const saveResponse = await axios.post('http://localhost:8010/api/save_conversation', conversationData);
+                console.log(saveResponse.data);
+            }
+
             if (diagnosisResponse.status[0] === 'error') {
                 setDiagnosisMessage('Error: No se pudo realizar el diagnóstico.');
                 setIsError(true);
@@ -70,11 +87,12 @@ const Chat = ({ patientData }) => {
         <div>
             {symptoms
                 .filter(symptom => !enteredSymptoms.symptoms.find(s => s.name === symptom.name))
+                .sort((a, b) => a.name.localeCompare(b.name))
                 .map(symptom => (
                     <button
                         key={symptom.id}
                         onClick={() => handleSymptomClick(symptom)}
-                        disabled={isDiagnosisSuccess || isError} // Desactivar botones si se completa el diagnóstico o hay un error
+                        disabled={isDiagnosisSuccess || isError}
                     >
                         {symptom.name}
                     </button>

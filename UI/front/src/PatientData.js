@@ -87,9 +87,7 @@ const PatientData = () => {
                         Abrir chat
                     </button>
                     {isChatOpen && (
-                        // <Chat patientData={{ sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: patientData.symptoms }} />
-                        // chatSymtoms={patientData.symptoms.names and degrees 1
-                        <Chat patientData={{ sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: symps }} />
+                        <Chat patientData={{ dni: patientData.dni, sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: symps }} />
                     )}
                 </div>
             );

@@ -7,10 +7,11 @@ from typing import Optional
 import requests
 import redis
 import json
+from uuid import uuid1
+from datetime import datetime
 
 app = FastAPI()
 
-# Configuración de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -106,3 +107,38 @@ def diagnose_text(patient_data: str):
         return response.json()
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/save_conversation")
+async def save_conversation(conversation_data: dict):
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+        session.execute('CREATE TABLE IF NOT EXISTS fds.conversations (id uuid, dni text, status text, diagnosis text, steps text, number_steps int, symptoms text, datetime timestamp, PRIMARY KEY (id))')
+
+        print(conversation_data)
+
+        id = uuid1()
+        dni = conversation_data['dni']
+        status = conversation_data['status']
+        if 'diagnosis' in conversation_data and conversation_data['diagnosis'] != '':
+            diagnosis = conversation_data['diagnosis']  
+        else:
+            diagnosis = None
+        steps = json.dumps(conversation_data['steps'])
+        number_steps = conversation_data['number_steps']
+        symptoms = json.dumps(conversation_data['symptoms'])
+        dtt = datetime.now()
+
+        session.execute(
+            """
+            INSERT INTO fds.conversations (id, dni, status, diagnosis, steps, number_steps, symptoms, datetime)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (id, dni, status, diagnosis, steps, number_steps, symptoms, dtt)
+        )
+
+        return {"status": "success", "message": "Conversation saved successfully. ID: " + str(id)}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
