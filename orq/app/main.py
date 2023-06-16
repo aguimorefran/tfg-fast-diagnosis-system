@@ -2,15 +2,50 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
-from typing import Optional
-
-import requests
+from typing import List, Optional
+from sklearn.feature_extraction.text import TfidfVectorizer
+import nmslib
 import redis
+import requests
 import json
 from uuid import uuid1
 from datetime import datetime
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+vectorizer = TfidfVectorizer()
+index = nmslib.init(method='hnsw', space='cosinesimil')
+
+def prepare_symptoms_db():
+    cluster = Cluster(['cassandra'], port=9042, 
+                      auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+    session = cluster.connect()
+    rows = session.execute('SELECT id, name, question_en FROM fds.evidences')
+
+    symptoms_data = [{"id": row.id, "name": row.name, "question_en": row.question_en} for row in rows]
+
+    vectorizer.fit([x["question_en"] for x in symptoms_data])
+    index.addDataPointBatch(vectorizer.transform([x["question_en"] for x in symptoms_data]).toarray())
+    index.createIndex({'post': 2}, print_progress=True)
+
+    return symptoms_data
+
+symptoms_data = prepare_symptoms_db()
+
+@app.get("/search_symptoms", response_model=List[dict])
+def search_symptoms(query: str):
+    query_vector = vectorizer.transform([query]).toarray()
+    ids, distances = index.knnQuery(query_vector, k=5)
+    return [{"name": symptoms_data[id]["name"], "question": symptoms_data[id]["question_en"], "distance": float(dist)} for id, dist in zip(ids, distances)]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,21 +78,21 @@ async def ping_all():
         session = cluster.connect()
         session.execute('SELECT now() FROM system.local')
         cassandra_status = "up"
-    except:
+    except Exception as e:
         cassandra_status = "down"
         
     try:
         response_fds = requests.get("http://fca-engine:8005/ping")
         response_fds.raise_for_status()
         fds_status = "up"
-    except:
+    except Exception as e:
         fds_status = "down"
 
     try:
         response_sas = requests.get("http://sasmock:8000/ping")
         response_sas.raise_for_status()
         sas_status = "up"
-    except:
+    except Exception as e:
         sas_status = "down"
 
     return {

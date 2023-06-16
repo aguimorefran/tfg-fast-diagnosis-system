@@ -4,3 +4,5 @@ pydantic
 cassandra-driver
 requests
 redis
+scikit-learn
+nmslib
