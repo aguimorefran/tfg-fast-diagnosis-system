@@ -15,7 +15,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     useEffect(() => {
         const fetchSymptoms = async () => {
             try {
-                const response = await axios.get('http://localhost:8010/api/get_symptoms');
+                const response = await axios.get('/api/get_symptoms');
                 setSymptoms(response.data);
             } catch (error) {
                 console.error(`Error fetching symptoms: ${error}`);
@@ -27,7 +27,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
 
     const handleSearch = async () => {
         try {
-            const response = await axios.get(`http://localhost:8010/search_symptoms?query=${searchQuery}`);
+            const response = await axios.get(`api/search_symptoms?query=${searchQuery}`);
             setSearchResults(response.data);
         } catch (error) {
             console.error(`Error fetching search results: ${error}`);
@@ -56,7 +56,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
 
         try {
             console.log(updatedPatientData);
-            const response = await axios.post('http://localhost:8010/diagnose_json', updatedPatientData);
+            const response = await axios.post('api/diagnose_json', updatedPatientData);
             if (response.status === 200) {
                 setRemainingSymptoms(prevSymptoms => prevSymptoms.filter(s => s.name !== symptom.name));
             }
@@ -76,7 +76,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                     number_steps: steps.length,
                 };
 
-                const saveResponse = await axios.post('http://localhost:8010/api/save_conversation', conversationData);
+                const saveResponse = await axios.post('/api/save_conversation', conversationData);
                 console.log(saveResponse.data);
             }
 

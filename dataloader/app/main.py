@@ -5,6 +5,9 @@ import uuid
 import os
 import logging
 import json
+import requests
+import zipfile
+import io
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,6 +18,49 @@ auth_provider = PlainTextAuthProvider(
 cluster = Cluster(['cassandra'], port=9042, auth_provider=auth_provider)
 session = cluster.connect()
 dataset_dir = os.path.join('resources', 'dataset')
+
+def download_data():
+    """
+    Download and extract data files from given urls
+    """
+
+    # URLs to download the data
+    JSONS = {
+        "release_conditions.json": "https://figshare.com/ndownloader/files/35829014",
+        "release_evidences.json": "https://figshare.com/ndownloader/files/35829017"
+    }
+    ZIPS = [
+      "https://figshare.com/ndownloader/files/35945966",
+      "https://figshare.com/ndownloader/files/35945969",
+      "https://figshare.com/ndownloader/files/35945972"
+    ]
+
+    # Create the data directory if it doesn't exist
+    if not os.path.exists(dataset_dir):
+        os.makedirs(dataset_dir)
+
+    # Download JSON files
+    for filename, url in JSONS.items():
+        file_path = os.path.join(dataset_dir, filename)
+        if not os.path.exists(file_path):
+            r = requests.get(url, allow_redirects=True)
+            open(file_path, 'wb').write(r.content)
+
+    # Download and extract ZIP files
+    for url in ZIPS:
+        filename = os.path.join(dataset_dir, os.path.basename(url))
+        if not os.path.exists(filename):
+            r = requests.get(url, allow_redirects=True)
+            open(filename, 'wb').write(r.content)
+            with zipfile.ZipFile(filename, 'r') as zip_ref:
+                zip_ref.extractall(dataset_dir)
+            os.remove(filename)
+
+    # Print all contents of the data directory
+    logging.info("Contents of the data directory:")
+    for root, dirs, files in os.walk(dataset_dir):
+        for file in files:
+            logging.info(os.path.join(root, file))
 
 
 def load_medical_cases():
@@ -169,6 +215,7 @@ def load_ev_names():
 
 
 if __name__ == "__main__":
+    download_data()
     load_medical_cases()
     load_cond_names()
     load_ev_names()

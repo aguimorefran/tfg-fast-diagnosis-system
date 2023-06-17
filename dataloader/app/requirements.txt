@@ -1,3 +1,4 @@
 pandas
 uuid
 cassandra-driver
+requests

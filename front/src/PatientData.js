@@ -26,7 +26,7 @@ const PatientData = () => {
 
     const searchPatientData = async () => {
         try {
-            const response = await axios.get(`http://localhost:8010/api/get_patient_data/${dni}`);
+            const response = await axios.get(`/api/get_patient_data/${dni}`);
             setPatientData(response.data);
             setRemainingSymptoms(response.data.remaining_symptoms);
         } catch (error) {
