@@ -40,7 +40,7 @@ def prepare_symptoms_db():
 
 symptoms_data = prepare_symptoms_db()
 
-@app.get("/search_symptoms", response_model=List[dict])
+@app.get("/api/search_symptoms", response_model=List[dict])
 def search_symptoms(query: str):
     query_vector = vectorizer.transform([query]).toarray()
     ids, distances = index.knnQuery(query_vector, k=5)
@@ -124,7 +124,7 @@ async def get_symptoms():
         raise HTTPException(status_code=500, detail="Internal server error")
     
 
-@app.post("/diagnose_json")
+@app.post("/api/diagnose_json")
 def diagnose_json(data: dict):
     try:
         response = requests.post("http://fca-engine:8005/diagnose_json", data=json.dumps(data))
@@ -133,7 +133,7 @@ def diagnose_json(data: dict):
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/diagnose_text")
+@app.post("/api/diagnose_text")
 def diagnose_text(patient_data: str):
     try:
         url = f"http://fca-engine:8005/diagnose_text?patient_data={patient_data}"
