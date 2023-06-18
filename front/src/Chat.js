@@ -84,7 +84,14 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                 setDiagnosisMessage('Error: No se encuentra diagnóstico para los síntomas introducidos.');
                 setIsError(true);
             } else if (diagnosisResponse.status[0] === 'success') {
-                setDiagnosisMessage(`Diagnóstico realizado: ${diagnosisResponse.diagnosis.join(', ')}`);
+                const severity = '';
+                try {
+                    severity = await axios.get('/api/get_condition_severity/' + diagnosisResponse.diagnosis[0]);
+                    console.log(severity.data);
+                } catch (error) {
+                    console.error(`Error fetching condition severity: ${error}`);
+                }
+                setDiagnosisMessage(`Diagnóstico realizado: ${diagnosisResponse.diagnosis.join(', ')}\nGravedad: ${severity.data}`);
                 setIsDiagnosisSuccess(true);
             } else if (diagnosisResponse.status[0] === 'missing_symptoms') {
                 setDiagnosisMessage('Faltan síntomas, introduzca más en el sistema.');

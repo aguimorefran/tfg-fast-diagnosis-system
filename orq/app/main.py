@@ -177,3 +177,17 @@ async def save_conversation(conversation_data: dict):
         return {"status": "success", "message": "Conversation saved successfully. ID: " + str(id)}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+@app.get("/api/get_condition_severity/{condition}")
+async def get_condition_severity(condition: str):
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+        rows = session.execute('SELECT severity FROM fds.conditions WHERE name = %s', [condition])
+        return rows[0].severity
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error: " + str(e))
+
+
+TODO: QUITAR ENFERMEDADES METIDAS DE LAS POSIBLES AL HACER COSINE
