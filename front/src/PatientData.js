@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import Chat from './Chat';
+// import Chat from './Chat';
+import Chat from './Chat2';
 import axios from 'axios';
+import './PatientData.css';
 
 const PatientData = () => {
     const [dni, setDni] = useState('');
@@ -51,67 +53,71 @@ const PatientData = () => {
             );
 
             return (
-                <div>
-                    <h2>Data del Paciente:</h2>
-                    <table>
-                        <tr>
-                            <th>DNI</th>
-                            <th>Nombre</th>
-                            <th>Apellidos</th>
-                            <th>Edad</th>
-                            <th>Sexo</th>
-                        </tr>
-                        <tr>
-                            <td>{dni}</td>
-                            <td>{name}</td>
-                            <td>{surnames}</td>
-                            <td>{age}</td>
-                            <td>{sex}</td>
-                        </tr>
-                    </table>
-                    <h3>Síntomas:</h3>
-                    <table>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Grado</th>
-                            <th>Pregunta</th>
-                        </tr>
-                        {symptoms.map(symptom => (
-                            <tr key={symptom.name}>
-                                <td>{symptom.name}</td>
-                                <td>{symptom.degree}</td>
-                                <td>{symptom.question_en}</td>
+                <div className="container">
+                    <div className="left-column">
+                        <h2>Data del Paciente:</h2>
+                        <table>
+                            <tr>
+                                <th>DNI</th>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Edad</th>
+                                <th>Sexo</th>
                             </tr>
-                        ))}
-                    </table>
-                    <h3>Síntomas restantes:</h3>
-                    <table>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Pregunta</th>
-                        </tr>
-                        {uniqueRemainingSymptoms.map(symptom => (
-                            <tr key={symptom.name}>
-                                <td>{symptom.name}</td>
-                                <td>{symptom.question_en}</td>
+                            <tr>
+                                <td>{dni}</td>
+                                <td>{name}</td>
+                                <td>{surnames}</td>
+                                <td>{age}</td>
+                                <td>{sex}</td>
                             </tr>
-                        ))}
-                    </table>
+                        </table>
+                        <h3>Síntomas:</h3>
+                        <table>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Grado</th>
+                                <th>Pregunta</th>
+                            </tr>
+                            {symptoms.map(symptom => (
+                                <tr key={symptom.name}>
+                                    <td>{symptom.name}</td>
+                                    <td>{symptom.degree}</td>
+                                    <td>{symptom.question_en}</td>
+                                </tr>
+                            ))}
+                        </table>
+                        <h3>Síntomas restantes:</h3>
+                        <table>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Pregunta</th>
+                            </tr>
+                            {uniqueRemainingSymptoms.map(symptom => (
+                                <tr key={symptom.name}>
+                                    <td>{symptom.name}</td>
+                                    <td>{symptom.question_en}</td>
+                                </tr>
+                            ))}
+                        </table>
 
+                        <h2>Enfermedad esperada:</h2>
+                        <p>{patientData.expected_pathology}</p>
+                    </div>
+                    <div className="right-column">
 
-                    <h2>Enfermedad esperada:</h2>
-                    <p>{patientData.expected_pathology}</p>
-
-                    <button onClick={handleOpenChat} disabled={isChatOpen}>
-                        Abrir chat
-                    </button>
-                    {isChatOpen && (
-                        <Chat
-                            patientData={{ dni: patientData.dni, sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: symps }}
-                            setRemainingSymptoms={setRemainingSymptoms}
-                        />
-                    )}
+                        <button onClick={handleOpenChat} disabled={isChatOpen}>
+                            Abrir chat
+                        </button>
+                        {isChatOpen && (
+                            <Chat
+                                patientData={{ dni: patientData.dni, sex: 'SEX_' + patientData.sex, age: patientData.age, symptoms: symps }}
+                                setRemainingSymptoms={setRemainingSymptoms}
+                            />
+                        )}
+                    </div>
                 </div>
+
             );
         }
     };

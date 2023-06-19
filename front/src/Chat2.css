@@ -1,0 +1,80 @@
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.chat-window {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.chat-message {
+    max-width: 50%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.chat-message.system {
+    align-self: flex-start;
+    background-color: #eee;
+}
+
+.chat-message.user {
+    align-self: flex-end;
+    background-color: #007BFF;
+    color: white;
+}
+
+.chat-message-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-message-time {
+    align-self: flex-end;
+    font-size: 0.8em;
+    color: #666;
+}
+
+.chat-input-section {
+    display: flex;
+    padding: 20px;
+}
+
+.chat-input {
+    flex-grow: 1;
+    margin-right: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.chat-button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.chat-button:hover {
+    background-color: #0056b3;
+}
+
+.chat-symptom-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #eee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chat-symptom-button:hover {
+    background-color: #ddd;
+}
