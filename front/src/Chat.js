@@ -94,7 +94,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                 } catch (error) {
                     console.error(`Error fetching condition severity: ${error}`);
                 }
-                setDiagnosisMessage(`Diagnóstico realizado: ${severity.data.name_english}\nGravedad: ${severity.data.severity}`);
+                setDiagnosisMessage(`Diagnóstico realizado: ${severity.data.name_english}\nGravedad: ${severity.data.severity}/5`);
                 setIsDiagnosisSuccess(true);
             } else if (diagnosisResponse.status[0] === 'missing_symptoms') {
                 setDiagnosisMessage('Faltan síntomas, introduzca más en el sistema.');
