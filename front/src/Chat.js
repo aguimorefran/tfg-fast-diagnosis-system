@@ -26,8 +26,9 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     }, []);
 
     const handleSearch = async () => {
+        const discardSymptoms = enteredSymptoms.symptoms.map(s => s.name).join(",");
         try {
-            const response = await axios.get(`api/search_symptoms?query=${searchQuery}`);
+            const response = await axios.get(`api/search_symptoms?query=${searchQuery}&discard=${discardSymptoms}`);
             setSearchResults(response.data);
         } catch (error) {
             console.error(`Error fetching search results: ${error}`);
@@ -35,12 +36,13 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     };
 
     const handleSymptomClick = async (symptom) => {
-        const degree = window.prompt('Por favor, introduzca un grado para el síntoma\nSÍNTOMA: ' + symptom.name + '\nDESCRIPCIÓN: ' + symptom.question, '1');
-        if (degree == null || degree === '') {
-            console.log('No se introdujo un grado.');
+        // Ensure symptom hasn't already been entered
+        if (enteredSymptoms.symptoms.some(s => s.name === symptom.name)) {
+            alert('This symptom has already been entered.');
             return;
         }
 
+        const degree = window.prompt('Por favor, introduzca un grado para el síntoma\nSÍNTOMA: ' + symptom.name + '\nDESCRIPCIÓN: ' + symptom.question, '1');
 
         const updatedSymptoms = enteredSymptoms.symptoms.concat({
             name: symptom.name,
@@ -84,14 +86,15 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                 setDiagnosisMessage('Error: No se encuentra diagnóstico para los síntomas introducidos.');
                 setIsError(true);
             } else if (diagnosisResponse.status[0] === 'success') {
-                const severity = '';
+                let severity = '';
                 try {
-                    severity = await axios.get('/api/get_condition_severity/' + diagnosisResponse.diagnosis[0]);
+                    const encodedDiagnosis = encodeURIComponent(diagnosisResponse.diagnosis[0]);
+                    severity = await axios.get(`/api/get_condition_severity?condition=${encodeURIComponent(diagnosisResponse.diagnosis[0])}`);
                     console.log(severity.data);
                 } catch (error) {
                     console.error(`Error fetching condition severity: ${error}`);
                 }
-                setDiagnosisMessage(`Diagnóstico realizado: ${diagnosisResponse.diagnosis.join(', ')}\nGravedad: ${severity.data}`);
+                setDiagnosisMessage(`Diagnóstico realizado: ${severity.data.name_english}\nGravedad: ${severity.data.severity}`);
                 setIsDiagnosisSuccess(true);
             } else if (diagnosisResponse.status[0] === 'missing_symptoms') {
                 setDiagnosisMessage('Faltan síntomas, introduzca más en el sistema.');
@@ -125,7 +128,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                     <div key={index}>
                         <button
                             onClick={() => handleSymptomClick(result)}
-                            disabled={isDiagnosisSuccess || isError}
+                            disabled={isDiagnosisSuccess || isError || enteredSymptoms.symptoms.some(s => s.name === result.name)}
                         >
                             {result.name}
                         </button>

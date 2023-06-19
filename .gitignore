@@ -6,13 +6,10 @@ rmd_creator.py
 !fca/benchmarks/benchmark_results.csv
 data/*
 !package*.json
+node_modules*
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,windows,linux,redis
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,windows,linux,redis
-
-### Translator ###
-translator/packages/
-
 
 ### Redis ###
 # Ignore redis binary dump (dump.rdb) files

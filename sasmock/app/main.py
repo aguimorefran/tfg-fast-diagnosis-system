@@ -157,7 +157,8 @@ async def read_patient(dni: str):
                 })
 
         selected = new_selected
-        
+
+        pathology_en = session.execute('SELECT name_english FROM fds.conditions WHERE name = %s ALLOW FILTERING', [pathology])[0].name_english
 
         patient_data = {
             "dni": dni,
@@ -167,7 +168,7 @@ async def read_patient(dni: str):
             "sex": sex,
             "symptoms": selected,
             "remaining_symptoms": [symptom for symptom in symptoms_list if symptom not in selected],
-            "expected_pathology": pathology
+            "expected_pathology": pathology_en
         }
         
         r.setex(dni, 300, json.dumps(patient_data))

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
@@ -10,6 +10,7 @@ import requests
 import json
 from uuid import uuid1
 from datetime import datetime
+from urllib.parse import unquote
 
 app = FastAPI()
 
@@ -41,10 +42,17 @@ def prepare_symptoms_db():
 symptoms_data = prepare_symptoms_db()
 
 @app.get("/api/search_symptoms", response_model=List[dict])
-def search_symptoms(query: str):
+def search_symptoms(query: str, exclude: Optional[str] = None):
+    exclude_list = exclude.split(",") if exclude else []
     query_vector = vectorizer.transform([query]).toarray()
     ids, distances = index.knnQuery(query_vector, k=5)
-    return [{"name": symptoms_data[id]["name"], "question": symptoms_data[id]["question_en"], "distance": float(dist)} for id, dist in zip(ids, distances)]
+
+    return [
+        {"name": symptoms_data[id]["name"], "question": symptoms_data[id]["question_en"], "distance": float(dist)} 
+        for id, dist in zip(ids, distances)
+        if symptoms_data[id]["name"] not in exclude_list
+    ]
+
 
 
 app.add_middleware(
@@ -178,16 +186,16 @@ async def save_conversation(conversation_data: dict):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.get("/api/get_condition_severity/{condition}")
-async def get_condition_severity(condition: str):
+
+@app.get("/api/get_condition_severity")
+async def get_condition_severity(condition: str = Query(...)):
     try:
+        # Decoding the URL
+        condition = unquote(condition)
         cluster = Cluster(['cassandra'], port=9042, 
                           auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
         session = cluster.connect()
-        rows = session.execute('SELECT severity FROM fds.conditions WHERE name = %s', [condition])
-        return rows[0].severity
+        rows = session.execute('SELECT severity, name_english FROM fds.conditions WHERE name = %s ALLOW FILTERING', [condition])
+        return {"severity": rows[0].severity, "name_english": rows[0].name_english}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error: " + str(e))
-
-
-TODO: QUITAR ENFERMEDADES METIDAS DE LAS POSIBLES AL HACER COSINE
