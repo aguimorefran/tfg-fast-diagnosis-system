@@ -8,7 +8,7 @@ import nmslib
 import redis
 import requests
 import json
-from uuid import uuid1
+from uuid import uuid1, UUID
 from datetime import datetime
 from urllib.parse import unquote
 
@@ -182,7 +182,7 @@ async def save_conversation(conversation_data: dict):
             (id, dni, status, diagnosis, steps, number_steps, symptoms, dtt)
         )
 
-        return {"status": "success", "message": "Conversation saved successfully. ID: " + str(id)}
+        return {"status": "success", "message": "Conversation saved successfully", "conv_id": str(id)}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
@@ -199,3 +199,32 @@ async def get_condition_severity(condition: str = Query(...)):
         return {"severity": rows[0].severity, "name_english": rows[0].name_english}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error: " + str(e))
+
+
+@app.post("/api/book_appointment")
+async def book_appointment(appointment_data: dict):
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+        session.execute('CREATE TABLE IF NOT EXISTS fds.appointments (id uuid, dni text, conversation_id uuid, datetime timestamp, PRIMARY KEY (id))')
+
+        id = uuid1()
+        dni = appointment_data['dni']
+        conversation_id = appointment_data['conversation_id']
+
+        print(f'Conversation ID: {conversation_id}')
+
+        dtt = datetime.now()
+
+        session.execute(
+            """
+            INSERT INTO fds.appointments (id, dni, conversation_id, datetime)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (id, dni, UUID(conversation_id), dtt)  # cast conversation_id to UUID before insertion
+        )
+
+        return {"status": "success", "message": "Appointment booked successfully. ID: " + str(id)}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

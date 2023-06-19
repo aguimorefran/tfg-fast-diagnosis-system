@@ -5,7 +5,8 @@ from typing import List
 import random
 import redis
 import json
-from uuid import UUID
+from uuid import UUID, uuid1
+from datetime import datetime
 
 
 REDIS_DB = 1
@@ -177,9 +178,6 @@ async def read_patient(dni: str):
         patient_data = json.loads(patient_data)
     
     return patient_data
-
-
-
 
 
 

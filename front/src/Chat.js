@@ -11,6 +11,8 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     const [enteredSymptomsInChat, setEnteredSymptomsInChat] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [conversationId, setConversationId] = useState(null);
+
 
     useEffect(() => {
         const fetchSymptoms = async () => {
@@ -25,6 +27,20 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
         fetchSymptoms();
     }, []);
 
+    const handleBookAppointment = async () => {
+        try {
+            const response = await axios.post('/api/book_appointment', {
+                dni: patientData.dni,
+                conversation_id: conversationId,
+            });
+            console.log(response.data);
+            alert('Cita reservada exitosamente!');
+        } catch (error) {
+            console.error(`Error booking appointment: ${error}`);
+            alert('Error al reservar cita.');
+        }
+    };
+
     const handleSearch = async () => {
         const discardSymptoms = enteredSymptoms.symptoms.map(s => s.name).join(",");
         try {
@@ -36,7 +52,6 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     };
 
     const handleSymptomClick = async (symptom) => {
-        // Ensure symptom hasn't already been entered
         if (enteredSymptoms.symptoms.some(s => s.name === symptom.name)) {
             alert('This symptom has already been entered.');
             return;
@@ -79,7 +94,10 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                 };
 
                 const saveResponse = await axios.post('/api/save_conversation', conversationData);
-                console.log(saveResponse.data);
+                console.log("ID de la conversación: " + saveResponse.data.conv_id);
+                if (saveResponse.data.status === "success") {
+                    setConversationId(saveResponse.data.conv_id);
+                }
             }
 
             if (diagnosisResponse.status[0] === 'error') {
@@ -137,6 +155,10 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                     </div>
                 ))
             }
+            {(isDiagnosisSuccess || isError) && conversationId && (
+                <button onClick={handleBookAppointment}>Pedir cita</button>
+            )}
+
         </div>
     );
 };
