@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import Chat from './Chat';
 import Chat from './Chat2';
 import axios from 'axios';
 import './PatientData.css';

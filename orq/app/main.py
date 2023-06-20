@@ -4,13 +4,16 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from typing import List, Optional
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+from uuid import uuid1, UUID
+from datetime import datetime
+from urllib.parse import unquote
+
 import nmslib
 import redis
 import requests
 import json
-from uuid import uuid1, UUID
-from datetime import datetime
-from urllib.parse import unquote
+import editdistance
 
 app = FastAPI()
 
@@ -190,7 +193,6 @@ async def save_conversation(conversation_data: dict):
 @app.get("/api/get_condition_severity")
 async def get_condition_severity(condition: str = Query(...)):
     try:
-        # Decoding the URL
         condition = unquote(condition)
         cluster = Cluster(['cassandra'], port=9042, 
                           auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
@@ -222,9 +224,58 @@ async def book_appointment(appointment_data: dict):
             INSERT INTO fds.appointments (id, dni, conversation_id, datetime)
             VALUES (%s, %s, %s, %s)
             """,
-            (id, dni, UUID(conversation_id), dtt)  # cast conversation_id to UUID before insertion
+            (id, dni, UUID(conversation_id), dtt)
         )
 
         return {"status": "success", "message": "Appointment booked successfully. ID: " + str(id)}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+    
+
+def closest_word(word, words):
+    return min(words, key=lambda x: editdistance.eval(word, x))
+    
+    
+@app.get("/api/get_treatment")
+async def get_treatment(condition: str = Query(...)):
+    try:
+        condition = unquote(condition)
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+
+        rows = session.execute('SELECT disease FROM fds.medications')
+        closest_name = closest_word(condition, [row.disease for row in rows])
+        rows = session.execute('SELECT treatment FROM fds.medications WHERE disease = %s ALLOW FILTERING', [closest_name])
+        
+        return {"treatment": rows[0].treatment}
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Error: " + str(e))
+
+@app.get("/medicamentos/{principio_activo}")
+def get_medicamentos(principio_activo: str):
+    url = f"https://cima.aemps.es/cima/rest/medicamentos?principio_activo={principio_activo}"
+    response = requests.get(url)
+    data = response.json()
+    medicamentos = data['resultados']
+
+    medicamento_con_receta = next((m for m in medicamentos if m['receta'] == True), None)
+    medicamento_sin_receta = next((m for m in medicamentos if m['receta'] == False), None)
+
+    if medicamento_con_receta:
+        medicamento_con_receta = {
+            "informacion": medicamento_con_receta,
+            "foto": next((f['url'] for f in medicamento_con_receta['fotos']), None)
+        }
+
+    if medicamento_sin_receta:
+        medicamento_sin_receta = {
+            "informacion": medicamento_sin_receta,
+            "foto": next((f['url'] for f in medicamento_sin_receta['fotos']), None)
+        }
+
+    return {
+        "medicamento_con_receta": medicamento_con_receta,
+        "medicamento_sin_receta": medicamento_sin_receta
+    }

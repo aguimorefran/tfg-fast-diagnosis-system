@@ -7,7 +7,7 @@ import logging
 import json
 import requests
 import zipfile
-import io
+import csv
 
 logging.basicConfig(level=logging.INFO)
 
@@ -213,9 +213,52 @@ def load_ev_names():
     logging.info("Evidences loaded successfully. %s evidences loaded", counter)
 
 
+def load_med_names():
+    """
+    Load medication names from csv file into Cassandra
+    """
+    logging.info("Loading medication names into Cassandra")
+
+    session.execute("""
+        CREATE TABLE IF NOT EXISTS medications (
+            id UUID PRIMARY KEY,
+            disease text,
+            treatment text
+        )
+    """)
+
+    result = session.execute("SELECT COUNT(*) FROM medications")
+    if result[0].count > 0:
+        logging.info("Table medications already has data, not loading.")
+        return
+
+    meds_file = os.path.join(dataset_dir, 'meds.csv')
+    
+    with open(meds_file, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)
+        medications = list(reader)
+
+    counter = 0
+    for row in medications:
+        disease = row[0]
+        treatment = row[1]
+
+        session.execute(
+            """
+            INSERT INTO medications (id, disease, treatment)
+            VALUES (%s, %s, %s)
+            """,
+            (uuid.uuid4(), disease, treatment)
+        )
+        counter += 1
+
+    logging.info("Medications loaded successfully. %s medications loaded", counter)
+
 
 if __name__ == "__main__":
     download_data()
     load_medical_cases()
     load_cond_names()
     load_ev_names()
+    load_med_names()
