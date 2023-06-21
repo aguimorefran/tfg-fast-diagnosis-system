@@ -259,7 +259,6 @@ async def get_treatment(condition: str = Query(...)):
 
 @app.get("/medicamentos/{principio_activo}")
 def get_medicamentos(principio_activo: str):
-    # Hacer una solicitud a la API CIMA con el principio activo proporcionado
     url = f"https://cima.aemps.es/cima/rest/medicamentos?practiv1={principio_activo}"
     response = requests.get(url)
     data = response.json()
@@ -269,18 +268,29 @@ def get_medicamentos(principio_activo: str):
     medicamento_sin_receta = next((m for m in medicamentos if m['receta'] == False), None)
     
     if medicamento_con_receta:
+        try:
+            foto = next((f['url'] for f in medicamento_con_receta['fotos']), None)
+        except Exception:
+            foto = None
+
         medicamento_con_receta = {
             "informacion": medicamento_con_receta,
-            "foto": next((f['url'] for f in medicamento_con_receta['fotos']), None)
+            "foto": foto
         }
 
     if medicamento_sin_receta:
+        try:
+            foto = next((f['url'] for f in medicamento_sin_receta['fotos']), None)
+        except Exception:
+            foto = None
+
         medicamento_sin_receta = {
             "informacion": medicamento_sin_receta,
-            "foto": next((f['url'] for f in medicamento_sin_receta['fotos']), None)
+            "foto": foto
         }
 
     return {
         "medicamento_con_receta": medicamento_con_receta,
         "medicamento_sin_receta": medicamento_sin_receta
     }
+
