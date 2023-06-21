@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './Chat2.css';
 import fdsLogo from './images/fdslogo-t.png';
@@ -25,7 +25,13 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     const [startTime, setStartTime] = useState(null);
     const [treatment, setTreatment] = useState('');
     const [medicine, setMedicine] = useState({ prescription: null, nonPrescription: null });
+    const messagesEndRef = useRef(null);
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    };
+
+    useEffect(scrollToBottom, [chatMessages]);
 
 
     useEffect(() => {
@@ -42,6 +48,17 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
         fetchSymptoms();
     }, []);
 
+    const handleMedicineMessage = (medicineType, medicineData) => {
+        setChatMessages(prevMessages => [...prevMessages,
+        {
+            type: 'system',
+            text: `<h3>${medicineType}</h3>
+                   <p><b>Nombre:</b> ${medicineData.informacion.nombre}</p>
+                   <img class="medicine-img" src=${medicineData.foto} alt="${medicineType}" />`,
+            time: new Date()
+        }]);
+    };
+
     const handleBookAppointment = async () => {
         try {
             const response = await axios.post('/api/book_appointment', {
@@ -49,10 +66,10 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                 conversation_id: conversationId,
             });
             console.log(response.data);
-            alert('Cita reservada exitosamente!');
+            setChatMessages(prevMessages => [...prevMessages, { type: 'system', text: `Cita reservada exitosamente. ID de la cita: ${response.data.appointment_id}`, time: new Date() }]);
         } catch (error) {
             console.error(`Error booking appointment: ${error}`);
-            alert('Error al reservar cita.');
+            setChatMessages(prevMessages => [...prevMessages, { type: 'system', text: 'Error al reservar cita.', time: new Date() }]);
         }
     };
 
@@ -60,17 +77,24 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
         try {
             const treatmentResponse = await axios.get(`/api/get_treatment?condition=${encodeURIComponent(condition)}`);
             setTreatment(treatmentResponse.data.treatment);
+            setChatMessages(prevMessages => [...prevMessages, { type: 'system', text: `Tratamiento: ${treatmentResponse.data.treatment}`, time: new Date() }]);
 
             const medicineResponse = await axios.get(`/medicamentos/${encodeURIComponent(treatmentResponse.data.treatment)}`);
-            setMedicine({
-                prescription: medicineResponse.data.medicamento_con_receta,
-                nonPrescription: medicineResponse.data.medicamento_sin_receta
-            });
+
+            if (medicineResponse.data.medicamento_con_receta) {
+                handleMedicineMessage('Medicamento con receta', medicineResponse.data.medicamento_con_receta);
+            }
+
+            if (medicineResponse.data.medicamento_sin_receta) {
+                handleMedicineMessage('Medicamento sin receta', medicineResponse.data.medicamento_sin_receta);
+            }
+
         } catch (error) {
             console.error(`Error fetching treatment and medicine: ${error}`);
             setChatMessages(prevMessages => [...prevMessages, { type: 'system', text: 'Error: No se pudo obtener el tratamiento y el medicamento.', time: new Date() }]);
         }
     };
+
 
 
     const handleSearch = async () => {
@@ -102,7 +126,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
         };
 
         setEnteredSymptoms(updatedPatientData);
-        setChatMessages(prevMessages => [...prevMessages, { type: 'user', text: `<b>Síntoma ingresado:</b> ${symptom.name}<br/><b>Descripción:</b> ${symptom.question}`, time: new Date() }]);
+        setChatMessages(prevMessages => [...prevMessages, { type: 'user', text: `<b><u>Síntoma ingresado:</b></u> ${symptom.name}<br/><b><u>Descripción:</b></u> ${symptom.question}`, time: new Date() }]);
 
         try {
             const response = await axios.post('api/diagnose_json', updatedPatientData);
@@ -176,6 +200,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                         </div>
                     );
                 })}
+                <div ref={messagesEndRef} />
             </div>
             <div className="chat-input-section">
                 <input
@@ -195,14 +220,13 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                             onClick={() => handleSymptomClick(result)}
                             disabled={isDiagnosisSuccess || isError || enteredSymptoms.symptoms.some(s => s.name === result.name)}
                         >
-                            {result.name}
-                            <p>{result.question}</p>
+                            {result.name + ': ' + result.question}
+                            
                         </button>
                     ))
                 }
                 {isDiagnosisSuccess && (
                     <>
-                        <p><strong>Tratamiento:</strong> {treatment}</p>
                         {medicine.prescription && (
                             <div>
                                 <h3>Medicamento con receta:</h3>
@@ -219,7 +243,9 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                         )}
                     </>
                 )}
-
+                {(isDiagnosisSuccess || isError) && (
+                    <button className="chat-appointment-button" onClick={handleBookAppointment}>Pedir cita</button>
+                )}
             </div>
         </div>
     );

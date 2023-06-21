@@ -227,7 +227,7 @@ async def book_appointment(appointment_data: dict):
             (id, dni, UUID(conversation_id), dtt)
         )
 
-        return {"status": "success", "message": "Appointment booked successfully. ID: " + str(id)}
+        return {"status": "success", "message": "Appointment booked successfully", "appointment_id": str(id)}
     except Exception as e:
         return {"status": "error", "message": str(e)}
     
@@ -247,6 +247,10 @@ async def get_treatment(condition: str = Query(...)):
         rows = session.execute('SELECT disease FROM fds.medications')
         closest_name = closest_word(condition, [row.disease for row in rows])
         rows = session.execute('SELECT treatment FROM fds.medications WHERE disease = %s ALLOW FILTERING', [closest_name])
+
+        print("Asked for: " + condition)
+        print("Closest name: " + closest_name)
+        print("Treatment: " + rows[0].treatment)
         
         return {"treatment": rows[0].treatment}
     except Exception as e:
@@ -255,14 +259,15 @@ async def get_treatment(condition: str = Query(...)):
 
 @app.get("/medicamentos/{principio_activo}")
 def get_medicamentos(principio_activo: str):
-    url = f"https://cima.aemps.es/cima/rest/medicamentos?principio_activo={principio_activo}"
+    # Hacer una solicitud a la API CIMA con el principio activo proporcionado
+    url = f"https://cima.aemps.es/cima/rest/medicamentos?practiv1={principio_activo}"
     response = requests.get(url)
     data = response.json()
     medicamentos = data['resultados']
 
     medicamento_con_receta = next((m for m in medicamentos if m['receta'] == True), None)
     medicamento_sin_receta = next((m for m in medicamentos if m['receta'] == False), None)
-
+    
     if medicamento_con_receta:
         medicamento_con_receta = {
             "informacion": medicamento_con_receta,

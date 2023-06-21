@@ -19,6 +19,10 @@ cluster = Cluster(['cassandra'], port=9042, auth_provider=auth_provider)
 session = cluster.connect()
 dataset_dir = os.path.join('resources', 'dataset')
 
+if os.getenv('DROP_DB', 'false').lower() == 'true':
+    logging.info('DROP_DB is set to true, dropping tablespace fds...')
+    session.execute("DROP KEYSPACE IF EXISTS fds;")
+
 def download_data():
     """
     Download and extract data files from given urls

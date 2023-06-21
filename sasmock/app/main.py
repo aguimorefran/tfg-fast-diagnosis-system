@@ -115,9 +115,9 @@ async def read_patient(dni: str):
         all_evidences = clean_evidences_string(evidences_str) + [initial_evidence]
 
         if sex == "M":
-            name = random.choice([row.name for row in session.execute('SELECT name FROM names_m')])
+            name_person = random.choice([row.name for row in session.execute('SELECT name FROM names_m')])
         else:
-            name = random.choice([row.name for row in session.execute('SELECT name FROM names_f')])
+            name_person = random.choice([row.name for row in session.execute('SELECT name FROM names_f')])
 
         surnames = " ".join(random.sample([row.surname for row in session.execute('SELECT surname FROM surnames')], 2))
 
@@ -163,7 +163,7 @@ async def read_patient(dni: str):
 
         patient_data = {
             "dni": dni,
-            "name": name,
+            "name": name_person,
             "surnames": surnames,
             "age": age,
             "sex": sex,
