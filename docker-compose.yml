@@ -42,7 +42,7 @@ services:
       context: ./dataloader
       dockerfile: Dockerfile
     environment:
-      - DROP_DB=true
+      - DROP_DB=false
     depends_on:
       cassandra:
         condition: service_healthy
