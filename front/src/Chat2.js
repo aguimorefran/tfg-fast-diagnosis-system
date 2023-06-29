@@ -26,6 +26,8 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     const [treatment, setTreatment] = useState('');
     const [medicine, setMedicine] = useState({ prescription: null, nonPrescription: null });
     const messagesEndRef = useRef(null);
+    const [selectedSymptom, setSelectedSymptom] = useState(null);
+
 
 
     const scrollToBottom = () => {
@@ -108,17 +110,21 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
         }
     };
 
-    const handleSymptomClick = async (symptom) => {
-        if (enteredSymptoms.symptoms.some(s => s.name === symptom.name)) {
-            alert('This symptom has already been entered.');
+    const handleSymptomClick = (symptom) => {
+        setSelectedSymptom(symptom);
+    };
+
+    const handleSymptomDegreeClick = async (symptom, degree) => {
+
+        setSelectedSymptom(null);
+        if (enteredSymptoms.symptoms.some(s => s.name === selectedSymptom.name)) {
+            alert('Este síntoma ya ha sido ingresado.');
             return;
         }
 
-        const degree = window.prompt('Por favor, introduzca un grado para el síntoma\nSÍNTOMA: ' + symptom.name + '\nDESCRIPCIÓN: ' + symptom.question, '1');
-
         const updatedSymptoms = enteredSymptoms.symptoms.concat({
-            name: symptom.name,
-            degree: parseFloat(degree),
+            name: selectedSymptom.name,
+            degree: degree,
         });
 
         const updatedPatientData = {
@@ -202,6 +208,9 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
             console.error(`Error sending patient data: ${error}`);
             setChatMessages(prevMessages => [...prevMessages, { type: 'system', text: 'Error: No se pudo conectar con el servidor.', time: new Date() }]);
         }
+
+        setSelectedSymptom(null);
+
     };
 
     return (
@@ -231,19 +240,28 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                 <button className="button-base purple-button" onClick={handleSearch}>Buscar</button>
             </div>
             <hr className="hr" />
-            {searchResults
-                .sort((a, b) => a.distance - b.distance)
-                .map((result, index) => (
-                    <button
-                        key={index}
-                        className="button-base purple-button"
-                        onClick={() => handleSymptomClick(result)}
-                        disabled={isDiagnosisSuccess || isError || enteredSymptoms.symptoms.some(s => s.name === result.name)}
-                    >
-                        {result.name + ': ' + result.question}
-                    </button>
-                ))
-            }
+            {selectedSymptom === null ? (
+                searchResults
+                    .sort((a, b) => a.distance - b.distance)
+                    .map((result, index) => (
+                        <button
+                            key={index}
+                            className="button-base purple-button"
+                            onClick={() => handleSymptomClick(result)}
+                            disabled={isDiagnosisSuccess || isError || enteredSymptoms.symptoms.some(s => s.name === result.name)}
+                        >
+                            {result.name + ': ' + result.question}
+                        </button>
+                    ))
+            ) : (
+                <div>
+                    <p>Selecciona el grado del síntoma: {selectedSymptom.name}</p>
+                    <button className="button-base purple-button" onClick={() => handleSymptomDegreeClick(selectedSymptom, 0.3)}>Bajo</button>
+                    <button className="button-base purple-button" onClick={() => handleSymptomDegreeClick(selectedSymptom, 0.6)}>Medio</button>
+                    <button className="button-base purple-button" onClick={() => handleSymptomDegreeClick(selectedSymptom, 1.0)}>Alto</button>
+
+                </div>
+            )}
             {isDiagnosisSuccess && (
                 <>
                     {medicine.prescription && (
@@ -265,6 +283,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
             {(isDiagnosisSuccess || isError) && (
                 <button className="button-base orange-button" onClick={handleBookAppointment}>Pedir cita</button>
             )}
+
         </div>
 
     );
