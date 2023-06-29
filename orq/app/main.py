@@ -294,3 +294,37 @@ def get_medicamentos(principio_activo: str):
         "medicamento_sin_receta": medicamento_sin_receta
     }
 
+
+@app.get("/api/get_past_appointments/{dni}")
+async def get_past_appointments(dni: str):
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+        
+        query = f'SELECT * FROM fds.appointments WHERE dni = %s ALLOW FILTERING'
+        appointments = session.execute(query, [dni])
+
+        appointments_list = [{column: value for column, value in row._asdict().items()} for row in appointments]
+
+        print(appointments_list)
+        return {"status": "success", "appointments": appointments_list}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/get_past_conversations/{dni}")
+async def get_past_conversations(dni: str):
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+
+        query = f'SELECT * FROM fds.conversations WHERE dni = %s ALLOW FILTERING'
+        conversations = session.execute(query, [dni])
+
+        conversations_list = [{column: value for column, value in row._asdict().items()} for row in conversations]
+
+        print(conversations_list)
+        return {"status": "success", "conversations": conversations_list}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

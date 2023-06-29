@@ -104,6 +104,7 @@ async def read_patient(dni: str):
 
     patient_data = r.get(dni)
 
+
     if patient_data is None:
         test_case_id = random.choice(test_case_ids)
         test_case = session.execute('SELECT * FROM test_cases WHERE id = %s', [test_case_id])[0]

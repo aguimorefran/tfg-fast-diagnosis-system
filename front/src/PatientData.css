@@ -2,48 +2,120 @@
     display: flex;
     justify-content: space-between;
     font-family: 'Ubuntu', sans-serif;
-    padding: 20px;
+    padding: 10px;
     height: 100vh;
-    /* Esto asegura que el contenedor ocupe toda la altura de la pantalla */
+    background-color: #f5f5f5;
 }
 
 .left-column {
     width: 50%;
-    padding-right: 20px;
+    padding-right: 10px;
     box-sizing: border-box;
     border-right: 1px solid #ddd;
 }
 
+.data-table-container {
+    text-align: left;
+}
+
 .right-column {
     width: 50%;
-    padding-left: 20px;
+    padding-left: 10px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.input-and-buttons-container {
+    width: 30%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .button-container {
-    width: 25%;
-    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
-input[type=text],
-button {
+.content-container {
     width: 100%;
 }
 
+input[type=text],
+.button-base {
+    width: 40%;
+}
+
 input[type=text] {
-    padding: 12px 20px;
-    margin: 8px 0;
+    padding: 8px 16px;
+    margin: 4px 0;
     box-sizing: border-box;
-    border: 2px solid #ccc;
+    border: 2px solid #3a7bd5;
     border-radius: 4px;
 }
 
-button {
-    padding: 10px 20px;
-    background-color: #007BFF;
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table,
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 5px;
+    font-size: 0.9em;
+}
+
+th {
+    background-color: #3a7bd5;
+    color: white;
+    font-weight: bold;
+}
+
+td {
+    background-color: #f9f9f9;
+}
+
+.button-base {
     color: white;
     border: none;
-    border-radius: 15px;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.4s;
     cursor: pointer;
+    border-radius: 4px;
     margin-top: 10px;
+    width: 45%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+
+.button-base.small {
+    width: auto;
+}
+
+.purple-button {
+    background-color: #3a7bd5;
+    border: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    transition-duration: 0.4s;
+}
+
+.purple-button:hover {
+    background-color: #6b9ce8;
+    color: white;
 }

@@ -1,0 +1,50 @@
+/* Header.css */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo img {
+    height: 50px;
+}
+
+.header-logo .logo-text {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 20px;
+    color: #333;
+    margin-left: 10px;
+    letter-spacing: 1px;
+    line-height: 1.2;
+}
+
+.header-nav .base-button {
+    text-decoration: none;
+    display: inline-block;
+    padding: 10px 20px;
+    color: white;
+    background-color: #4D4AE8;
+    border-radius: 1rem;
+    transition: background-color .15s ease-in-out, color .15s ease-in-out;
+}
+
+.header-nav .base-button:hover {
+    background-color: #3733E5;
+    color: white;
+}
+
+.header-nav .base-button:focus {
+    background-color: #413FC5;
+    outline: none;
+}
+
+.header-nav .base-button:active {
+    background-color: #3E3BBA;
+}

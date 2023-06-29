@@ -27,6 +27,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
     const [medicine, setMedicine] = useState({ prescription: null, nonPrescription: null });
     const messagesEndRef = useRef(null);
 
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     };
@@ -148,6 +149,23 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                     number_steps: steps.length,
                 };
 
+                let severity = '';
+                let diagnosisNameEnglish = '';
+                try {
+                    const encodedDiagnosis = encodeURIComponent(diagnosisResponse.diagnosis[0]);
+                    const severityResponse = await axios.get(`/api/get_condition_severity?condition=${encodeURIComponent(diagnosisResponse.diagnosis[0])}`);
+                    severity = severityResponse.data.severity;
+                    diagnosisNameEnglish = severityResponse.data.name_english;
+                    console.log(severity.data);
+                } catch (error) {
+                    console.error(`Error fetching condition severity: ${error}`);
+                }
+
+                // change name to english
+                if (diagnosisNameEnglish) {
+                    conversationData.diagnosis = diagnosisNameEnglish;
+                }
+
                 const saveResponse = await axios.post('/api/save_conversation', conversationData);
                 if (saveResponse.data.status === "success") {
                     setConversationId(saveResponse.data.conv_id);
@@ -202,7 +220,7 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                 })}
                 <div ref={messagesEndRef} />
             </div>
-            <div className="chat-input-section">
+            <div className="input-and-buttons-section">
                 <input
                     className="chat-input"
                     type="text"
@@ -210,44 +228,45 @@ const Chat = ({ patientData, setRemainingSymptoms }) => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search symptoms"
                 />
-                <button className="chat-button" onClick={handleSearch}>Buscar</button>
-                {searchResults
-                    .sort((a, b) => a.distance - b.distance)
-                    .map((result, index) => (
-                        <button
-                            key={index}
-                            className="chat-symptom-button"
-                            onClick={() => handleSymptomClick(result)}
-                            disabled={isDiagnosisSuccess || isError || enteredSymptoms.symptoms.some(s => s.name === result.name)}
-                        >
-                            {result.name + ': ' + result.question}
-                            
-                        </button>
-                    ))
-                }
-                {isDiagnosisSuccess && (
-                    <>
-                        {medicine.prescription && (
-                            <div>
-                                <h3>Medicamento con receta:</h3>
-                                <p>{medicine.prescription.informacion.nombre}</p>
-                                <img src={medicine.prescription.foto} alt="Medicamento con receta" />
-                            </div>
-                        )}
-                        {medicine.nonPrescription && (
-                            <div>
-                                <h3>Medicamento sin receta:</h3>
-                                <p>{medicine.nonPrescription.informacion.nombre}</p>
-                                <img src={medicine.nonPrescription.foto} alt="Medicamento sin receta" />
-                            </div>
-                        )}
-                    </>
-                )}
-                {(isDiagnosisSuccess || isError) && (
-                    <button className="chat-appointment-button" onClick={handleBookAppointment}>Pedir cita</button>
-                )}
+                <button className="button-base purple-button" onClick={handleSearch}>Buscar</button>
             </div>
+            <hr className="hr" />
+            {searchResults
+                .sort((a, b) => a.distance - b.distance)
+                .map((result, index) => (
+                    <button
+                        key={index}
+                        className="button-base purple-button"
+                        onClick={() => handleSymptomClick(result)}
+                        disabled={isDiagnosisSuccess || isError || enteredSymptoms.symptoms.some(s => s.name === result.name)}
+                    >
+                        {result.name + ': ' + result.question}
+                    </button>
+                ))
+            }
+            {isDiagnosisSuccess && (
+                <>
+                    {medicine.prescription && (
+                        <div>
+                            <h3>Medicamento con receta:</h3>
+                            <p>{medicine.prescription.informacion.nombre}</p>
+                            <img src={medicine.prescription.foto} alt="Medicamento con receta" />
+                        </div>
+                    )}
+                    {medicine.nonPrescription && (
+                        <div>
+                            <h3>Medicamento sin receta:</h3>
+                            <p>{medicine.nonPrescription.informacion.nombre}</p>
+                            <img src={medicine.nonPrescription.foto} alt="Medicamento sin receta" />
+                        </div>
+                    )}
+                </>
+            )}
+            {(isDiagnosisSuccess || isError) && (
+                <button className="button-base orange-button" onClick={handleBookAppointment}>Pedir cita</button>
+            )}
         </div>
+
     );
 };
 
