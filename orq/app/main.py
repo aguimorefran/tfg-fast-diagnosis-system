@@ -119,6 +119,8 @@ async def get_patient_data(dni: str):
     try:
         response_sas = requests.get(f"http://sasmock:8000/patient/{dni}")
         response_sas.raise_for_status()
+        # Add random phone number
+        response_sas.json()["phone"] = "9" + str(uuid1().int)[:8]
         return response_sas.json()
     except:
         raise HTTPException(status_code=404, detail="Patient not found")
@@ -423,37 +425,50 @@ from faker import Faker
 
 fake = Faker()
 
-@app.get("/populate_convs_and_apps")
-async def populate_convs_and_apps(number_of_entries: int = 100):
-    try:
-        cluster = Cluster(['cassandra'], port=9042, 
-                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
-        session = cluster.connect()
-        for _ in range(number_of_entries):
-            conversation_id = uuid1()
-            session.execute(
-                """
-                INSERT INTO fds.conversations (id, diagnosis, steps, symptoms, number_steps)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (conversation_id, 'TEST', 'TEST', 'TEST', 0)
-            )
-
-            if random.random() < 0.5:
-                dni = generate_random_dni()
-                session.execute(
-                    """
-                    INSERT INTO fds.appointments (id, dni, conversation_id, datetime)
-                    VALUES (%s, %s, %s, %s)
-                    """,
-                    (uuid1(), dni, conversation_id, datetime.now())
-                )
-        return {"status": "success"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
 def generate_random_dni():
     table = "TRWAGMYFPDXBNJZSQVHLCKE"
     digits = "".join([random.choice(string.digits) for _ in range(8)])
     letter = table[int(digits) % 23]
     return digits + letter
+
+
+@app.post("/api/populate_convs_and_apps")
+async def populate_convs_and_apps():
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+
+        # Recoger todas las enfermedades en inglés de la base de datos
+        rows = session.execute('SELECT name_english FROM fds.conditions')
+        diseases = [row.name_english for row in rows]
+
+        for _ in range(20):  # Crear 20 registros
+            id = uuid1()
+            dni = generate_random_dni()  # Generar un DNI aleatorio
+            number_steps = random.randint(1, 5)  # Seleccionar un número aleatorio de pasos
+            diagnosis = random.choice(diseases)  # Seleccionar un diagnóstico aleatorio
+            
+            # Insertar la conversación en la base de datos
+            session.execute(
+                """
+                INSERT INTO fds.conversations (id, dni, steps, diagnosis, number_steps)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (id, dni, "TEST", diagnosis, number_steps)
+            )
+            
+            # Con un 50% de probabilidad, también crear una cita
+            if random.random() < 0.5:
+                id_appointment = uuid1()
+                session.execute(
+                    """
+                    INSERT INTO fds.appointments (id, dni, conversation_id, datetime)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (id_appointment, dni, id, datetime.now())
+                )
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+

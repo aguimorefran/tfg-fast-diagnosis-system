@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import axios from 'axios';
 
 function PatientDataTable({ data }) {
+    const [patientData, setPatientData] = useState(null);
+
+    const fetchPatientData = (dni) => {
+        axios.get(`/api/get_patient_data/${dni}`)
+            .then(response => setPatientData(response.data))
+            .catch(error => console.error('Error:', error));
+    };
+
     const closeAppointment = (id) => {
         if (window.confirm("¿Estás seguro de que quieres cerrar esta cita?")) {
             axios.post('/api/close_appointment', { id: id })
@@ -26,6 +34,18 @@ function PatientDataTable({ data }) {
             {
                 Header: 'DNI',
                 accessor: 'dni',
+                Cell: ({ value }) => (
+                    <div onMouseOver={() => fetchPatientData(value)}>
+                        {value}
+                        {patientData && patientData.dni === value && (
+                            <div className="tooltip">
+                                <p>Nombre: {patientData.name}</p>
+                                <p>Apellidos: {patientData.surnames}</p>
+                                <p>Teléfono: {patientData.phone}</p>
+                            </div>
+                        )}
+                    </div>
+                ),
             },
             {
                 Header: 'Diagnosis',
@@ -48,11 +68,9 @@ function PatientDataTable({ data }) {
                         <button onClick={() => closeAppointment(row.original.id)}>
                             Cerrar cita
                         </button>
-
                     ) : null;
                 },
             },
-
         ],
         []
     );
