@@ -328,3 +328,90 @@ async def get_past_conversations(dni: str):
         return {"status": "success", "conversations": conversations_list}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+    
+
+@app.get("/api/get_medical_data")
+async def get_medical_data():
+    cluster = Cluster(['cassandra'], port=9042, 
+                        auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+    session = cluster.connect()
+
+    try:
+        query_conversations = 'SELECT * FROM fds.conversations'
+        conversations = session.execute(query_conversations)
+        conversations_list = [{column: value for column, value in row._asdict().items()} for row in conversations]
+
+        query_appointments = 'SELECT * FROM fds.appointments'
+        appointments = session.execute(query_appointments)
+        appointments_list = [{column: value for column, value in row._asdict().items()} for row in appointments]
+
+        medical_data = []
+
+        for conversation in conversations_list:
+            data = {}
+
+            data['id'] = str(conversation['id'])
+            data['dni'] = conversation['dni']
+            data['steps'] = conversation['steps']
+            data['diagnosis'] = conversation['diagnosis']
+
+            condition = unquote(data['diagnosis'])
+            query_severity = 'SELECT severity FROM fds.conditions WHERE name_english = %s ALLOW FILTERING'
+            severity = session.execute(query_severity, [condition])
+            if severity:
+                try:
+                    data['severity'] = severity[0].severity
+                except Exception as e:
+                    data['severity'] = "ERROR"
+            else:
+                data['severity'] = None
+
+            query_treatment = 'SELECT treatment FROM fds.medications WHERE disease = %s ALLOW FILTERING'
+            treatment = session.execute(query_treatment, [condition])
+            try:
+                data['active_principle'] = treatment[0].treatment
+            except Exception as e:
+                data['active_principle'] = "ERROR"
+
+            try:
+                url = f"https://cima.aemps.es/cima/rest/medicamentos?practiv1={data['active_principle']}"
+                response = requests.get(url)
+                medications = response.json()['resultados']
+
+                data['med_receta'] = next((m for m in medications if m['receta'] == True), None)
+                data['med_sin_receta'] = next((m for m in medications if m['receta'] == False), None)
+            except Exception as e:
+                data['med_receta'] = "ERROR"
+                data['med_sin_receta'] = "ERROR"
+
+            data['appointment'] = any(appointment['conversation_id'] == conversation['id'] for appointment in appointments_list)
+
+            medical_data.append(data)
+
+        return {"status": "success", "medical_data": medical_data}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
+from typing import Dict
+from uuid import UUID
+
+@app.post("/api/close_appointment")
+async def close_appointment(appointment_data: dict):
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+
+        # First, select the IDs of the appointments associated with the given conversation ID
+        select_query = 'SELECT id FROM fds.appointments WHERE conversation_id = %s ALLOW FILTERING'
+        rows = session.execute(select_query, [UUID(appointment_data['id'])])
+
+        # Then, delete each of those appointments
+        for row in rows:
+            delete_query = 'DELETE FROM fds.appointments WHERE id = %s IF EXISTS'
+            session.execute(delete_query, [row.id])
+
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

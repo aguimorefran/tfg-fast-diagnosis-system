@@ -9,7 +9,9 @@ function Portal() {
             <Link to="/patientdata">
                 <button className="button-base purple-button">Soy paciente</button>
             </Link>
-            <button className="button-base purple-button">Soy medico</button>
+            <Link to="/medicdata">
+                <button className="button-base purple-button">Soy medico</button>
+            </Link>
         </div>
     );
 }
