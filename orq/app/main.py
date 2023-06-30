@@ -415,3 +415,45 @@ async def close_appointment(appointment_data: dict):
         return {"status": "success"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+import random
+import string
+from faker import Faker
+
+fake = Faker()
+
+@app.get("/populate_convs_and_apps")
+async def populate_convs_and_apps(number_of_entries: int = 100):
+    try:
+        cluster = Cluster(['cassandra'], port=9042, 
+                          auth_provider=PlainTextAuthProvider(username='cassandra', password='cassandra'))
+        session = cluster.connect()
+        for _ in range(number_of_entries):
+            conversation_id = uuid1()
+            session.execute(
+                """
+                INSERT INTO fds.conversations (id, diagnosis, steps, symptoms, number_steps)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (conversation_id, 'TEST', 'TEST', 'TEST', 0)
+            )
+
+            if random.random() < 0.5:
+                dni = generate_random_dni()
+                session.execute(
+                    """
+                    INSERT INTO fds.appointments (id, dni, conversation_id, datetime)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (uuid1(), dni, conversation_id, datetime.now())
+                )
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def generate_random_dni():
+    table = "TRWAGMYFPDXBNJZSQVHLCKE"
+    digits = "".join([random.choice(string.digits) for _ in range(8)])
+    letter = table[int(digits) % 23]
+    return digits + letter

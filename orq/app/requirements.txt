@@ -7,3 +7,4 @@ redis
 scikit-learn
 nmslib
 editdistance
+faker
